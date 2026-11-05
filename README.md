@@ -41,7 +41,7 @@ make deploy
 默认入口 `http://10.2.0.119:32080/`，可通过 jenkinsUrl 修改。初始账号为 admin、builder1、builder2，
 随机密码保存于 `.state/jenkins/users.json`（0600）。通过管理员的 Users 页面创建正式个人账号；
 验收账号可在交付后停用。普通账号没有任务配置、脚本控制台和流水线重放权限。
-`storage-maintenance` 仅管理员可见和操作；普通账号使用 `x-ran-cloud`，自动磁盘维护照常运行。
+`storage-maintenance` 及首页 CI/清理提示仅管理员可见；普通账号使用 `x-ran-cloud`，自动磁盘维护照常运行。
 
 ## 使用
 
@@ -56,6 +56,7 @@ make deploy
 
 切换 BUILD_KIND 会立即隐藏无关字段并保留此前输入，REF_TYPE/GIT_REF 始终显示。
 联动脚本随 Controller 镜像提供，离线可用；API 调用参数保持一致，流水线只读取当前构建类型需要的字段。
+构建详情的只读 `Parameters` 页面也按该次 BUILD_KIND 筛选，包括已有历史构建；分支/tag/commit 字段保留显示。
 
 模拟项目位于 ../X-RAN-CLOUD，提供 main、demo/feature、demo-v1.0.0 和历史 commit。
 另提供带注释的 demo-v1.0.0-annotated tag。

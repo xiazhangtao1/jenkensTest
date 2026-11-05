@@ -73,17 +73,22 @@ class Verification:
 
     def maintenance_access(self):
         job = 'job/storage-maintenance/'
-        details = self.admin.get(job + 'api/json?tree=name,lastBuild[number]')
+        details = self.admin.get(job + 'api/json?tree=name,description,lastBuild[number]')
         assert details['name'] == 'storage-maintenance' and details['lastBuild']
+        assert details['description'].startswith('X-RAN-CLOUD CI：')
         last = details['lastBuild']['number']
         with self.admin.request(job + 'configure') as response:
             assert response.status == 200
         results = {}
         for name, client in self.clients.items():
-            visible = [item['name'] for item in client.get('api/json?tree=jobs[name]')['jobs']]
+            jobs = client.get('api/json?tree=jobs[name,description]')['jobs']
+            visible = [item['name'] for item in jobs]
             assert 'x-ran-cloud' in visible and 'storage-maintenance' not in visible, visible
+            assert all('X-RAN-CLOUD CI：' not in (item.get('description') or '') for item in jobs)
             with client.request('') as response:
-                assert b'href="job/storage-maintenance/' not in response.read()
+                page = response.read()
+                assert b'href="job/storage-maintenance/' not in page
+                assert 'X-RAN-CLOUD CI：'.encode() not in page
             client.get('job/x-ran-cloud/api/json')
             denied = {}
             for path, form in [('', None), ('api/json', None), ('config.xml', None),

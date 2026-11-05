@@ -295,7 +295,7 @@ def render(args):
         'containerEnv': [{'name': 'PLUGINS_FORCE_UPGRADE', 'value': 'true'}],
         'JCasC': {'defaultConfig': True, 'securityRealm': yaml.safe_dump(realm),
             'authorizationStrategy': yaml.safe_dump(authorization), 'configScripts': {'xran': yaml.safe_dump({
-                'jenkins': {'systemMessage': 'X-RAN-CLOUD CI：历史包持续保存；磁盘压力时回收最早未保留产物。清理明细见 storage-maintenance。'},
+                'jenkins': {'systemMessage': ''},
                 'appearance': {'simpleTheme': {'elements': [{'jsUrl': {
                     'url': cfg['jenkinsUrl'].rstrip('/') + '/userContent/xran-parameters.js?v=' +
                            hash_file(ROOT / 'jenkins/parameters.js')[:12]}}]}}})}}},

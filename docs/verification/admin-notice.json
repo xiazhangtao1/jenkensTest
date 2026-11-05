@@ -1,0 +1,120 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-11-05T17:45:28+0800",
+  "api": {
+    "namespace": "jenkins",
+    "startedAt": "2026-11-05T17:36:47+0800",
+    "checks": [
+      {
+        "name": "全部插件启用",
+        "status": "PASS",
+        "details": {
+          "count": 73
+        }
+      },
+      {
+        "name": "匿名访问及普通账号管理权限受限",
+        "status": "PASS",
+        "details": null
+      },
+      {
+        "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+        "status": "PASS",
+        "details": {
+          "builder1": {
+            "visibleJobs": [
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "25/consoleText": 404,
+              "build": 404
+            }
+          },
+          "builder2": {
+            "visibleJobs": [
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "25/consoleText": 404,
+              "build": 404
+            }
+          }
+        }
+      },
+      {
+        "name": "清理摘要更新不写公共 systemMessage；重新初始化后保留且普通账号无法读取",
+        "status": "PASS",
+        "details": {
+          "survivesInitialization": true,
+          "publicMessageEmpty": true,
+          "ordinaryUsersDenied": true,
+          "artifactsDeleted": false
+        }
+      },
+      {
+        "name": "更新后普通账号构建及下载正常",
+        "status": "PASS",
+        "details": {
+          "build": 43,
+          "target": "serviceC",
+          "user": "builder2",
+          "result": "SUCCESS"
+        }
+      }
+    ],
+    "builds": [
+      {
+        "number": 43,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceC",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest"
+        }
+      }
+    ],
+    "status": "PASS",
+    "finishedAt": "2026-11-05T17:43:20+0800"
+  },
+  "browser": {
+    "status": "PASS",
+    "checkedAt": "2026-11-05T17:40:26+0800",
+    "users": [
+      {
+        "user": "admin",
+        "noticeVisible": true,
+        "maintenanceVisible": true,
+        "buildJobVisible": true,
+        "screenshot": "output/playwright/home-notice-admin.png"
+      },
+      {
+        "user": "builder1",
+        "noticeVisible": false,
+        "maintenanceVisible": false,
+        "buildJobVisible": true,
+        "screenshot": "output/playwright/home-notice-builder1.png"
+      },
+      {
+        "user": "builder2",
+        "noticeVisible": false,
+        "maintenanceVisible": false,
+        "buildJobVisible": true,
+        "screenshot": "output/playwright/home-notice-builder2.png"
+      }
+    ],
+    "parameters": {
+      "serviceImageToggle": true,
+      "preservesValues": true,
+      "sharedGitFieldsVisible": true
+    }
+  }
+}

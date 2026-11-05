@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-11-05T17:55:04+0800",
+  "history": [
+    {
+      "build": 43,
+      "kind": "service",
+      "user": "builder1",
+      "status": "PASS",
+      "sharedFields": [
+        "BUILD_KIND",
+        "REF_TYPE",
+        "GIT_REF"
+      ],
+      "visibleTargets": [
+        "SERVICE_TARGET"
+      ],
+      "screenshot": "output/playwright/parameters-history-service.png"
+    },
+    {
+      "build": 35,
+      "kind": "image",
+      "user": "builder2",
+      "status": "PASS",
+      "sharedFields": [
+        "BUILD_KIND",
+        "REF_TYPE",
+        "GIT_REF"
+      ],
+      "visibleTargets": [
+        "IMAGE_TARGET",
+        "IMAGE_TAG"
+      ],
+      "screenshot": "output/playwright/parameters-history-image.png"
+    }
+  ],
+  "buildForm": {
+    "status": "PASS",
+    "bothModes": true,
+    "preservesValues": true,
+    "sharedFieldsVisible": true
+  }
+}

@@ -7,8 +7,10 @@ Jenkins 2.580.2、官方 Helm chart 5.10.10，锁定的 73 个插件全部启用
 |---|---|---|
 | 运行时/资源配置测试 | 7 项通过；包含真实 Git HTTP 检出、C 编译和 tar 校验 | tests/test_runtime.py、tests/test_config.py |
 | 维护任务权限 | 7 项通过；管理员访问、手动/定时维护、普通账号隔离及构建下载均正常 | [maintenance-permissions.json](verification/maintenance-permissions.json) |
+| 管理员首页提示 | 三账号真实浏览器、API 隔离、清理摘要保留及普通构建下载通过 | [admin-notice.json](verification/admin-notice.json) |
 | Jenkins 主实例 | 20 项通过，30 次实际构建包含预期失败与取消场景 | [jenkins.json](verification/jenkins.json) |
 | 原生参数页 | 服务/镜像整行条件显示、双向切换、输入保留、普通账号页面提交均通过 | [parameters.json](verification/parameters.json) |
+| 历史 Parameters 页 | 已有服务 #43、镜像 #35 按类型筛选；新建表单双向切换及输入保留再次通过 | [parameters-history.json](verification/parameters-history.json) |
 | 全新 PVC 离线首启 | 15 项通过，全部服务与镜像模式、引用选择、下载、失败留存 | [offline.json](verification/offline.json) |
 | 离线网络与镜像策略 | Controller、init、Agent、编译、DinD、Git、Registry 均 Never；公网连接超时被阻止 | [offline-egress.json](verification/offline-egress.json) |
 | 新 PVC 备份恢复 | 8 项通过；41 次历史、审计、参数、脚本一致，历史服务/镜像可下载使用，恢复后新构建 #42 成功 | [restore.json](verification/restore.json) |
@@ -21,9 +23,15 @@ builder1、builder2 的首页和 API 清单仅显示 x-ran-cloud，维护任务�
 只读权限回归可执行 `python3 tests/verify.py --permissions-only --report .state/jenkins/maintenance-permissions.json`，
 不会提交构建或执行磁盘压力清理测试。
 
+首页 CI 说明和最近清理摘要同样仅管理员可见；管理员浏览器可见，builder1、builder2 的浏览器、首页 HTML 和 API 均无该提示。
+更新清理摘要后公共 systemMessage 保持为空，摘要重新初始化后保留；验证使用临时文字并恢复原文，未删除产物。
+新增的 serviceC 构建 #43 由 builder2 成功执行并下载校验，参数双向切换和输入保留也再次通过真实浏览器检查。
+
 页面模式：BUILD_KIND=service 仅显示 SERVICE_TARGET；BUILD_KIND=image 仅显示 IMAGE_TARGET、IMAGE_TAG。
 REF_TYPE/GIT_REF 始终可见。实际从页面提交的 #34 serviceC 和 #35 imageB 均成功，
 镜像已完成 build/save/push/download/load/run；截图留在验证机 output/playwright/。
+构建详情的只读 Parameters 页采用不同的行标识与值展示，现已覆盖该入口；旧历史记录也会按 BUILD_KIND 显示整行，
+服务记录隐藏 IMAGE_TARGET/IMAGE_TAG，镜像记录隐藏 SERVICE_TARGET。已用普通账号实际打开 #43、#35 并逐项验证。
 静态联动脚本来自 Controller 镜像的 userContent，包含内容版本号，不依赖公网脚本。
 重启、恢复后参数定义只保留一套，脚本 SHA256 与仓库相同。
 

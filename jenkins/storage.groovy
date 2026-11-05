@@ -73,6 +73,14 @@ class XranStorage {
         }.sort { a, b -> (a.startTimeInMillis + a.duration) <=> (b.startTimeInMillis + b.duration) }
     }
 
+    @NonCPS static void publishNotice(String notice) {
+        def maintenance = Jenkins.get().getItemByFullName('storage-maintenance')
+        if (maintenance != null) {
+            maintenance.description = (maintenance.description ?: '').split('最近清理：', 2)[0].trim() + '\n' + notice
+            maintenance.save()
+        }
+    }
+
     @NonCPS static Map enforce(Map cfg, Map state, Map workspace) {
         File home = Jenkins.get().rootDir
         long homeDev = device(home)
@@ -109,8 +117,7 @@ class XranStorage {
             def notice = "最近清理：${deleted[-1].at}，删除 ${deleted.size()} 个历史产物集合，" +
                 "合计 ${deleted.collect { it.bytes as long }.sum()} 字节；可用 ${home.usableSpace} 字节。" +
                 ' 明细见 storage-maintenance 任务和 xran-storage/cleanup.jsonl。'
-            Jenkins.get().systemMessage = (Jenkins.get().systemMessage ?: '').split('最近清理：')[0].trim() + '\n' + notice
-            Jenkins.get().save()
+            publishNotice(notice)
         }
         def result = [available: home.usableSpace, reserved: homeReserved, minimum: homeFloor, deleted: deleted]
         if (home.usableSpace < homeFloor + homeReserved) {

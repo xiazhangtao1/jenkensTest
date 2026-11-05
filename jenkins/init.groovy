@@ -43,8 +43,12 @@ while (maintenance.getProperty(AuthorizationMatrixProperty) != null) {
 }
 maintenance.addProperty(new AuthorizationMatrixProperty([:], new NonInheritingStrategy()))
 maintenance.addTrigger(new TimerTrigger('H/15 * * * *'))
-maintenance.description = '仅管理员可见：磁盘余量与清理审计；无固定天数、次数或产物容量淘汰。'
+def cleanupNotice = (maintenance.description ?: '').find(/(?s)最近清理：.*/)
+maintenance.description = 'X-RAN-CLOUD CI：历史包持续保存；磁盘压力时回收最早未保留产物。清理明细见 storage-maintenance。' +
+    (cleanupNotice ? '\n' + cleanupNotice : '')
 maintenance.save()
+// systemMessage 对所有登录用户公开；管理员提示由受限任务提供。
+j.systemMessage = ''
 def locks = LockableResourcesManager.get()
 (1..(cfg.concurrency as int)).each { i ->
     String name = "xran-slot-${i}"
