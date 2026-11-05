@@ -8,6 +8,8 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tarfile
+import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / '.cache'
@@ -86,12 +88,12 @@ def assemble_sources():
     (target / 'SHA256SUMS').write_text(''.join(f"{s['sha256']}  {s['archive']}\n" for s in manifest['sources']))
 
 
-def prepare_apt(args, base):
-    cache = CACHE / 'compile-apt'
+def prepare_apt(args, base, cache_name='compile-apt', package_files=None):
+    cache = CACHE / cache_name
     cache.mkdir(parents=True, exist_ok=True)
     source = (ROOT / args.apt_sources).resolve()
-    packages = sorted(set((ROOT / 'config/apt-packages.txt').read_text().split() +
-                          (ROOT / 'config/compile-apt-packages.txt').read_text().split()))
+    package_files = package_files or ['config/apt-packages.txt', 'config/compile-apt-packages.txt']
+    packages = sorted({package for name in package_files for package in (ROOT / name).read_text().split()})
     fingerprint = {'baseImageId': inspect(base)['Id'], 'sourcesSha256': sha256(source), 'packages': packages}
     lock_path = cache / 'manifest.json'
     if lock_path.exists():
@@ -106,7 +108,7 @@ def prepare_apt(args, base):
         raise RuntimeError('完整 APT 缓存缺失或与基础镜像/源/软件清单不符；请在联网环境先执行同配置的 compile-image')
     # Download the complete dependency closure from a fresh instance of the pinned base.
     # A temporary directory avoids mixing multiple revisions of a deb on subsequent preparations.
-    staging = CACHE / 'compile-apt-staging'
+    staging = CACHE / (cache_name + '-staging')
     staging.mkdir(exist_ok=True)
     proxy = []
     for name in ('HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'NO_PROXY', 'no_proxy'):
@@ -128,6 +130,27 @@ def prepare_apt(args, base):
     lock_path.write_text(json.dumps({'inputs': fingerprint, 'debs': debs}, indent=2) + '\n')
 
 
+def prepare_helm(offline):
+    lock = json.loads((ROOT / 'config/helm.lock.json').read_text())
+    directory = CACHE / 'compile-tools'
+    directory.mkdir(exist_ok=True)
+    binary = directory / 'helm'
+    if binary.exists() and sha256(binary) == lock['binarySha256']:
+        return
+    if offline:
+        raise RuntimeError('离线缓存缺少已锁定的 Helm 二进制')
+    archive = directory / 'helm.tar.gz'
+    with urllib.request.urlopen(lock['url'], timeout=120) as response, archive.open('wb') as output:
+        while block := response.read(1024 * 1024):
+            output.write(block)
+    with tarfile.open(archive) as source:
+        data = source.extractfile('linux-amd64/helm').read()
+    if hashlib.sha256(data).hexdigest() != lock['binarySha256']:
+        raise RuntimeError('Helm 二进制校验失败')
+    binary.write_bytes(data)
+    binary.chmod(0o755)
+
+
 def build(args):
     ref = image_reference(args.image_name, args.image_tag)
     if not 1 <= args.jobs <= 64:
@@ -144,6 +167,8 @@ def build(args):
     if not (CACHE / 'base-images.tar').exists():
         run(['docker', 'save', '-o', CACHE / 'base-images.tar', *bases])
     prepare_apt(args, v['UBUNTU_IMAGE'])
+    prepare_apt(args, v['UBUNTU_IMAGE'], 'compile-extra-apt', ['config/compiler-extra-apt-packages.txt'])
+    prepare_helm(args.offline)
     env = os.environ.copy()
     env['DOCKER_BUILDKIT'] = '0'
     # Compilation never needs a network: all archives and debs have already been verified.

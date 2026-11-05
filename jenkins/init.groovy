@@ -5,6 +5,7 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition
 import hudson.model.ParametersDefinitionProperty
 import hudson.model.ChoiceParameterDefinition
 import hudson.model.StringParameterDefinition
+import hudson.model.BooleanParameterDefinition
 import hudson.triggers.TimerTrigger
 import hudson.security.AuthorizationMatrixProperty
 import org.jenkinsci.plugins.matrixauth.inheritance.NonInheritingStrategy
@@ -37,6 +38,23 @@ job.addProperty(new ParametersDefinitionProperty([
 ]))
 job.description = 'X-RAN-CLOUD 参数化构建。登录后提交构建；历史包持续保存，磁盘压力时按最早完成时间清理未标记保留产物。'
 job.save()
+def open5gs = j.getItem('open5gs') ?: j.createProject(WorkflowJob, 'open5gs')
+open5gs.definition = new CpsFlowDefinition(buildScript, false)
+while (open5gs.getProperty(ParametersDefinitionProperty) != null) {
+    open5gs.removeProperty(ParametersDefinitionProperty)
+}
+open5gs.addProperty(new ParametersDefinitionProperty([
+    new StringParameterDefinition('COMPILER_IMAGE', cfg.builderImage as String, '编译环境'),
+    new ChoiceParameterDefinition('COMPILER_IMAGE_PULL_POLICY',
+        ([cfg.compilerImagePullPolicy ?: 'Always'] + ['Always', 'IfNotPresent', 'Never']).unique() as String[], '拉取策略'),
+    new ChoiceParameterDefinition('REF_TYPE', ['branch', 'tag', 'commit'] as String[], '引用类型'),
+    new StringParameterDefinition('GIT_REF', 'main', '分支名、tag 或 commit SHA'),
+    new BooleanParameterDefinition('OFFLINE', cfg.open5gs.offline == true, '离线构建'),
+    new StringParameterDefinition('CHART_VERSION', '', 'Chart 版本，默认当天日期（无前导零）'),
+    new StringParameterDefinition('APP_VERSION', '', '应用版本，默认当天日期（无前导零）')
+]))
+open5gs.description = 'open5gs 发布构建：三个镜像包和一个 Helm Chart。默认 main；当前闭环使用 open5gs-basev277-develop，并取消离线构建。版本留空按上海时区的构建日期生成。'
+open5gs.save()
 def maintenance = j.getItem('storage-maintenance') ?: j.createProject(WorkflowJob, 'storage-maintenance')
 def maintenanceScript = support + '\n' + new File('/opt/xran/maintenance.groovy').text
 ScriptApproval.get().preapprove(maintenanceScript, GroovyLanguage.get())
@@ -48,7 +66,7 @@ while (maintenance.getProperty(AuthorizationMatrixProperty) != null) {
 maintenance.addProperty(new AuthorizationMatrixProperty([:], new NonInheritingStrategy()))
 maintenance.addTrigger(new TimerTrigger('H/15 * * * *'))
 def cleanupNotice = (maintenance.description ?: '').find(/(?s)最近清理：.*/)
-maintenance.description = 'X-RAN-CLOUD CI：历史包持续保存；磁盘压力时回收最早未保留产物。清理明细见 storage-maintenance。' +
+maintenance.description = 'X-RAN-CLOUD CI：历史包持续保存；同时管理 open5gs。磁盘压力时回收最早未保留产物。清理明细见 storage-maintenance。' +
     (cleanupNotice ? '\n' + cleanupNotice : '')
 maintenance.save()
 // systemMessage 对所有登录用户公开；管理员提示由受限任务提供。

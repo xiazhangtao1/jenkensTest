@@ -65,28 +65,131 @@ def checkout():
         'refType': kind, 'repository': url}, ensure_ascii=False))
 
 
+def ensure_docker(archive):
+    for _ in range(120):
+        if subprocess.run(['docker', 'info'], stdout=subprocess.DEVNULL,
+                          stderr=subprocess.DEVNULL).returncode == 0:
+            break
+        time.sleep(1)
+    else:
+        raise RuntimeError('独立 Docker daemon 启动超时')
+    run(['docker', 'load', '-i', archive])
+
+
+def release_build():
+    script = SOURCE / 'helm/build-release.sh'
+    if not script.is_file():
+        raise RuntimeError('当前 Git 引用缺少 helm/build-release.sh，请选择具备发布入口的分支/tag/commit')
+    chart, app = os.environ['XRAN_CHART_VERSION'], os.environ['XRAN_IMAGE_TAG']
+    ensure_docker('/opt/xran/open5gs-bases/images.tar')
+    # The upstream script keeps old outputs on failure; remove only this run's
+    # expected files in the isolated checkout to prevent stale publication.
+    for name in ['xcn-runtime.tar', 'xcn-webui.tar', 'xcn-monitor.tar', f'xcn-{chart}.tgz']:
+        (SOURCE / 'helm' / name).unlink(missing_ok=True)
+    command = ['./build-release.sh'] + (['--offline'] if os.environ['XRAN_OFFLINE'] == 'true' else []) + [chart, app]
+    pushes = {}
+    with (ROOT / 'release-build.log').open('w') as log:
+        process = subprocess.Popen(command, cwd=SOURCE / 'helm', stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT, text=True)
+        for line in process.stdout:
+            log.write(line)
+            print(line, end='', flush=True)
+            match = re.match(r'^(\S+): build OK, push (OK|FAILED)', line)
+            if match:
+                pushes[match[1]] = 'success' if match[2] == 'OK' else 'failed'
+        status = process.wait()
+    (ROOT / 'release-push.json').write_text(json.dumps(pushes))
+    if status:
+        raise subprocess.CalledProcessError(status, command)
+
+
 def build():
     target = os.environ['XRAN_TARGET']
     kind = os.environ['XRAN_KIND']
     if kind == 'service':
         run(['./build.sh', '-c', '-m', target], SOURCE / 'services')
     elif kind == 'image':
-        for _ in range(120):
-            if subprocess.run(['docker', 'info'], stdout=subprocess.DEVNULL,
-                              stderr=subprocess.DEVNULL).returncode == 0:
-                break
-            time.sleep(1)
-        else:
-            raise RuntimeError('独立 Docker daemon 启动超时')
-        run(['docker', 'load', '-i', '/opt/xran/base-images.tar'])
+        ensure_docker('/opt/xran/base-images.tar')
         run(['./images-build.sh', target, os.environ['XRAN_IMAGE_TAG']],
             SOURCE / 'platform/k8s/images-build')
+    elif kind == 'open5gs':
+        release_build()
     else:
         raise ValueError('未知构建类型')
 
 
+def read_small(archive, name):
+    item = archive.getmember(name)
+    if not item.isfile() or item.size > 8 * 1024 * 1024:
+        raise ValueError('非法归档元数据: ' + name)
+    return archive.extractfile(item).read()
+
+
+def collect_release():
+    import yaml
+    PUBLISH.mkdir(exist_ok=True)
+    meta = json.loads((ROOT / 'checkout.json').read_text()) if (ROOT / 'checkout.json').exists() else {}
+    meta.update(json.loads(os.environ['XRAN_BUILD_METADATA']))
+    chart, app = os.environ['XRAN_CHART_VERSION'], os.environ['XRAN_IMAGE_TAG']
+    registry = os.environ['XRAN_REGISTRY']
+    pushes = json.loads((ROOT / 'release-push.json').read_text()) if (ROOT / 'release-push.json').exists() else {}
+    collected, errors, images = [], [], []
+    names = ['xcn-runtime.tar', 'xcn-webui.tar', 'xcn-monitor.tar', f'xcn-{chart}.tgz']
+    for name in names:
+        path = SOURCE / 'helm' / name
+        if not path.exists():
+            if meta.get('result') == 'SUCCESS': errors.append('缺少产物: ' + name)
+            continue
+        try:
+            if path.is_symlink() or not path.is_file(): raise ValueError('非法产物路径')
+            with tarfile.open(path, 'r:*') as archive:
+                for member in archive:
+                    if member.isfile():
+                        with archive.extractfile(member) as data:
+                            while data.read(1024 * 1024): pass
+                if name.endswith('.tgz'):
+                    info = yaml.safe_load(read_small(archive, 'xcn/Chart.yaml'))
+                    values = yaml.safe_load(read_small(archive, 'xcn/values.yaml'))
+                    if (info.get('name'), info.get('version'), info.get('appVersion')) != ('xcn', chart, app):
+                        raise ValueError('Chart 名称或版本不匹配')
+                    tags = [values['images'][key]['tag'] for key in ['runtime', 'webui']] + [values['monitor']['image']['tag']]
+                    if tags != [app] * 3: raise ValueError('Chart 默认镜像标签不匹配')
+                else:
+                    reference = f'{registry}/xcn/{name[:-4]}:{app}'
+                    manifest = json.loads(read_small(archive, 'manifest.json'))
+                    if len(manifest) != 1 or reference not in (manifest[0].get('RepoTags') or []):
+                        raise ValueError('Docker 镜像引用不匹配')
+                    layers = manifest[0].get('Layers')
+                    if not isinstance(layers, list) or not layers or any(not archive.getmember(layer).isfile() for layer in layers):
+                        raise ValueError('缺少 Docker 镜像层')
+                    image_id = 'sha256:' + hashlib.sha256(read_small(archive, manifest[0]['Config'])).hexdigest()
+                    images.append({'name': name[:-4], 'reference': reference, 'imageId': image_id,
+                                   'pushStatus': pushes.get(reference, 'unknown')})
+            out = PUBLISH / name
+            shutil.move(str(path), out)
+            digest = hashlib.sha256()
+            with out.open('rb') as stream:
+                for block in iter(lambda: stream.read(1024 * 1024), b''): digest.update(block)
+            collected.append({'name': name, 'size': out.stat().st_size, 'sha256': digest.hexdigest()})
+        except (ValueError, KeyError, TypeError, tarfile.TarError, EOFError, OSError, yaml.YAMLError) as error:
+            errors.append(name + ': ' + str(error))
+    if errors: meta['result'] = 'FAILURE'
+    warnings = ['镜像推送未全部成功；有效本地包仍可下载'] if any(i['pushStatus'] != 'success' for i in images) else []
+    meta.update(files=collected, images=images, chartVersion=chart, appVersion=app,
+                offline=os.environ['XRAN_OFFLINE'] == 'true', collectionErrors=errors, warnings=warnings,
+                finishedAt=dt.datetime.now(dt.timezone.utc).isoformat())
+    (PUBLISH / 'metadata.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2) + '\n')
+    (PUBLISH / 'SHA256SUMS').write_text(''.join(f'{x["sha256"]}  {x["name"]}\n' for x in collected))
+    (ROOT / 'collection.json').write_text(json.dumps({'bytes': sum(p.stat().st_size for p in PUBLISH.iterdir()),
+        'errors': errors, 'files': len(collected), 'warnings': warnings}))
+    if errors: print('\n'.join(errors), file=sys.stderr)
+    return 1 if errors else 0
+
+
 def collect():
     """即使 push 失败，也只发布通过 tar 完整性检查的已有文件。"""
+    if os.environ['XRAN_KIND'] == 'open5gs':
+        return collect_release()
     PUBLISH.mkdir(exist_ok=True)
     meta = json.loads((ROOT / 'checkout.json').read_text()) if (ROOT / 'checkout.json').exists() else {}
     meta.update(json.loads(os.environ['XRAN_BUILD_METADATA']))

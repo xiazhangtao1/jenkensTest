@@ -1,0 +1,802 @@
+{
+  "status": "PASS",
+  "verifiedAt": "2026-11-06T02:33:10+0800",
+  "environment": {
+    "kubernetes": "1.26.8",
+    "containerd": "1.6.32",
+    "jenkins": "2.580.2",
+    "chart": "5.10.10",
+    "dockerDind": "29.9.3",
+    "cgroup": "v1/cgroupfs"
+  },
+  "unitTests": {
+    "passed": 19
+  },
+  "release": {
+    "number": 1,
+    "url": "http://10.2.0.119:32080/job/open5gs/1/",
+    "metadata": {
+      "commit": "49a9671f78814b27c171c681a8acb75ecf255f94",
+      "ref": "open5gs-basev277-develop",
+      "refType": "branch",
+      "repository": "http://xran-demo:8000/open5gs.git",
+      "buildNumber": "1",
+      "buildUrl": "http://10.2.0.119:32080/job/open5gs/1/",
+      "job": "open5gs",
+      "project": "open5gs",
+      "userId": "builder1",
+      "userName": "Builder One",
+      "kind": "open5gs",
+      "target": "release",
+      "imageTag": null,
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-06T01:34:01+08:00",
+      "chartVersion": "26.11.6",
+      "appVersion": "26.11.6",
+      "offline": false,
+      "builderImageId": "sha256:c35fc07fbb6ac293b26bf4dbb222dc5e014b07304708e56adf814307520e2b51",
+      "builderPod": "open5gs-1-c9lrd-gjn23-9xwff",
+      "result": "SUCCESS",
+      "durationMillis": 2217515,
+      "files": [
+        {
+          "name": "xcn-runtime.tar",
+          "size": 274081280,
+          "sha256": "53a23f6c107ae9e43fa2bd962726dd91703e50a6c948e22d605e3ad39a391163"
+        },
+        {
+          "name": "xcn-webui.tar",
+          "size": 466788352,
+          "sha256": "9c9965737917d697944926d1c7a4f3d9cac490833753aa536bb0a7269d2ac2e0"
+        },
+        {
+          "name": "xcn-monitor.tar",
+          "size": 436609024,
+          "sha256": "5ac1aed2d86d7bef42932a15a241c81d6d3d91f9575b6aef70b24c56b7666a6e"
+        },
+        {
+          "name": "xcn-26.11.6.tgz",
+          "size": 25708,
+          "sha256": "58dcc66f1b683bf3df4c33d5bcd256db54c55807dbbb46bbae9081418a8ed079"
+        }
+      ],
+      "images": [
+        {
+          "name": "xcn-runtime",
+          "reference": "192.168.10.35/xcn/xcn-runtime:26.11.6",
+          "imageId": "sha256:50e771bcdd34b0f80113d8838353586dca372f887949b1b7122dbe11a296cc90",
+          "pushStatus": "failed"
+        },
+        {
+          "name": "xcn-webui",
+          "reference": "192.168.10.35/xcn/xcn-webui:26.11.6",
+          "imageId": "sha256:fbca818981933eddca24308bc4ade7dd415218853430d63c7200272bc50104e6",
+          "pushStatus": "failed"
+        },
+        {
+          "name": "xcn-monitor",
+          "reference": "192.168.10.35/xcn/xcn-monitor:26.11.6",
+          "imageId": "sha256:d40f24dfab2f719089fd86fd343dd291230c49161e90833459de738a8edbf763",
+          "pushStatus": "failed"
+        }
+      ],
+      "collectionErrors": [],
+      "warnings": [
+        "镜像推送未全部成功；有效本地包仍可下载"
+      ],
+      "finishedAt": "2026-11-05T18:11:02.425253+00:00"
+    },
+    "checks": [
+      {
+        "name": "精确提交、构建人、时间、日期版本及编译镜像",
+        "status": "PASS"
+      },
+      {
+        "name": "普通账号下载四个产物及 SHA256 完整性",
+        "status": "PASS"
+      },
+      {
+        "name": "Helm lint 与模板渲染",
+        "status": "PASS",
+        "details": {
+          "objects": 34,
+          "lint": "==> Linting /home/xiazhangtao/code/jenkensTest/.state/jenkins/downloads/open5gs/1/xcn-26.11.6.tgz\n[INFO] Chart.yaml: icon is recommended\n\n1 chart(s) linted, 0 chart(s) failed"
+        }
+      },
+      {
+        "name": "xcn-runtime 导入与断网运行检查",
+        "status": "PASS",
+        "imageId": "sha256:50e771bcdd34b0f80113d8838353586dca372f887949b1b7122dbe11a296cc90",
+        "outputSummary": [
+          "xcn v2.7.7"
+        ]
+      },
+      {
+        "name": "xcn-webui 导入与断网运行检查",
+        "status": "PASS",
+        "imageId": "sha256:fbca818981933eddca24308bc4ade7dd415218853430d63c7200272bc50104e6",
+        "outputSummary": [
+          "v19.9.0"
+        ]
+      },
+      {
+        "name": "xcn-monitor 导入与断网运行检查",
+        "status": "PASS",
+        "imageId": "sha256:d40f24dfab2f719089fd86fd343dd291230c49161e90833459de738a8edbf763",
+        "outputSummary": [
+          "TShark (Wireshark) 4.6.9 (Git commit 2d548b197c75).",
+          ""
+        ]
+      },
+      {
+        "name": "推送状态如实记录；非致命 push 失败仍保留有效产物",
+        "status": "PASS"
+      }
+    ]
+  },
+  "references": [
+    {
+      "commit": "318eeb49a7dcdff733dec60e02d9c60aefca2fb9",
+      "ref": "v2.7.7",
+      "refType": "tag",
+      "repository": "http://xran-demo:8000/open5gs.git"
+    },
+    {
+      "commit": "49a9671f78814b27c171c681a8acb75ecf255f94",
+      "ref": "49a9671f7",
+      "refType": "commit",
+      "repository": "http://xran-demo:8000/open5gs.git"
+    }
+  ],
+  "negativeCases": [
+    {
+      "name": "非法 Chart 版本",
+      "number": 2,
+      "result": "FAILURE",
+      "message": "非法 Chart 版本",
+      "description": null
+    },
+    {
+      "name": "默认 main 缺少发布入口",
+      "number": 3,
+      "result": "FAILURE",
+      "message": "缺少 helm/build-release.sh",
+      "description": "2026-11-06T01:56:31+08:00 | builder2 | branch:main | commit=103940122d349f46e5f54db7ba958f90bb45ab60 | compiler=192.168.10.35/xnet/xran-compile:latest (Never) | chart=26.11.6 app=main-entry-check-1793901372 offline=true"
+    }
+  ],
+  "pullPolicies": [
+    {
+      "policy": "Always",
+      "number": 4,
+      "status": "PASS",
+      "pod": {
+        "pod": "open5gs-4-2bn4q-dx68w-rcgcb",
+        "image": "localhost:15050/xnet/xran-compile:open5gs",
+        "policy": "Always",
+        "imageId": "localhost:15050/xnet/xran-compile@sha256:ca4450df16f38d8abbb50f1371252b49c2b83ebc14fe18383cf95aae53d7d019"
+      },
+      "sdkConfigId": "sha256:c35fc07fbb6ac293b26bf4dbb222dc5e014b07304708e56adf814307520e2b51"
+    },
+    {
+      "policy": "IfNotPresent",
+      "number": 5,
+      "status": "PASS",
+      "pod": {
+        "pod": "open5gs-5-6s0mj-2mm4m-vmp1v",
+        "image": "192.168.10.35/xnet/xran-compile:latest",
+        "policy": "IfNotPresent",
+        "imageId": "localhost:15050/xnet/xran-compile@sha256:ca4450df16f38d8abbb50f1371252b49c2b83ebc14fe18383cf95aae53d7d019"
+      },
+      "sdkConfigId": "sha256:c35fc07fbb6ac293b26bf4dbb222dc5e014b07304708e56adf814307520e2b51"
+    }
+  ],
+  "shared": {
+    "namespace": "jenkins-open5gs-verify",
+    "checks": [
+      {
+        "name": "三类 Pod 模板及镜像参数校验",
+        "status": "PASS",
+        "details": {
+          "status": "PASS",
+          "templateCases": 27,
+          "invalidReferencesRejected": 5,
+          "invalidPolicyRejected": true
+        }
+      },
+      {
+        "name": "相同构建号按项目分别选择 Pod",
+        "status": "PASS",
+        "details": {
+          "xran": "shared-pod-check-xran",
+          "open5gs": "shared-pod-check-open5gs"
+        }
+      },
+      {
+        "name": "两项目合计六个槽位、其余排队",
+        "status": "PASS",
+        "details": {
+          "builds": [
+            [
+              "x-ran-cloud",
+              6
+            ],
+            [
+              "open5gs",
+              6
+            ],
+            [
+              "x-ran-cloud",
+              7
+            ],
+            [
+              "open5gs",
+              7
+            ],
+            [
+              "x-ran-cloud",
+              8
+            ],
+            [
+              "open5gs",
+              8
+            ],
+            [
+              "x-ran-cloud",
+              9
+            ],
+            [
+              "open5gs",
+              9
+            ]
+          ],
+          "maximumSlots": 6,
+          "queued": true
+        }
+      },
+      {
+        "name": "open5gs 相同 APP_VERSION 等待标签锁且不占额外槽位",
+        "status": "PASS",
+        "details": {
+          "builds": [
+            [
+              "open5gs",
+              10
+            ],
+            [
+              "open5gs",
+              11
+            ]
+          ],
+          "maximumSlots": 1
+        }
+      },
+      {
+        "name": "跨项目最早回收、运行/保留保护、提示审计及空间不足拒绝",
+        "status": "PASS",
+        "details": {
+          "oldestDeleted": "x-ran-cloud#11",
+          "protectedBuild": "open5gs#12",
+          "secondDeleted": "open5gs#13",
+          "runningProtected": [
+            "open5gs#14"
+          ],
+          "rejectedWhenInsufficient": true,
+          "audit": true
+        }
+      }
+    ],
+    "status": "PASS"
+  },
+  "offlineStartup": {
+    "namespace": "jenkins-open5gs-offline-verify",
+    "freshPVC": true,
+    "checks": [
+      {
+        "name": "全新 PVC 离线首启、全部插件和两任务参数/权限",
+        "status": "PASS",
+        "details": {
+          "plugins": 73,
+          "parameters": {
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main",
+            "OFFLINE": true,
+            "CHART_VERSION": "",
+            "APP_VERSION": ""
+          }
+        }
+      },
+      {
+        "name": "离线构建 Pod 全 Never、跨项目相同编号元数据及 Git 检出",
+        "status": "PASS",
+        "details": {
+          "builds": [
+            [
+              "x-ran-cloud",
+              1
+            ],
+            [
+              "open5gs",
+              1
+            ]
+          ],
+          "pods": {
+            "open5gs": {
+              "pod": "open5gs-1-j96bg-m7r8d-kh1cx",
+              "build": "b1",
+              "policies": {
+                "jnlp": "Never",
+                "builder": "Never",
+                "dind": "Never",
+                "open5gs-bases": "Never"
+              }
+            },
+            "x-ran-cloud": {
+              "pod": "x-ran-cloud-1-6rr5x-sx4lq-dmz6p",
+              "build": "b1",
+              "policies": {
+                "jnlp": "Never",
+                "builder": "Never"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "DNS 可用、NetworkPolicy 阻止公网 HTTP",
+        "status": "PASS",
+        "details": {
+          "log": "PASS: DNS resolved; public HTTP blocked: URLError"
+        }
+      }
+    ],
+    "status": "PASS"
+  },
+  "freshDocker": {
+    "status": "PASS",
+    "network": "none",
+    "initialImages": 0,
+    "restoredImages": {
+      "192.168.10.35/xnet/ubuntu:22.04": "sha256:b8e6b596a32475661d9fcaf4a212fcc7736e0d8d1494973aefdbcc71c442d890",
+      "192.168.10.35/xcn/vpp:26.06": "sha256:c6905634e001db54e9920644265f7d3ebb29b9dd6a7c171ebb0ae2c7e4e4541c"
+    },
+    "archiveExported": true
+  },
+  "resources": {
+    "dindMemoryLimitBytes": 4294967296,
+    "innerBuildMemoryBytes": 3221225472,
+    "memoryFailureCount": 0,
+    "podCpuLimit": 4,
+    "podMemoryGiB": 8,
+    "podEphemeralGiB": 20
+  },
+  "browser": {
+    "parameters": [
+      {
+        "name": "COMPILER_IMAGE",
+        "value": "192.168.10.35/xnet/xran-compile:latest",
+        "visible": true
+      },
+      {
+        "name": "COMPILER_IMAGE_PULL_POLICY",
+        "value": "Always",
+        "visible": true
+      },
+      {
+        "name": "REF_TYPE",
+        "value": "branch",
+        "visible": true
+      },
+      {
+        "name": "GIT_REF",
+        "value": "main",
+        "visible": true
+      },
+      {
+        "name": "OFFLINE",
+        "value": true,
+        "visible": true
+      },
+      {
+        "name": "CHART_VERSION",
+        "value": "26.11.6",
+        "visible": true
+      },
+      {
+        "name": "APP_VERSION",
+        "value": "26.11.6",
+        "visible": true
+      }
+    ],
+    "mockedServerDate": "2026-12-10",
+    "versionsAfterNewPage": [
+      "26.12.10",
+      "26.12.10"
+    ],
+    "xranServiceHistory": [
+      "COMPILER_IMAGE",
+      "COMPILER_IMAGE_PULL_POLICY",
+      "BUILD_KIND",
+      "REF_TYPE",
+      "GIT_REF",
+      "SERVICE_TARGET"
+    ],
+    "xranImageHistory": [
+      "COMPILER_IMAGE",
+      "COMPILER_IMAGE_PULL_POLICY",
+      "BUILD_KIND",
+      "REF_TYPE",
+      "GIT_REF",
+      "IMAGE_TARGET",
+      "IMAGE_TAG"
+    ],
+    "open5gsHistoryPreservesSubmittedBlankVersions": true,
+    "open5gsHistoryOffline": false
+  },
+  "xranRegression": {
+    "namespace": "jenkins",
+    "startedAt": "2026-11-06T01:37:15+0800",
+    "checks": [
+      {
+        "name": "全部插件启用",
+        "status": "PASS",
+        "details": {
+          "count": 73
+        }
+      },
+      {
+        "name": "匿名访问及普通账号管理权限受限",
+        "status": "PASS",
+        "details": null
+      },
+      {
+        "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+        "status": "PASS",
+        "details": {
+          "builder1": {
+            "visibleJobs": [
+              "open5gs",
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "64/consoleText": 404,
+              "build": 404
+            }
+          },
+          "builder2": {
+            "visibleJobs": [
+              "open5gs",
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "64/consoleText": 404,
+              "build": 404
+            }
+          }
+        }
+      },
+      {
+        "name": "serviceA 分支",
+        "status": "PASS",
+        "details": {
+          "build": 81,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "serviceB 演示分支",
+        "status": "PASS",
+        "details": {
+          "build": 82,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "serviceC tag",
+        "status": "PASS",
+        "details": {
+          "build": 83,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "带注释 tag",
+        "status": "PASS",
+        "details": {
+          "build": 84,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "all 多包",
+        "status": "PASS",
+        "details": {
+          "build": 85,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "services_all 历史完整 SHA",
+        "status": "PASS",
+        "details": {
+          "build": 86,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "唯一短 SHA",
+        "status": "PASS",
+        "details": {
+          "build": 87,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageA build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 88,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageB build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 89,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageC build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 90,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "不存在的 Git 引用明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 91
+        }
+      },
+      {
+        "name": "非法标签明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 92
+        }
+      },
+      {
+        "name": "push 失败仍能下载并运行有效镜像 tar",
+        "status": "PASS",
+        "details": {
+          "build": 93
+        }
+      }
+    ],
+    "builds": [
+      {
+        "number": 81,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 82,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "demo/feature",
+          "SERVICE_TARGET": "serviceB",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 83,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "tag",
+          "GIT_REF": "demo-v1.0.0",
+          "SERVICE_TARGET": "serviceC",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 84,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "tag",
+          "GIT_REF": "demo-v1.0.0-annotated",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 85,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "all",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 86,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "commit",
+          "GIT_REF": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+          "SERVICE_TARGET": "services_all",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 87,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "commit",
+          "GIT_REF": "db3051980",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 88,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "verify-1793900240",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 89,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageB",
+          "IMAGE_TAG": "verify-1793900240",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 90,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageC",
+          "IMAGE_TAG": "verify-1793900240",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 91,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "missing-ci-reference",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 92,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "bad;touch /tmp/injected",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 93,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "push-failure-ci",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      }
+    ],
+    "status": "PASS",
+    "finishedAt": "2026-11-06T01:46:09+0800"
+  },
+  "deployment": {
+    "quiet": false,
+    "jobs": {
+      "x-ran-cloud": {
+        "sha256": "ca55b1b8fe9593a6d03f60b4f37ebf67d62de07bb95a2c2961dcfecd85d85ad1",
+        "building": false,
+        "discarder": null
+      },
+      "open5gs": {
+        "sha256": "ca55b1b8fe9593a6d03f60b4f37ebf67d62de07bb95a2c2961dcfecd85d85ad1",
+        "building": false,
+        "discarder": null
+      }
+    },
+    "status": "PASS",
+    "controllerImage": "xran-ci/controller:2.580.2-8"
+  },
+  "sourcePreservation": {
+    "open5gsMainCommit": "103940122d349f46e5f54db7ba958f90bb45ab60",
+    "trackedOpen5gsFilesChanged": false
+  },
+  "limits": {
+    "intranetRegistryPushVerified": false,
+    "fullReleaseOffline": false,
+    "intranetAptBusinessBuildVerified": false,
+    "temporaryVerificationControllersPaused": true
+  }
+}

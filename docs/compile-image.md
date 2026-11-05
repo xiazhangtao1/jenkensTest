@@ -35,7 +35,9 @@ asn1c 0.9.29 和资料中的 x86-64 `libairtracer.so`。该二进制没有随附
 gRPC 所需外部 proto 源码也已锁定提交并入库。`wls_mod.tar` 和 Intel oneAPI 不参与构建。
 protobuf、gRPC、Abseil、OpenTelemetry 和 spdlog 同时提供共享库与静态归档，兼容原装机资料中直接链接 `.a` 的用法；CMake 默认使用共享版本。
 
-APT 包拆为通用工具和编译依赖两个清单。protobuf、gRPC、Boost 使用上述源码版本，避免再安装 APT 中不同版本的开发库。
+APT 包拆为通用工具、编译依赖和额外运行工具清单；后者提供 open5gs 发布需要的 PyYAML。
+Helm 3.17.3 二进制及 SHA256 固定于 `config/helm.lock.json`，缓存随离线包交付。
+protobuf、gRPC、Boost 使用上述源码版本，避免再安装 APT 中不同版本的开发库。
 Docker `ENV` 设置 PATH、PKG_CONFIG_PATH、CMAKE_PREFIX_PATH，动态库通过 ldconfig 配置，非交互 Jenkins shell 可以直接使用。
 DPDK 源码和 build 路径保留在 `/opt/dpdk-22.03`。镜像内 `/opt/packages.lock` 记录实际 APT 包版本，
 `/opt/xran/compile-sources.lock.json` 记录源码依赖。
@@ -69,10 +71,11 @@ docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/
 | IfNotPresent | 节点已有该镜像时直接使用，否则拉取 |
 | Never | 只使用节点已导入的镜像，缺少时失败 |
 
-这两个参数在服务、镜像构建表单和历史 Parameters 页均显示，仅影响编译容器。
+这两个参数在 X-RAN-CLOUD 服务、镜像及 open5gs 构建表单和历史 Parameters 页均显示，仅影响编译容器。
 `IMAGE_TAG` 仍表示产出的业务镜像标签。每次构建保存实际 Pod 返回的编译镜像 ID，不能仅凭可变 tag 判断版本。
 所选镜像须兼容 UID 1000，包含 `/bin/sh`、Python、Git、编译工具和本项目 `/opt/xran/run-build.py`；
-业务镜像模式还需 Docker CLI 及 `/opt/xran/base-images.tar`。缺少工具时流水线明确失败。
+业务镜像模式还需 Docker CLI 及 `/opt/xran/base-images.tar`；open5gs 还需 Helm、PyYAML 和更新后的发布适配器。
+open5gs 的基础镜像通过独立 init 容器挂载到 `/opt/xran/open5gs-bases/images.tar`。缺少工具时流水线明确失败。
 
 编译镜像拉取凭据使用命名空间内的 Kubernetes Secret，在 `config/site.yaml` 配置 `compilerImagePullSecrets`。
 可以从管理员已有 Docker 登录配置创建 Secret：

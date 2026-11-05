@@ -8,6 +8,7 @@ pvcSize: 250Gi
 concurrency: 6
 buildCpuLimit: 4
 buildMemoryGiB: 8
+dindMemoryGiB: 4
 temporaryStorageGiB: 20
 minimumFreeGiB: 50
 minimumFreePercent: 10
@@ -27,6 +28,17 @@ services: [serviceA, serviceB, serviceC]
 images: [imageA, imageB, imageC]
 # 真实项目镜像名到 Registry 仓库路径的映射，供元数据与推送检查使用。
 imageRepositories: {imageA: xran-demo/imagea, imageB: xran-demo/imageb, imageC: xran-demo/imagec}
+open5gs:
+  gitUrl: http://xran-demo:8000/open5gs.git
+  gitCredentialsId: ''
+  offline: true
+  registry: 192.168.10.35
+  registryCredentialsId: ''
+  registryInsecure: true
+  ubuntuImage: 192.168.10.35/xnet/ubuntu:22.04
+  vppImage: 192.168.10.35/xcn/vpp:26.06
+  innerBuildMemoryGiB: 3
+  buildJobs: 2
 # 集群、Git、Registry、apt 源始终绕过代理。内网一般留空。
 proxy: ''
 noProxy: localhost,127.0.0.1,.svc,.cluster.local,10.2.0.119,172.30.0.0/16,192.168.10.0/24

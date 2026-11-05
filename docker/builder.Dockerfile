@@ -44,6 +44,10 @@ RUN mkdir -p /tmp/xran-spdlog \
 # Meson's uninstalled DPDK .pc references optional build-only directories;
 # consumers use the fully installed SDK while the source/build tree is retained.
 ENV PKG_CONFIG_DISABLE_UNINSTALLED=1
+COPY .cache/compile-extra-apt/ /tmp/extra-apt/
+RUN apt-get install -y --no-install-recommends /tmp/extra-apt/*.deb \
+    && dpkg-query -W > /opt/packages.lock && rm -rf /tmp/extra-apt /var/lib/apt/lists/*
+COPY .cache/compile-tools/helm /usr/local/bin/helm
 COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
 COPY --from=dockercli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/local/libexec/docker/cli-plugins/docker-buildx
 COPY --chown=1000:1000 .cache/base-images.tar /opt/xran/base-images.tar

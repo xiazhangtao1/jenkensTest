@@ -1,6 +1,30 @@
 /* Native Jenkins parameters remain intact for buildWithParameters and saved defaults. */
 (() => {
   "use strict";
+  const root = document.head.dataset.rooturl || "";
+  if (!location.pathname.slice(root.length).replace(/\/$/, "").endsWith("/job/open5gs/build")) return;
+  async function defaults() {
+    let now = new Date();
+    try {
+      const response = await fetch(root + "/whoAmI/api/json", {cache: "no-store", credentials: "same-origin"});
+      const serverDate = response.headers.get("Date");
+      if (serverDate && !Number.isNaN(Date.parse(serverDate))) now = new Date(serverDate);
+    } catch (_) { /* Backend independently supplies defaults for empty values. */ }
+    const parts = new Intl.DateTimeFormat("en", {timeZone: "Asia/Shanghai", year: "numeric", month: "numeric", day: "numeric"})
+      .formatToParts(now).reduce((result, part) => { result[part.type] = part.value; return result; }, {});
+    const version = `${Number(parts.year) % 100}.${Number(parts.month)}.${Number(parts.day)}`;
+    ["CHART_VERSION", "APP_VERSION"].forEach(name => {
+      const key = Array.from(document.querySelectorAll('input[name="name"]')).find(input => input.value === name);
+      const input = key?.closest('.jenkins-form-item')?.querySelector('input[name="value"]');
+      if (input && !input.value) input.value = version;
+    });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", defaults, {once: true});
+  else defaults();
+})();
+
+(() => {
+  "use strict";
 
   const path = location.pathname.replace(/\/$/, "");
   const history = /\/job\/x-ran-cloud\/[^/]+\/parameters$/.test(path);

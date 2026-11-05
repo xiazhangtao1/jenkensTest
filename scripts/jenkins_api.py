@@ -11,8 +11,10 @@ import urllib.request
 
 
 class JenkinsAPI:
-    def __init__(self, url, user, password):
+    def __init__(self, url, user, password, job='x-ran-cloud'):
         self.url = url.rstrip('/') + '/'
+        self.job = job
+        self.job_path = 'job/' + urllib.parse.quote(job, safe='') + '/'
         self.authorization = 'Basic ' + base64.b64encode((user + ':' + password).encode()).decode()
         self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}),
             urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
@@ -41,10 +43,11 @@ class JenkinsAPI:
 
     def set_pipeline(self, text):
         encoded = base64.b64encode(text.encode()).decode()
+        job_encoded = base64.b64encode(self.job.encode()).decode()
         self.script('''import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition
 import org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval
 import org.jenkinsci.plugins.scriptsecurity.scripts.languages.GroovyLanguage
-def job=jenkins.model.Jenkins.get().getItem('x-ran-cloud')
+def job=jenkins.model.Jenkins.get().getItemByFullName(new String(''' + "'" + job_encoded + "'" + '''.decodeBase64(),'UTF-8'))
 def text=new String(''' + "'" + encoded + "'" + '''.decodeBase64(),'UTF-8')
 ScriptApproval.get().preapprove(text,GroovyLanguage.get())
 job.definition=new CpsFlowDefinition(text,false)
@@ -53,7 +56,7 @@ return null
 ''')
 
     def trigger(self, parameters):
-        location, _ = self.post('job/x-ran-cloud/buildWithParameters', parameters)
+        location, _ = self.post(self.job_path + 'buildWithParameters', parameters)
         if not location:
             raise RuntimeError('构建请求未返回队列地址')
         return location.removeprefix(self.url)
@@ -72,7 +75,7 @@ return null
     def wait(self, number, timeout=900):
         deadline = time.time() + timeout
         while time.time() < deadline:
-            build = self.get(f'job/x-ran-cloud/{number}/api/json')
+            build = self.get(self.job_path + f'{number}/api/json')
             if not build['building']:
                 return build
             time.sleep(2)
@@ -83,5 +86,5 @@ return null
             shutil.copyfileobj(response, output, 1024 * 1024)
 
     def console(self, number):
-        with self.request(f'job/x-ran-cloud/{number}/consoleText') as response:
+        with self.request(self.job_path + f'{number}/consoleText') as response:
             return response.read().decode()

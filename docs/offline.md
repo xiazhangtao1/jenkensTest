@@ -30,7 +30,8 @@ Jenkins 使用独立 Retain StorageClass，已有默认类的回收策略保持�
 
 ## 站点配置
 
-编辑 config/site.yaml：jenkinsUrl、NodePort、namespace、服务/镜像清单、内网 gitUrl、registry 和 imageRepositories。
+编辑 config/site.yaml：jenkinsUrl、NodePort、namespace、服务/镜像清单、内网 gitUrl、registry 和 imageRepositories；
+open5gs 另配置 `open5gs.gitUrl`、Git/Registry 凭据、Ubuntu/VPP 镜像与 `offline: true`。
 先保留 demo 验证，正式切换时设 demo: false。镜像脚本真实仓库路径应与映射一致。
 TLS Registry 设置 registryInsecure: false；proxy 通常留空，noProxy 包含 API、Pod/Service CIDR、内网域名与 apt 源。
 
@@ -74,13 +75,19 @@ Pod 出口限制为本命名空间与 RFC1918 内网。
 
 ```bash
 git clone --mirror repos/X-RAN-CLOUD.bundle ../X-RAN-CLOUD.git
+git clone --mirror repos/open5gs.bundle ../open5gs.git
 docker load -i .cache/build-base-images.tar
 docker load -i .cache/k8s-images.tar
 make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list
-python3 scripts/ci.py images --offline --source ../X-RAN-CLOUD.git --apt-sources config/sources.intranet.list
+python3 scripts/ci.py images --offline --source ../X-RAN-CLOUD.git \
+  --open5gs-source ../open5gs.git --apt-sources config/sources.intranet.list
 ```
 
 SDK 构建始终使用 --network none，离线入口不会更新 APT 或拉取基础镜像。
+包内新增 Helm 二进制及固定 SHA256、PyYAML 的额外 APT 缓存、open5gs Git 镜像/bundle 和 Ubuntu/VPP 基础镜像归档。
+`images --offline` 自动将 `.cache/open5gs-base-images.tar` 加载到构建机 Docker，随后制作基础镜像携带容器；无需预先访问内网镜像仓库。
+运行镜像共九个，包含独立 `open5gs-bases` 镜像；两项目业务源码镜像都从 Git 的已提交文件生成，不复制工作区未跟踪文件。
+open5gs 业务构建勾选 OFFLINE 后仍需要内网 APT 软件库；不会访问 GitHub/npm/pip 下载 vendor 依赖。
 新增依赖时先在能访问所选源的准备机执行 compile-image 更新缓存；新增 FROM 镜像须下载并补充清单后重新打包。
 镜像发布更新时提升 versions.env 自定义标签，保留旧标签及旧离线目录用于回滚。
 
@@ -91,7 +98,9 @@ SDK 构建始终使用 --network none，离线入口不会更新 APT 或拉取�
 ```bash
 git clone repos/jenkensTest.bundle ../jenkensTest
 make test
-make verify SOURCE=../X-RAN-CLOUD.git
+python3 tests/verify.py --quick --source ../X-RAN-CLOUD.git
+# 内网 APT / Registry 配置完成后验证 open5gs 发布：
+python3 tests/verify-open5gs.py --offline --source ../open5gs.git
 ```
 
 真实站点将源码推至内网 Git 后，配置其地址与凭据。通用离线包不携带任何生产项目密钥。

@@ -1,5 +1,39 @@
 # 验证结果
 
+## open5gs 扩展（2026-11-06）
+
+主实例已部署 Controller `2.580.2-8`，新增独立 `open5gs` 任务，原 `x-ran-cloud` 保持可用。
+编译镜像已增加 Helm 3.17.3、PyYAML 和发布适配器，最终配置 ID：
+`sha256:c35fc07fbb6ac293b26bf4dbb222dc5e014b07304708e56adf814307520e2b51`。
+断网重建得到同一 ID，导出的 image.tar/manifest.json 校验通过，原有 SDK 两个 CTest 和附加检查通过。
+
+| 验证 | 实际结果 |
+|---|---|
+| Python 自动化测试 | 19 项通过，包括产物缺失/损坏/版本不符、OFFLINE 参数和临时空间边界 |
+| 完整 open5gs 发布 | 主实例 #1 SUCCESS；真实 develop 提交 `49a9671f78814b27c171c681a8acb75ecf255f94`，约 37 分钟 |
+| 四个产物 | 普通账号下载 runtime/webui/monitor tar 和 `xcn-26.11.6.tgz`，全部 SHA256/大小匹配 |
+| 下载后使用 | 三个 tar 均实际导入、断网运行检查通过；Chart 使用所选提交的站点测试 values，lint 和 34 个模板对象通过 |
+| 引用和失败提示 | 真实 tag/短 SHA 精确检出；#2 非法 Chart 版本失败；#3 默认 main 缺少发布入口明确失败 |
+| 镜像策略 | #1 Never；#4 Always 实际访问临时演示 Registry；#5 IfNotPresent 使用缓存，Pod imageID 与元数据一致 |
+| 资源额度 | 实际 DinD cgroup 为 4GiB，嵌套构建为 3GiB，内存失败计数为 0；Pod 总额度 4 CPU/8GiB/20GiB |
+| 共享能力 | 独立 PVC：27 个模板组合、相同构建号 Pod 隔离、8 请求共用 6 槽、同 app 版本串行、跨项目压力回收均通过 |
+| 离线首启 | 另一全新 PVC：73 个插件启用、两任务参数/权限正确、所有 Agent/init 容器 Never、相同编号元数据正确 |
+| 离线网络 | DNS 正常，NetworkPolicy 阻止公网 HTTP；源码检出使用命名空间内网 Git 镜像 |
+| 全新 Docker 基础镜像恢复 | 镜像列表为空且 `--network none`，自动加载包内 Ubuntu/VPP 并重新导出成功，无预热镜像依赖 |
+| X-RAN-CLOUD 回归 | 主实例 #81–93，共 16 项检查通过，包含服务、镜像、分支/tag/完整及短 SHA、下载运行、推送失败留存和权限 |
+| 页面 | 七个 open5gs 参数顺序/默认值正确，模拟另一天重新打开表单生成新日期；两项目历史 Parameters 保留原行为 |
+
+完整证据见 [open5gs.json](verification/open5gs.json)。共享锁测试保留真实参数校验和两层锁，在获得槽位后用短等待代替编译；
+压力测试仅作用于专用验收 PVC，验证运行中、标记保留的版本不被清理以及提示/审计。两个临时验收 Controller 已暂停。
+主实例两任务的流水线 SHA256 与仓库一致、没有按天数/次数丢弃策略，Jenkins 已恢复正常接单。
+
+本次完整发布使用真实 `open5gs-basev277-develop` 且 OFFLINE=false；没有修改 open5gs 业务源码或 main。
+内网 Registry `192.168.10.35` 不可达，三个业务镜像推送均记录为 failed，构建摘要/日志明确提示，四个有效包仍可下载。
+未声称向内网仓库推送成功；内网 APT `192.168.10.36` 下的完整 OFFLINE 业务编译需迁入后验证。
+平台默认编译镜像及策略仍为指定内网地址和 Always，本机已导入镜像可选择 Never。
+
+## 2026-11-05 平台原有验收记录
+
 2026-11-05 在 Ubuntu 22.04 amd64、Kubernetes 1.26.8/containerd 1.6.32 上完成实际验收。
 Jenkins 2.580.2、官方 Helm chart 5.10.10，锁定的 73 个插件全部启用。
 

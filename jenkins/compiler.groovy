@@ -16,10 +16,11 @@ class XranCompiler {
     }
 
     @com.cloudbees.groovy.cps.NonCPS
-    static Map template(String text, String image, String policy, String number) {
+    static Map template(String text, String image, String policy, String number, String job = 'x-ran-cloud') {
         validate(image, policy)
         def pod = XranStorage.parseJson(text)
         pod.metadata.labels['xran-build'] = 'b' + number
+        pod.metadata.labels['xran-job'] = job
         def builder = pod.spec.containers.find { it.name == 'builder' }
         if (builder == null) throw new IllegalArgumentException('Pod 模板缺少 builder 容器')
         builder.image = image
@@ -28,12 +29,12 @@ class XranCompiler {
     }
 
     @com.cloudbees.groovy.cps.NonCPS
-    static Map podInfo(String namespace, String number) {
+    static Map podInfo(String namespace, String number, String job = 'x-ran-cloud') {
         def cloud = jenkins.model.Jenkins.get().clouds.find {
             it instanceof org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud
         }
         if (cloud == null) return [:]
-        def pods = cloud.connect().pods().inNamespace(namespace).withLabel('xran-build', 'b' + number).list().items
+        def pods = cloud.connect().pods().inNamespace(namespace).withLabel('xran-job', job).withLabel('xran-build', 'b' + number).list().items
         def pod = pods.find { it.status?.phase == 'Running' } ?: pods.find()
         if (pod == null) return [:]
         def builder = pod.status?.containerStatuses?.find { it.name == 'builder' }

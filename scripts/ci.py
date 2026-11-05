@@ -65,6 +65,11 @@ def config(args):
     cfg.setdefault('compilerImagePullPolicy', 'Always')
     cfg.setdefault('compilerImagePullSecrets', [])
     cfg.setdefault('agentStartupTimeoutMinutes', 15)
+    cfg.setdefault('dindMemoryGiB', 4)
+    assert 2 <= int(cfg['dindMemoryGiB']) < int(cfg['buildMemoryGiB']) - 1
+    cfg.setdefault('open5gs', {})
+    cfg['open5gs'].setdefault('innerBuildMemoryGiB', 3)
+    assert 1 <= int(cfg['open5gs']['innerBuildMemoryGiB']) < int(cfg['dindMemoryGiB'])
     cfg['agentStartupTimeoutMinutes'] = int(cfg['agentStartupTimeoutMinutes'])
     if not 1 <= cfg['agentStartupTimeoutMinutes'] <= 120:
         raise ValueError('编译 Pod 启动超时应为 1..120 分钟')
@@ -74,7 +79,7 @@ def config(args):
         raise ValueError('非法编译镜像拉取策略')
     cfg.update(builderImage=builder, controllerImage=v['CONTROLLER_IMAGE'],
                agentImage=v['AGENT_IMAGE'], dindImage=v['DIND_IMAGE'],
-               demoImage=v['DEMO_IMAGE'], registryImage=v['REGISTRY_IMAGE'])
+               demoImage=v['DEMO_IMAGE'], registryImage=v['REGISTRY_IMAGE'], open5gsBasesImage=v['OPEN5GS_BASES_IMAGE'])
     image_lock = ROOT / 'config/images.lock.json'
     cfg['imageIds'] = json.loads(image_lock.read_text()) if image_lock.exists() else {}
     return cfg
@@ -169,6 +174,19 @@ def lock_plugins():
     (ROOT / 'config/plugins.lock').write_text('\n'.join(sorted(plugins)) + '\n')
 
 
+def prepare_open5gs_bases(cfg, offline):
+    compiler = compiler_module()
+    archive = CACHE / 'open5gs-base-images.tar'
+    # A fresh offline Docker daemon has only the outer carrier image until this
+    # archive is loaded. Its embedded images are not loaded by docker load of the carrier.
+    if offline and archive.exists():
+        run(['docker', 'load', '-i', archive])
+    bases = [cfg['open5gs']['ubuntuImage'], cfg['open5gs']['vppImage']]
+    for ref in bases:
+        compiler.ensure_image(ref, offline)
+    run(['docker', 'save', '-o', archive, *bases])
+
+
 def images(args):
     v = versions()
     cfg = config(args)
@@ -183,11 +201,19 @@ def images(args):
     lock_plugins()
     run([*build, '--build-arg', f'JENKINS_BASE={v["JENKINS_BASE"]}',
          '-f', ROOT / 'docker/controller.Dockerfile', '-t', v['CONTROLLER_IMAGE'], ROOT], env=build_env)
+    prepare_open5gs_bases(cfg, args.offline)
+    run([*build, '--build-arg', f'STORAGE_HELPER_IMAGE={v["STORAGE_HELPER_IMAGE"]}',
+         '-f', ROOT / 'docker/open5gs-bases.Dockerfile', '-t', v['OPEN5GS_BASES_IMAGE'], ROOT], env=build_env)
     mirror = CACHE / 'demo.git'
     if mirror.exists():
         shutil.rmtree(mirror)
     run(['git', 'clone', '--mirror', '--no-hardlinks', args.source, mirror])
     run(['git', '-C', mirror, 'update-server-info'])
+    open5gs_mirror = CACHE / 'open5gs.git'
+    if open5gs_mirror.exists():
+        shutil.rmtree(open5gs_mirror)
+    run(['git', 'clone', '--mirror', '--no-hardlinks', args.open5gs_source, open5gs_mirror])
+    run(['git', '-C', open5gs_mirror, 'update-server-info'])
     run([*build, '--build-arg', f'BUILDER_IMAGE={cfg["builderImage"]}',
          '-f', ROOT / 'docker/demo.Dockerfile', '-t', v['DEMO_IMAGE'], ROOT], env=build_env)
     refs = runtime_images(config(args))
@@ -197,7 +223,7 @@ def images(args):
 
 
 def runtime_images(cfg):
-    refs = [cfg[x] for x in ['controllerImage', 'builderImage', 'agentImage', 'dindImage']]
+    refs = [cfg[x] for x in ['controllerImage', 'builderImage', 'agentImage', 'dindImage', 'open5gsBasesImage']]
     if cfg.get('demo'):
         refs += [cfg['demoImage'], cfg['registryImage']]
     refs += [versions()[key] for key in ['LOCAL_PATH_IMAGE', 'STORAGE_HELPER_IMAGE']]
@@ -221,12 +247,13 @@ def pod_template(cfg, kind):
         'resources': {'requests': {'cpu': '100m', 'memory': '256Mi', 'ephemeral-storage': '64Mi'},
                       'limits': {'cpu': '250m', 'memory': '512Mi', 'ephemeral-storage': '256Mi'}},
         'volumeMounts': [shared]}
-    image = kind == 'image'
+    image = kind in ('image', 'open5gs')
+    dind_memory = int(cfg.get('dindMemoryGiB', 4)) * 1024
     builder = {'name': 'builder', 'image': cfg['builderImage'], 'workingDir': '/home/jenkins/agent',
         'command': ['sleep', 'infinity'], 'env': env,
         'resources': {'requests': {'cpu': '500m', 'memory': f'{min(1024, memory - (1536 if image else 512))}Mi',
             'ephemeral-storage': f'{min(1024, maximum // 2 if image else maximum - 256)}Mi'},
-            'limits': {'cpu': f'{cpu - (1500 if image else 250)}m', 'memory': f'{memory - (1536 if image else 512)}Mi',
+            'limits': {'cpu': f'{500 if kind == "open5gs" else cpu - (1500 if image else 250)}m', 'memory': f'{memory - (dind_memory + 512 if image else 512)}Mi',
                        'ephemeral-storage': f'{maximum // 2 if image else maximum - 256}Mi'}},
         'securityContext': {'runAsUser': 1000, 'runAsGroup': 1000, 'allowPrivilegeEscalation': False},
         'volumeMounts': [dict(shared), {'name': 'build-trust', 'mountPath': '/home/jenkins/.ssh', 'readOnly': True}]}
@@ -235,26 +262,39 @@ def pod_template(cfg, kind):
     containers = [jnlp, builder]
     if image:
         builder['volumeMounts'].append({'name': 'docker-run', 'mountPath': '/var/run/xran'})
-        arguments = ['dockerd', '--host=unix:///var/run/xran/docker.sock', '--group=1000', '--storage-driver=overlay2']
-        if cfg.get('registryInsecure'):
-            arguments += ['--insecure-registry=' + cfg['registry']]
-        dind = {'name': 'dind', 'image': cfg['dindImage'], 'command': ['dockerd-entrypoint.sh'], 'args': arguments,
+        project = cfg['open5gs'] if kind == 'open5gs' else cfg
+        arguments = ['--insecure-registry=' + project['registry']] if project.get('registryInsecure') else []
+        dind = {'name': 'dind', 'image': cfg['dindImage'], 'command': ['sh', '/etc/xran/dind-start.sh'], 'args': arguments,
             'env': [{'name': 'DOCKER_TLS_CERTDIR', 'value': ''}],
             'securityContext': {'privileged': True, 'runAsUser': 0, 'runAsGroup': 0},
             'resources': {'requests': {'cpu': '250m', 'memory': '256Mi',
                 'ephemeral-storage': f'{min(1024, maximum - maximum // 2 - 256)}Mi'},
-                'limits': {'cpu': '1250m', 'memory': '1Gi', 'ephemeral-storage': f'{maximum - maximum // 2 - 256}Mi'}},
+                'limits': {'cpu': f'{cpu - 750 if kind == "open5gs" else 1250}m', 'memory': f'{dind_memory}Mi', 'ephemeral-storage': f'{maximum - maximum // 2 - 256}Mi'}},
             'volumeMounts': [{'name': 'docker-run', 'mountPath': '/var/run/xran'},
+                             {'name': 'dind-start', 'mountPath': '/etc/xran', 'readOnly': True},
                              {'name': 'docker-data', 'mountPath': '/var/lib/docker'}]}
         containers.append(dind)
         volumes += [{'name': 'docker-run', 'emptyDir': {}},
+                    {'name': 'dind-start', 'configMap': {'name': 'xran-config', 'items': [{'key': 'dind-start.sh', 'path': 'dind-start.sh'}]}},
                     {'name': 'docker-data', 'emptyDir': {'sizeLimit': f'{cfg["temporaryStorageGiB"]}Gi'}}]
+    init = []
+    if kind == 'open5gs':
+        workspace_limit = min(4096, maximum // 2)
+        builder['resources']['limits']['ephemeral-storage'] = f'{workspace_limit}Mi'
+        dind['resources']['limits']['ephemeral-storage'] = f'{maximum - workspace_limit - 256}Mi'
+        volumes.append({'name': 'open5gs-bases', 'emptyDir': {'sizeLimit': '1Gi'}})
+        builder['volumeMounts'].append({'name': 'open5gs-bases', 'mountPath': '/opt/xran/open5gs-bases', 'readOnly': True})
+        init = [{'name': 'open5gs-bases', 'image': cfg['open5gsBasesImage'],
+                 'imagePullPolicy': 'Never' if cfg.get('offline') else 'IfNotPresent',
+                 'resources': {'requests': {'cpu': '100m', 'memory': '64Mi'}, 'limits': {'cpu': '500m', 'memory': '128Mi'}},
+                 'securityContext': {'runAsUser': 1000, 'runAsGroup': 1000, 'allowPrivilegeEscalation': False},
+                 'volumeMounts': [{'name': 'open5gs-bases', 'mountPath': '/base'}]}]
     if cfg.get('caSecret'):
         volumes.append({'name': 'registry-ca', 'secret': {'secretName': cfg['caSecret']}})
         builder['volumeMounts'].append({'name': 'registry-ca', 'mountPath': '/var/xran/ca', 'readOnly': True})
         builder['env'] += [{'name': key, 'value': '/var/xran/ca/ca.crt'} for key in ['GIT_SSL_CAINFO', 'CURL_CA_BUNDLE']]
         if image:
-            dind['volumeMounts'].append({'name': 'registry-ca', 'mountPath': '/etc/docker/certs.d/' + cfg['registry'], 'readOnly': True})
+            dind['volumeMounts'].append({'name': 'registry-ca', 'mountPath': '/etc/docker/certs.d/' + project['registry'], 'readOnly': True})
     for container in containers:
         container['imagePullPolicy'] = 'Never' if cfg.get('offline') else 'IfNotPresent'
     builder['imagePullPolicy'] = cfg.get('compilerImagePullPolicy', 'Always')
@@ -262,7 +302,7 @@ def pod_template(cfg, kind):
         'spec': {'automountServiceAccountToken': False,
             'securityContext': {'runAsUser': 1000, 'runAsGroup': 1000, 'fsGroup': 1000},
             'activeDeadlineSeconds': int(cfg['buildTimeoutMinutes']) * 60,
-            'containers': containers, 'volumes': volumes,
+            'containers': containers, 'initContainers': init, 'volumes': volumes,
             'imagePullSecrets': [{'name': name} for name in cfg.get('compilerImagePullSecrets', [])]}}
 
 
@@ -277,7 +317,9 @@ def render(args):
          'reclaimPolicy': 'Retain', 'volumeBindingMode': 'WaitForFirstConsumer'}]
     runtime = {'site.json': json.dumps(cfg, ensure_ascii=False, indent=2),
                'pod-service.json': json.dumps(pod_template(cfg, 'service')),
-               'pod-image.json': json.dumps(pod_template(cfg, 'image'))}
+               'pod-image.json': json.dumps(pod_template(cfg, 'image')),
+               'pod-open5gs.json': json.dumps(pod_template(cfg, 'open5gs')),
+               'dind-start.sh': (ROOT / 'runtime/dind-start.sh').read_text()}
     manifests.append({'apiVersion': 'v1', 'kind': 'ConfigMap',
         'metadata': {'name': 'xran-config', 'namespace': namespace}, 'data': runtime})
     if cfg.get('offline'):
@@ -473,7 +515,7 @@ def bundle(args):
     for name in ['README.md', 'Makefile', '.dockerignore', '.gitignore']:
         if (ROOT / name).exists():
             shutil.copy2(ROOT / name, target / name)
-    for name in ['charts', 'plugins', 'tools', 'compile-apt']:
+    for name in ['charts', 'plugins', 'tools', 'compile-apt', 'compile-extra-apt', 'compile-tools']:
         shutil.copytree(CACHE / name, target / '.cache' / name)
     shutil.copy2(CACHE / 'base-images.tar', target / '.cache/base-images.tar')
     shutil.copy2(CACHE / 'plugins.complete', target / '.cache/plugins.complete')
@@ -483,6 +525,8 @@ def bundle(args):
     bundle_versions = dict(v, BUILDER_IMAGE=cfg['builderImage'])
     (target / 'config/versions.env').write_text(''.join(f'{key}={value}\n' for key, value in bundle_versions.items()))
     shutil.copytree(CACHE / 'demo.git', target / '.cache/demo.git')
+    shutil.copytree(CACHE / 'open5gs.git', target / '.cache/open5gs.git')
+    shutil.copy2(CACHE / 'open5gs-base-images.tar', target / '.cache/open5gs-base-images.tar')
     bases = [v[key] for key in ['JENKINS_BASE', 'DOCKER_CLI_IMAGE', 'UBUNTU_IMAGE']]
     bases.extend(line.strip() for line in (ROOT / 'config/base-images.txt').read_text().splitlines()
                  if line.strip() and not line.startswith('#'))
@@ -490,6 +534,7 @@ def bundle(args):
     repos = target / 'repos'
     repos.mkdir()
     run(['git', '-C', args.source, 'bundle', 'create', repos / 'X-RAN-CLOUD.bundle', '--all'])
+    run(['git', '-C', args.open5gs_source, 'bundle', 'create', repos / 'open5gs.bundle', '--all'])
     run(['git', '-C', ROOT, 'bundle', 'create', repos / 'jenkensTest.bundle', '--all'])
     manifest = {'createdAt': time.strftime('%Y-%m-%dT%H:%M:%S%z'), 'platform': 'linux/amd64',
                 'versions': bundle_versions, 'runtimeImages': runtime_images(cfg), 'files': {}}
@@ -602,6 +647,7 @@ if __name__ == '__main__':
     parser.add_argument('--image-name')
     parser.add_argument('--image-tag')
     parser.add_argument('--jobs', type=int, default=4)
+    parser.add_argument('--open5gs-source', default='/home/xiazhangtao/code/open5gs')
     arguments = parser.parse_args()
     os.chdir(ROOT)
     (ROOT / '.cache').mkdir(exist_ok=True)

@@ -3,16 +3,18 @@ def references = ['192.168.10.35/xnet/xran-compile:latest',
     'registry.example:5000/team/compiler:26.11.05', 'example/compiler@sha256:' + ('a' * 64)]
 def policies = ['Always', 'IfNotPresent', 'Never']
 int checked = 0
-['service', 'image'].each { kind ->
+['service', 'image', 'open5gs'].findAll { templates.containsKey(it) }.each { kind ->
     // The caller provides rendered JSON; the live deployment can use the previous version.
     def text = templates[kind]
     def original = XranStorage.parseJson(text)
     references.each { reference ->
         policies.each { policy ->
-            def pod = XranCompiler.template(text, reference, policy, '123')
+            def job = kind == 'open5gs' ? 'open5gs' : 'x-ran-cloud'
+            def pod = XranCompiler.template(text, reference, policy, '123', job)
             def builder = pod.spec.containers.find { it.name == 'builder' }
             assert builder.image == reference && builder.imagePullPolicy == policy
             assert pod.metadata.labels['xran-build'] == 'b123'
+            assert pod.metadata.labels['xran-job'] == job
             assert pod.spec.containers.findAll { it.name != 'builder' } == original.spec.containers.findAll { it.name != 'builder' }
             assert builder.resources == original.spec.containers.find { it.name == 'builder' }.resources
             assert XranStorage.parseJson(text) == original
