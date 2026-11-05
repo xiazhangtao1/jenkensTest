@@ -1,0 +1,382 @@
+{
+  "format": 1,
+  "excluded": [
+    "wls_mod.tar",
+    "Intel oneAPI"
+  ],
+  "sources": [
+    {
+      "archive": "dpdk-22.03.tar.gz",
+      "version": "22.03",
+      "origin": "xran_compile_dir/ict_env/dpdk-22.03.tar.gz",
+      "license": "BSD-3-Clause; component notices included",
+      "sha256": "f7543943542ee32d4084c004c85dbc3fcf832271066e8b9256169e385d56ad00",
+      "bytes": 21614489,
+      "parts": [
+        {
+          "path": "archives/dpdk-22.03.tar.gz",
+          "sha256": "f7543943542ee32d4084c004c85dbc3fcf832271066e8b9256169e385d56ad00"
+        }
+      ],
+      "originalSha256": "f7543943542ee32d4084c004c85dbc3fcf832271066e8b9256169e385d56ad00"
+    },
+    {
+      "archive": "protobuf-all-21.11.tar.gz",
+      "version": "3.21.11",
+      "origin": "xran_compile_dir/ict_env/protobuf-all-21.11.tar.gz",
+      "license": "BSD-3-Clause",
+      "sha256": "f045f136e61e367a9436571b6676b94e5e16631a06c864146688c3aaf7df794b",
+      "bytes": 7669439,
+      "parts": [
+        {
+          "path": "archives/protobuf-all-21.11.tar.gz",
+          "sha256": "f045f136e61e367a9436571b6676b94e5e16631a06c864146688c3aaf7df794b"
+        }
+      ],
+      "originalSha256": "f045f136e61e367a9436571b6676b94e5e16631a06c864146688c3aaf7df794b"
+    },
+    {
+      "archive": "protobuf-c-1.5.2.tar.gz",
+      "version": "1.5.2",
+      "origin": "xran_compile_dir/ict_env/protobuf-c-1.5.2.tar.gz",
+      "license": "BSD-2-Clause",
+      "sha256": "e2c86271873a79c92b58fef7ebf8de1aa0df4738347a8bd5d4e65a80a16d0d24",
+      "bytes": 532447,
+      "parts": [
+        {
+          "path": "archives/protobuf-c-1.5.2.tar.gz",
+          "sha256": "e2c86271873a79c92b58fef7ebf8de1aa0df4738347a8bd5d4e65a80a16d0d24"
+        }
+      ],
+      "originalSha256": "e2c86271873a79c92b58fef7ebf8de1aa0df4738347a8bd5d4e65a80a16d0d24"
+    },
+    {
+      "archive": "libwebsockets-4.5.8.tar.gz",
+      "version": "4.5.8",
+      "origin": "xran_compile_dir/ict_env/libwebsockets-4.5.8.tar.gz",
+      "license": "MIT",
+      "sha256": "b6ade658f4af3a823d0dc806ae5ef0623f0f4f5e2aeb895a0f77c4783840c30e",
+      "bytes": 20167661,
+      "parts": [
+        {
+          "path": "archives/libwebsockets-4.5.8.tar.gz",
+          "sha256": "b6ade658f4af3a823d0dc806ae5ef0623f0f4f5e2aeb895a0f77c4783840c30e"
+        }
+      ],
+      "originalSha256": "b6ade658f4af3a823d0dc806ae5ef0623f0f4f5e2aeb895a0f77c4783840c30e"
+    },
+    {
+      "archive": "boost_1_83_0.tar.bz2",
+      "version": "1.83.0",
+      "origin": "xran_compile_dir/extend_install/boost_1_83_0.tar.bz2",
+      "license": "BSL-1.0",
+      "sha256": "6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e",
+      "bytes": 122892751,
+      "parts": [
+        {
+          "path": "archives/boost_1_83_0.tar.bz2.part000",
+          "sha256": "cc346798f4e10eddd6e28e29a096e791aea74a46c096c82f3ae8c8fbe1030abf"
+        },
+        {
+          "path": "archives/boost_1_83_0.tar.bz2.part001",
+          "sha256": "b144a7af86a332c9fd76df6381cc2c58316287a5fb97a8b478792962aa85c722"
+        },
+        {
+          "path": "archives/boost_1_83_0.tar.bz2.part002",
+          "sha256": "6f91ae49be93a4e6c4e1879cd74872525b1deb93a429167f72b24b7a36b54570"
+        }
+      ],
+      "originalSha256": "6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e"
+    },
+    {
+      "archive": "rohc-1.7.0.tar.gz",
+      "version": "1.7.0",
+      "origin": "xran_compile_dir/ict_env/rohc-1.7.0.tar.xz",
+      "license": "LGPL-2.1-or-later; GPL tools",
+      "sha256": "097e70138d57484c55dff6ebb552380dc0e7dde42bf1c6019f55460593577870",
+      "bytes": 118243252,
+      "parts": [
+        {
+          "path": "archives/rohc-1.7.0.tar.gz.part000",
+          "sha256": "69d06f008fab1f45cb73c8f97fe71d22ab47cef5588f5e1cd2743edb8a424f98"
+        },
+        {
+          "path": "archives/rohc-1.7.0.tar.gz.part001",
+          "sha256": "0f6a306864f375106dfc2370f6bde2b97e684f7154217540534c241ad9181a6e"
+        },
+        {
+          "path": "archives/rohc-1.7.0.tar.gz.part002",
+          "sha256": "2e864ab08859e21d82c9983240a14183ec41f377c3ca0ccaf6c18045b2aa2034"
+        }
+      ],
+      "originalSha256": "a5173acaf01da58b67dcc15916ae6a44625484de539847893f8b0c212f38f7bc"
+    },
+    {
+      "archive": "cpprestsdk-2.10.19.tar.gz",
+      "version": "2.10.19",
+      "origin": "xran_compile_dir/extend_install/etcd_env/cpprestsdk",
+      "license": "MIT",
+      "sha256": "6b2e09ee2ac4648bf73cba012247d3c65753cf51d38c99cf9ab6a52573db4815",
+      "bytes": 1738494,
+      "parts": [
+        {
+          "path": "archives/cpprestsdk-2.10.19.tar.gz",
+          "sha256": "6b2e09ee2ac4648bf73cba012247d3c65753cf51d38c99cf9ab6a52573db4815"
+        }
+      ]
+    },
+    {
+      "archive": "etcd-cpp-apiv3-0.15.4.tar.gz",
+      "version": "0.15.4",
+      "origin": "xran_compile_dir/extend_install/etcd_env/etcd-cpp-apiv3",
+      "license": "BSD-3-Clause",
+      "sha256": "63ede637e7627d5c4a997a62a53ed5b98a0323eaf96d50c08cbc4940512f46b2",
+      "bytes": 364959,
+      "parts": [
+        {
+          "path": "archives/etcd-cpp-apiv3-0.15.4.tar.gz",
+          "sha256": "63ede637e7627d5c4a997a62a53ed5b98a0323eaf96d50c08cbc4940512f46b2"
+        }
+      ]
+    },
+    {
+      "archive": "json-3.11.3.tar.gz",
+      "version": "3.11.3",
+      "origin": "xran_compile_dir/extend_install/opentelemetry_env/json/json",
+      "license": "MIT",
+      "sha256": "8a5c94fa1ae0e90718efff6fc795886c646f1c221d85f11985d2cc8f87ea5fa6",
+      "bytes": 8040112,
+      "parts": [
+        {
+          "path": "archives/json-3.11.3.tar.gz",
+          "sha256": "8a5c94fa1ae0e90718efff6fc795886c646f1c221d85f11985d2cc8f87ea5fa6"
+        }
+      ]
+    },
+    {
+      "archive": "spdlog-1.14.1.tar.gz",
+      "version": "1.14.1",
+      "origin": "xran_compile_dir/extend_install/opentelemetry_env/spdlog/spdlog",
+      "license": "MIT",
+      "sha256": "3cf0e4851b81e32cc68677a58e2c441a3c46246f3694e93ffc140d0a2f5af72e",
+      "bytes": 266940,
+      "parts": [
+        {
+          "path": "archives/spdlog-1.14.1.tar.gz",
+          "sha256": "3cf0e4851b81e32cc68677a58e2c441a3c46246f3694e93ffc140d0a2f5af72e"
+        }
+      ]
+    },
+    {
+      "archive": "asn1c-0.9.29.tar.gz",
+      "version": "0.9.29",
+      "origin": "xran_compile_dir/extend_install/asn1c.rar",
+      "license": "BSD-2-Clause",
+      "sha256": "bf1a92975ceefd3b2170659b12d84409c989aeb2c7057aeac146b72d08f4dba4",
+      "bytes": 2738914,
+      "parts": [
+        {
+          "path": "archives/asn1c-0.9.29.tar.gz",
+          "sha256": "bf1a92975ceefd3b2170659b12d84409c989aeb2c7057aeac146b72d08f4dba4"
+        }
+      ],
+      "originalSha256": "997b8004de14747203fb47e4dc23ad2ac5be190f93aed9556f24ebcbb4475682"
+    },
+    {
+      "archive": "airtracer.tar.gz",
+      "version": "provided ELF x86-64",
+      "origin": "compileDep/xran_compile_dir/ict_env/libairtracer.so",
+      "license": "No license supplied; internal vendor binary",
+      "sha256": "a9143741ac547936935b0060cf85f895e982f0e220ca1d9ce07081ed26b86f7e",
+      "bytes": 3855,
+      "parts": [
+        {
+          "path": "archives/airtracer.tar.gz",
+          "sha256": "a9143741ac547936935b0060cf85f895e982f0e220ca1d9ce07081ed26b86f7e"
+        }
+      ]
+    },
+    {
+      "archive": "grpc-1.49.1.tar.gz",
+      "version": "v1.49.1",
+      "origin": "https://codeload.github.com/grpc/grpc/tar.gz/refs/tags/v1.49.1",
+      "license": "Apache-2.0",
+      "sha256": "5071b630e2a14707ad060636990f1b25b0984bd168c7ea1ab95e48a3bdc0081f",
+      "bytes": 8357937,
+      "parts": [
+        {
+          "path": "archives/grpc-1.49.1.tar.gz",
+          "sha256": "5071b630e2a14707ad060636990f1b25b0984bd168c7ea1ab95e48a3bdc0081f"
+        }
+      ]
+    },
+    {
+      "archive": "abseil-20220623.1.tar.gz",
+      "version": "20220623.1",
+      "origin": "https://codeload.github.com/abseil/abseil-cpp/tar.gz/refs/tags/20220623.1",
+      "license": "Apache-2.0",
+      "sha256": "91ac87d30cc6d79f9ab974c51874a704de9c2647c40f6932597329a282217ba8",
+      "bytes": 1957483,
+      "parts": [
+        {
+          "path": "archives/abseil-20220623.1.tar.gz",
+          "sha256": "91ac87d30cc6d79f9ab974c51874a704de9c2647c40f6932597329a282217ba8"
+        }
+      ]
+    },
+    {
+      "archive": "opentelemetry-cpp-1.17.0.tar.gz",
+      "version": "v1.17.0",
+      "origin": "https://codeload.github.com/open-telemetry/opentelemetry-cpp/tar.gz/refs/tags/v1.17.0",
+      "license": "Apache-2.0",
+      "sha256": "13542725463f1ea106edaef078c2276065cf3da998cb1d3dcf92630daa3f64d4",
+      "bytes": 923943,
+      "parts": [
+        {
+          "path": "archives/opentelemetry-cpp-1.17.0.tar.gz",
+          "sha256": "13542725463f1ea106edaef078c2276065cf3da998cb1d3dcf92630daa3f64d4"
+        }
+      ]
+    },
+    {
+      "archive": "opentelemetry-proto-1.3.2.tar.gz",
+      "version": "v1.3.2",
+      "origin": "https://codeload.github.com/open-telemetry/opentelemetry-proto/tar.gz/refs/tags/v1.3.2",
+      "license": "Apache-2.0",
+      "sha256": "c069c0d96137cf005d34411fa67dd3b6f1f8c64af1e7fb2fe0089a41c425acd7",
+      "bytes": 122464,
+      "parts": [
+        {
+          "path": "archives/opentelemetry-proto-1.3.2.tar.gz",
+          "sha256": "c069c0d96137cf005d34411fa67dd3b6f1f8c64af1e7fb2fe0089a41c425acd7"
+        }
+      ]
+    },
+    {
+      "archive": "grpc-envoy-api.tar.gz",
+      "version": "bf6154e482bbd5e6f64032993206e66b6116f2bd",
+      "origin": "https://codeload.github.com/envoyproxy/data-plane-api/tar.gz/bf6154e482bbd5e6f64032993206e66b6116f2bd",
+      "license": "License notices included in source archive",
+      "sha256": "0fe4c68dea4423f5880c068abbcbc90ac4b98496cf2af15a1fe3fbc0fdb050fd",
+      "bytes": 576497,
+      "parts": [
+        {
+          "path": "archives/grpc-envoy-api.tar.gz",
+          "sha256": "0fe4c68dea4423f5880c068abbcbc90ac4b98496cf2af15a1fe3fbc0fdb050fd"
+        }
+      ]
+    },
+    {
+      "archive": "grpc-googleapis.tar.gz",
+      "version": "2f9af297c84c55c8b871ba4495e01ade42476c92",
+      "origin": "https://codeload.github.com/googleapis/googleapis/tar.gz/2f9af297c84c55c8b871ba4495e01ade42476c92",
+      "license": "License notices included in source archive",
+      "sha256": "5bb6b0253ccf64b53d6c7249625a7e3f6c3bc6402abd52d3778bfa48258703a0",
+      "bytes": 4358573,
+      "parts": [
+        {
+          "path": "archives/grpc-googleapis.tar.gz",
+          "sha256": "5bb6b0253ccf64b53d6c7249625a7e3f6c3bc6402abd52d3778bfa48258703a0"
+        }
+      ]
+    },
+    {
+      "archive": "grpc-opencensus-proto.tar.gz",
+      "version": "v0.3.0",
+      "origin": "https://codeload.github.com/census-instrumentation/opencensus-proto/tar.gz/v0.3.0",
+      "license": "License notices included in source archive",
+      "sha256": "b7e13f0b4259e80c3070b583c2f39e53153085a6918718b1c710caf7037572b0",
+      "bytes": 163404,
+      "parts": [
+        {
+          "path": "archives/grpc-opencensus-proto.tar.gz",
+          "sha256": "b7e13f0b4259e80c3070b583c2f39e53153085a6918718b1c710caf7037572b0"
+        }
+      ]
+    },
+    {
+      "archive": "grpc-xds.tar.gz",
+      "version": "cb28da3451f158a947dfc45090fe92b07b243bc1",
+      "origin": "https://codeload.github.com/cncf/xds/tar.gz/cb28da3451f158a947dfc45090fe92b07b243bc1",
+      "license": "License notices included in source archive",
+      "sha256": "5bc8365613fe2f8ce6cc33959b7667b13b7fe56cb9d16ba740c06e1a7c4242fc",
+      "bytes": 79269,
+      "parts": [
+        {
+          "path": "archives/grpc-xds.tar.gz",
+          "sha256": "5bc8365613fe2f8ce6cc33959b7667b13b7fe56cb9d16ba740c06e1a7c4242fc"
+        }
+      ]
+    },
+    {
+      "archive": "grpc-protoc-gen-validate.tar.gz",
+      "version": "4694024279bdac52b77e22dc87808bd0fd732b69",
+      "origin": "https://codeload.github.com/envoyproxy/protoc-gen-validate/tar.gz/4694024279bdac52b77e22dc87808bd0fd732b69",
+      "license": "License notices included in source archive",
+      "sha256": "1e490b98005664d149b379a9529a6aa05932b8a11b76b4cd86f3d22d76346f47",
+      "bytes": 153867,
+      "parts": [
+        {
+          "path": "archives/grpc-protoc-gen-validate.tar.gz",
+          "sha256": "1e490b98005664d149b379a9529a6aa05932b8a11b76b4cd86f3d22d76346f47"
+        }
+      ]
+    },
+    {
+      "archive": "grpc-upb.tar.gz",
+      "version": "e4635f223e7d36dfbea3b722a4ca4807a7e882e2",
+      "origin": "https://codeload.github.com/protocolbuffers/upb/tar.gz/e4635f223e7d36dfbea3b722a4ca4807a7e882e2",
+      "license": "License notices included in source archive",
+      "sha256": "017a7e8e4e842d01dba5dc8aa316323eee080cd1b75986a7d1f94d87220e6502",
+      "bytes": 360790,
+      "parts": [
+        {
+          "path": "archives/grpc-upb.tar.gz",
+          "sha256": "017a7e8e4e842d01dba5dc8aa316323eee080cd1b75986a7d1f94d87220e6502"
+        }
+      ]
+    }
+  ],
+  "migration": [
+    {
+      "path": "xran_compile_dir/ict_env/dpdk-22.03.tar.gz",
+      "sha256": "f7543943542ee32d4084c004c85dbc3fcf832271066e8b9256169e385d56ad00"
+    },
+    {
+      "path": "xran_compile_dir/ict_env/protobuf-all-21.11.tar.gz",
+      "sha256": "f045f136e61e367a9436571b6676b94e5e16631a06c864146688c3aaf7df794b"
+    },
+    {
+      "path": "xran_compile_dir/ict_env/protobuf-c-1.5.2.tar.gz",
+      "sha256": "e2c86271873a79c92b58fef7ebf8de1aa0df4738347a8bd5d4e65a80a16d0d24"
+    },
+    {
+      "path": "xran_compile_dir/ict_env/libwebsockets-4.5.8.tar.gz",
+      "sha256": "b6ade658f4af3a823d0dc806ae5ef0623f0f4f5e2aeb895a0f77c4783840c30e"
+    },
+    {
+      "path": "xran_compile_dir/extend_install/boost_1_83_0.tar.bz2",
+      "sha256": "6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e"
+    },
+    {
+      "path": "xran_compile_dir/ict_env/rohc-1.7.0.tar.xz",
+      "sha256": "a5173acaf01da58b67dcc15916ae6a44625484de539847893f8b0c212f38f7bc"
+    },
+    {
+      "path": "xran_env_compile.sh",
+      "sha256": "08d55ee2cc6765eafed14f97ea6f90135d3c0d546935952188955fa8e0419621"
+    },
+    {
+      "path": "xran_compile_dir/ict_env/ict_env_install.sh",
+      "sha256": "60850b7e8d6265224290121b14891fbb9e48cf8df88a14bfe317207621997728"
+    },
+    {
+      "path": "xran_compile_dir/ict_env/rohc.conf",
+      "sha256": "ea0d5c3747fbf8198caa0d6250a86bb5553b56e9cfe3b218591c11b58a9ce2e3"
+    },
+    {
+      "path": "xran_compile_dir/ict_env/sources.list",
+      "sha256": "3adc95c9a49f6c909e8df77588b87745ebd3d8156891bfae21a3217776df17f4"
+    }
+  ]
+}

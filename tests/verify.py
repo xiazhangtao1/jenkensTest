@@ -35,6 +35,10 @@ class Verification:
         self.old = subprocess.check_output(['git', '-C', args.source, 'rev-parse', 'demo-v1.0.0^{commit}'], text=True).strip()
         self.base = {'BUILD_KIND': 'service', 'REF_TYPE': 'branch', 'GIT_REF': 'main',
                      'SERVICE_TARGET': 'serviceA', 'IMAGE_TARGET': 'imageA', 'IMAGE_TAG': 'latest'}
+        if args.compiler_image:
+            self.base['COMPILER_IMAGE'] = args.compiler_image
+        if args.compiler_image_pull_policy:
+            self.base['COMPILER_IMAGE_PULL_POLICY'] = args.compiler_image_pull_policy
 
     def save(self):
         self.report_path.write_text(json.dumps(self.report, ensure_ascii=False, indent=2) + '\n')
@@ -129,6 +133,12 @@ class Verification:
         assert meta['commit'] == sha and meta['userId'] == user
         assert meta['result'] == expected_result
         assert meta['startedAt'] and meta['finishedAt'] and meta['durationMillis'] >= 0
+        assert meta.get('builderImage') and meta.get('builderImageId')
+        assert meta.get('builderImagePullPolicy') in ('Always', 'IfNotPresent', 'Never')
+        if self.args.compiler_image:
+            assert meta['builderImage'] == self.args.compiler_image
+        if self.args.compiler_image_pull_policy:
+            assert meta['builderImagePullPolicy'] == self.args.compiler_image_pull_policy
         for item in meta['files']:
             path = target / item['name']
             client.download(prefix + item['name'], path)
@@ -281,4 +291,6 @@ if __name__ == '__main__':
     parser.add_argument('--services-only', action='store_true')
     parser.add_argument('--permissions-only', action='store_true', help='只检查权限，不提交构建或执行清理测试')
     parser.add_argument('--report', help='指定报告路径，避免覆盖已有完整验收报告')
+    parser.add_argument('--compiler-image', help='联调时显式选择编译镜像，默认使用 Jenkins 参数默认值')
+    parser.add_argument('--compiler-image-pull-policy', choices=['Always', 'IfNotPresent', 'Never'])
     Verification(parser.parse_args()).run()

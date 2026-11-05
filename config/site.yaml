@@ -12,6 +12,10 @@ temporaryStorageGiB: 20
 minimumFreeGiB: 50
 minimumFreePercent: 10
 buildTimeoutMinutes: 240
+agentStartupTimeoutMinutes: 15
+compilerImagePullPolicy: Always
+# 编译镜像私有仓库的 Kubernetes Secret 名称；与业务镜像推送凭据分别配置。
+compilerImagePullSecrets: []
 demo: true
 # demo 模式使用同命名空间只读 Git 镜像及独立 Registry。
 gitUrl: http://xran-demo:8000/X-RAN-CLOUD.git

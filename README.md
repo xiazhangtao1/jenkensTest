@@ -11,6 +11,8 @@
 | 登录 | 个人本地账号，匿名不可查看和下载 |
 | 并发 | 最多 6 个；同镜像同标签先等待标签锁，再申请槽位 |
 | 每个构建 Pod 总上限 | 4 CPU、8GiB 内存、20GiB 临时存储 |
+| 编译镜像 | `192.168.10.35/xnet/xran-compile:latest`，每次构建可填写其他版本 |
+| 编译镜像拉取策略 | `Always`，可选 `IfNotPresent` / `Never` |
 | 数据 PVC | 独立 local-path，声明 250Gi，Retain，卸载保留 |
 | 历史产物 | 不按天数、次数或固定总容量淘汰 |
 | 清理 | 空间不足时删除最早完成、未标记保留的产物 |
@@ -35,8 +37,20 @@ make import-images
 make deploy
 ```
 
-首次下载需要联网及可用代理；编译镜像使用主机网络访问当前代理。准备成功后再次执行复用缓存。
-大文件位于 `.cache/`，运行凭据位于 `.state/`，均不提交 Git。
+首次准备依赖需要联网及可用代理，准备容器默认使用主机网络；实际 SDK Docker 构建始终使用 `--network none`。
+下载缓存位于 `.cache/`，运行凭据位于 `.state/`，均不提交 Git。编译源码以校验归档及分片放在 `vendor/compile/`。
+
+## 一键制作编译镜像
+
+```bash
+make compile-image
+make compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.11.05
+make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.11.05
+```
+
+默认镜像为 `192.168.10.35/xnet/xran-compile:latest`。支持 `BUILD_JOBS=4`、
+`APT_SOURCES=config/sources.intranet.list` 和 `OFFLINE=1`；推送前按实际仓库执行 `docker login`。
+镜像及校验清单导出到 `dist/compile/`。详细依赖、离线重建和镜像兼容要求见 [编译镜像说明](docs/compile-image.md)。
 
 默认入口 `http://10.2.0.119:32080/`，可通过 jenkinsUrl 修改。初始账号为 admin、builder1、builder2，
 随机密码保存于 `.state/jenkins/users.json`（0600）。通过管理员的 Users 页面创建正式个人账号；
@@ -47,14 +61,15 @@ make deploy
 
 1. 选择 BUILD_KIND=service 或 image。
 2. 选择 REF_TYPE=branch/tag/commit，输入 GIT_REF；短 SHA 必须唯一。
-3. 服务模式仅显示 SERVICE_TARGET（serviceA/B/C、all、services_all）；镜像模式仅显示 IMAGE_TARGET 和 IMAGE_TAG。
-4. 在该次构建的 Artifacts 下载文件，核对 SHA256SUMS 和 metadata.json。
+3. 填写公共参数 COMPILER_IMAGE，选择 COMPILER_IMAGE_PULL_POLICY；分别默认为上述编译镜像和 Always。
+4. 服务模式显示 SERVICE_TARGET（serviceA/B/C、all、services_all）；镜像模式显示 IMAGE_TARGET 和 IMAGE_TAG。
+5. 在该次构建的 Artifacts 下载文件，核对 SHA256SUMS 和 metadata.json。
 
-摘要显示构建人、时间、引用和完整 commit；元数据另含耗时、镜像 ID/推送结果、大小和 SHA256。
+摘要显示构建人、时间、引用、完整 commit 和所选编译镜像；元数据另含实际编译镜像 ID、拉取策略、耗时、产出镜像 ID/推送结果、大小和 SHA256。
 镜像已导出但 push 失败时，构建失败且保留有效 tar。下载按构建号隔离，同名包不互相覆盖。
 管理员在构建详情点击 **Keep this build forever** 可保护版本。
 
-切换 BUILD_KIND 会立即隐藏无关字段并保留此前输入，REF_TYPE/GIT_REF 始终显示。
+切换 BUILD_KIND 会立即隐藏无关字段并保留此前输入，Git 和编译镜像参数始终显示。
 联动脚本随 Controller 镜像提供，离线可用；API 调用参数保持一致，流水线只读取当前构建类型需要的字段。
 构建详情的只读 `Parameters` 页面也按该次 BUILD_KIND 筛选，包括已有历史构建；分支/tag/commit 字段保留显示。
 

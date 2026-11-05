@@ -1,0 +1,3 @@
+syntax = "proto3";
+package xran.check;
+message Record { string value = 1; }

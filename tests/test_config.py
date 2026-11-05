@@ -29,10 +29,33 @@ class ConfigurationTests(unittest.TestCase):
             privileged = [c['name'] for c in pod['spec']['containers'] if c.get('securityContext', {}).get('privileged')]
             self.assertEqual(privileged, ['dind'] if kind == 'image' else [])
 
-    def test_offline_profiles_never_pull(self):
+    def test_offline_profiles_keep_selected_compiler_policy(self):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace='jenkins-offline-verify', offline=True))
         for kind in ['service', 'image']:
+            containers = ci.pod_template(cfg, kind)['spec']['containers']
+            self.assertTrue(all(c['imagePullPolicy'] == ('Always' if c['name'] == 'builder' else 'Never')
+                                for c in containers))
+            cfg['compilerImagePullPolicy'] = 'Never'
             self.assertTrue(all(c['imagePullPolicy'] == 'Never' for c in ci.pod_template(cfg, kind)['spec']['containers']))
+            cfg['compilerImagePullPolicy'] = 'Always'
+
+    def test_compiler_image_override_and_secrets(self):
+        args = SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False,
+                               image_name='registry.local:5000/team/sdk', image_tag='26.11.05')
+        cfg = ci.config(args)
+        cfg['compilerImagePullPolicy'] = 'IfNotPresent'
+        cfg['compilerImagePullSecrets'] = ['compile-registry']
+        for kind in ['service', 'image']:
+            pod = ci.pod_template(cfg, kind)
+            builder = next(c for c in pod['spec']['containers'] if c['name'] == 'builder')
+            self.assertEqual(builder['image'], 'registry.local:5000/team/sdk:26.11.05')
+            self.assertEqual(builder['imagePullPolicy'], 'IfNotPresent')
+            self.assertEqual(pod['spec']['imagePullSecrets'], [{'name': 'compile-registry'}])
+
+    def test_defaults(self):
+        cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False))
+        self.assertEqual(cfg['builderImage'], '192.168.10.35/xnet/xran-compile:latest')
+        self.assertEqual(cfg['compilerImagePullPolicy'], 'Always')
 
 
 if __name__ == '__main__':

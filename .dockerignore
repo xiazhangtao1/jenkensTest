@@ -9,8 +9,11 @@ AGENTS.md
 .cache/*
 !.cache/plugins/
 !.cache/apt-archives/
+!.cache/compile-apt/
+!.cache/compile-sources/
 !.cache/base-images.tar
 !.cache/demo.git/
 __pycache__
 .playwright-cli
 output
+vendor/compile/archives

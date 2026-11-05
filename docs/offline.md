@@ -58,7 +58,9 @@ kubectl -n jenkins create secret generic xran-registry-ca \
 python3 scripts/ci.py deploy --offline
 ```
 
-离线模式使用 Never 拉取策略，并限制 Pod 出口为本命名空间与 RFC1918 内网。
+离线模式下基础设施、Agent 和 DinD 使用 Never；编译容器使用本次构建选择的策略，默认 Always。
+内网 Registry 可达时可继续使用 Always；仅依赖节点预导入镜像时，明确选择 Never，或将站点 compilerImagePullPolicy 配为 Never。
+Pod 出口限制为本命名空间与 RFC1918 内网。
 需要支持 NetworkPolicy 的 CNI（当前为 Calico）；其他内网网段须先加入白名单。
 节点拉取不受 Pod NetworkPolicy 控制，因此必须先导入镜像。
 若 CPU webhook 直接指定 Pod.nodeName，脚本只给 Jenkins Pending PVC 补齐实际节点注解，兼容延迟绑定。
@@ -67,19 +69,22 @@ python3 scripts/ci.py deploy --offline
 
 ## 编译环境重建
 
-真实依赖暂不可见，需补齐 config/apt-packages.txt 和 config/base-images.txt。
-运行中的任务不执行 apt 安装。原始基础镜像、完整 deb 缓存及插件文件已准备：
+已按 compileDep 资料准备完整 SDK、固定源码及 deb 缓存。运行中的任务不执行 apt 安装。
+原始基础镜像、完整 deb 缓存及插件文件已准备：
 
 ```bash
 git clone --mirror repos/X-RAN-CLOUD.bundle ../X-RAN-CLOUD.git
 docker load -i .cache/build-base-images.tar
 docker load -i .cache/k8s-images.tar
-python3 scripts/ci.py images --source ../X-RAN-CLOUD.git --apt-sources config/sources.intranet.list
+make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list
+python3 scripts/ci.py images --offline --source ../X-RAN-CLOUD.git --apt-sources config/sources.intranet.list
 ```
 
-原始模拟工具链可使用 --build-network none 完全断网重建。新增依赖时先通过内网 apt 更新缓存；
-已有缓存的全套 deb 会先被本地安装。新增 FROM 镜像须在准备机下载并补充清单后重新打包。
+SDK 构建始终使用 --network none，离线入口不会更新 APT 或拉取基础镜像。
+新增依赖时先在能访问所选源的准备机执行 compile-image 更新缓存；新增 FROM 镜像须下载并补充清单后重新打包。
 镜像发布更新时提升 versions.env 自定义标签，保留旧标签及旧离线目录用于回滚。
+
+编译镜像制作、按构建选版本/策略及节点拉取凭据配置见 [编译镜像说明](compile-image.md)。
 
 版本与内容见 config/versions.env、plugins.lock、images.lock.json、编译镜像 /opt/packages.lock 及 SHA256SUMS。
 

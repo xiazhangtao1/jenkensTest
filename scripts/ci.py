@@ -13,6 +13,7 @@ import sys
 import tarfile
 import time
 import zipfile
+import importlib.util
 
 import yaml
 
@@ -57,12 +58,33 @@ def config(args):
     assert 1 <= int(cfg['temporaryStorageGiB']) <= 1024
     assert 0 <= float(cfg['minimumFreePercent']) < 80
     v = versions()
-    cfg.update(builderImage=v['BUILDER_IMAGE'], controllerImage=v['CONTROLLER_IMAGE'],
+    builder_name, builder_tag = v['BUILDER_IMAGE'].rsplit(':', 1)
+    compiler = compiler_module()
+    builder = compiler.image_reference(getattr(args, 'image_name', None) or builder_name,
+                                       getattr(args, 'image_tag', None) or builder_tag)
+    cfg.setdefault('compilerImagePullPolicy', 'Always')
+    cfg.setdefault('compilerImagePullSecrets', [])
+    cfg.setdefault('agentStartupTimeoutMinutes', 15)
+    cfg['agentStartupTimeoutMinutes'] = int(cfg['agentStartupTimeoutMinutes'])
+    if not 1 <= cfg['agentStartupTimeoutMinutes'] <= 120:
+        raise ValueError('编译 Pod 启动超时应为 1..120 分钟')
+    if not isinstance(cfg['compilerImagePullSecrets'], list):
+        raise ValueError('compilerImagePullSecrets 必须是 Secret 名称列表')
+    if cfg['compilerImagePullPolicy'] not in ('Always', 'IfNotPresent', 'Never'):
+        raise ValueError('非法编译镜像拉取策略')
+    cfg.update(builderImage=builder, controllerImage=v['CONTROLLER_IMAGE'],
                agentImage=v['AGENT_IMAGE'], dindImage=v['DIND_IMAGE'],
                demoImage=v['DEMO_IMAGE'], registryImage=v['REGISTRY_IMAGE'])
     image_lock = ROOT / 'config/images.lock.json'
     cfg['imageIds'] = json.loads(image_lock.read_text()) if image_lock.exists() else {}
     return cfg
+
+
+def compiler_module():
+    spec = importlib.util.spec_from_file_location('compile_image', ROOT / 'scripts/compile-image.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def state_dir(cfg):
@@ -149,19 +171,15 @@ def lock_plugins():
 
 def images(args):
     v = versions()
-    base_images = [line.strip() for line in (ROOT / 'config/base-images.txt').read_text().splitlines()
-                   if line.strip() and not line.startswith('#')]
-    run(['docker', 'save', '-o', CACHE / 'base-images.tar', *base_images])
-    proxy_args = []
-    for name in ('http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY', 'no_proxy'):
-        if os.environ.get(name):
-            proxy_args += ['--build-arg', name]
+    cfg = config(args)
+    compiler = compiler_module()
+    compiler.build(argparse.Namespace(image_name=cfg['builderImage'].rsplit(':', 1)[0],
+        image_tag=cfg['builderImage'].rsplit(':', 1)[1], jobs=args.jobs,
+        apt_sources=args.apt_sources, offline=args.offline or args.build_network == 'none',
+        prepare_network='host', no_export=True))
     build_env = os.environ.copy()
     build_env['DOCKER_BUILDKIT'] = '0'
-    build = ['docker', 'build', '--network', args.build_network, '--pull=false']
-    run([*build, *proxy_args, '--build-arg', f'APT_SOURCES={args.apt_sources}',
-         '--build-arg', f'DOCKER_CLI_IMAGE={v["DOCKER_CLI_IMAGE"]}',
-         '-f', ROOT / 'docker/builder.Dockerfile', '-t', v['BUILDER_IMAGE'], ROOT], env=build_env)
+    build = ['docker', 'build', '--network', 'none' if args.offline else args.build_network, '--pull=false']
     lock_plugins()
     run([*build, '--build-arg', f'JENKINS_BASE={v["JENKINS_BASE"]}',
          '-f', ROOT / 'docker/controller.Dockerfile', '-t', v['CONTROLLER_IMAGE'], ROOT], env=build_env)
@@ -170,7 +188,7 @@ def images(args):
         shutil.rmtree(mirror)
     run(['git', 'clone', '--mirror', '--no-hardlinks', args.source, mirror])
     run(['git', '-C', mirror, 'update-server-info'])
-    run([*build, '--build-arg', f'BUILDER_IMAGE={v["BUILDER_IMAGE"]}',
+    run([*build, '--build-arg', f'BUILDER_IMAGE={cfg["builderImage"]}',
          '-f', ROOT / 'docker/demo.Dockerfile', '-t', v['DEMO_IMAGE'], ROOT], env=build_env)
     refs = runtime_images(config(args))
     records = {ref: json.loads(output(['docker', 'image', 'inspect', ref]))[0]['Id'] for ref in refs}
@@ -239,11 +257,13 @@ def pod_template(cfg, kind):
             dind['volumeMounts'].append({'name': 'registry-ca', 'mountPath': '/etc/docker/certs.d/' + cfg['registry'], 'readOnly': True})
     for container in containers:
         container['imagePullPolicy'] = 'Never' if cfg.get('offline') else 'IfNotPresent'
+    builder['imagePullPolicy'] = cfg.get('compilerImagePullPolicy', 'Always')
     return {'apiVersion': 'v1', 'kind': 'Pod', 'metadata': {'labels': {'xran-ci': 'build', 'xran-build': 'bXRAN_BUILD_NUMBER'}},
         'spec': {'automountServiceAccountToken': False,
             'securityContext': {'runAsUser': 1000, 'runAsGroup': 1000, 'fsGroup': 1000},
             'activeDeadlineSeconds': int(cfg['buildTimeoutMinutes']) * 60,
-            'containers': containers, 'volumes': volumes}}
+            'containers': containers, 'volumes': volumes,
+            'imagePullSecrets': [{'name': name} for name in cfg.get('compilerImagePullSecrets', [])]}}
 
 
 def render(args):
@@ -256,8 +276,8 @@ def render(args):
          'metadata': {'name': cfg['storageClass']}, 'provisioner': 'rancher.io/local-path',
          'reclaimPolicy': 'Retain', 'volumeBindingMode': 'WaitForFirstConsumer'}]
     runtime = {'site.json': json.dumps(cfg, ensure_ascii=False, indent=2),
-               'pod-service.yaml': yaml.safe_dump(pod_template(cfg, 'service')),
-               'pod-image.yaml': yaml.safe_dump(pod_template(cfg, 'image'))}
+               'pod-service.json': json.dumps(pod_template(cfg, 'service')),
+               'pod-image.json': json.dumps(pod_template(cfg, 'image'))}
     manifests.append({'apiVersion': 'v1', 'kind': 'ConfigMap',
         'metadata': {'name': 'xran-config', 'namespace': namespace}, 'data': runtime})
     if cfg.get('offline'):
@@ -453,12 +473,15 @@ def bundle(args):
     for name in ['README.md', 'Makefile', '.dockerignore', '.gitignore']:
         if (ROOT / name).exists():
             shutil.copy2(ROOT / name, target / name)
-    for name in ['charts', 'plugins', 'tools']:
+    for name in ['charts', 'plugins', 'tools', 'compile-apt']:
         shutil.copytree(CACHE / name, target / '.cache' / name)
     shutil.copy2(CACHE / 'base-images.tar', target / '.cache/base-images.tar')
     shutil.copy2(CACHE / 'plugins.complete', target / '.cache/plugins.complete')
     shutil.copytree(CACHE / 'apt-archives', target / '.cache/apt-archives', ignore=shutil.ignore_patterns('lock', 'partial'))
     shutil.copy2(CACHE / 'k8s-images.tar', target / '.cache/k8s-images.tar')
+    # Store the effective SDK reference for rebuilding/rendering this particular bundle.
+    bundle_versions = dict(v, BUILDER_IMAGE=cfg['builderImage'])
+    (target / 'config/versions.env').write_text(''.join(f'{key}={value}\n' for key, value in bundle_versions.items()))
     shutil.copytree(CACHE / 'demo.git', target / '.cache/demo.git')
     bases = [v[key] for key in ['JENKINS_BASE', 'DOCKER_CLI_IMAGE', 'UBUNTU_IMAGE']]
     bases.extend(line.strip() for line in (ROOT / 'config/base-images.txt').read_text().splitlines()
@@ -469,7 +492,7 @@ def bundle(args):
     run(['git', '-C', args.source, 'bundle', 'create', repos / 'X-RAN-CLOUD.bundle', '--all'])
     run(['git', '-C', ROOT, 'bundle', 'create', repos / 'jenkensTest.bundle', '--all'])
     manifest = {'createdAt': time.strftime('%Y-%m-%dT%H:%M:%S%z'), 'platform': 'linux/amd64',
-                'versions': v, 'runtimeImages': runtime_images(cfg), 'files': {}}
+                'versions': bundle_versions, 'runtimeImages': runtime_images(cfg), 'files': {}}
     for path in sorted(target.rglob('*')):
         if path.is_file():
             manifest['files'][str(path.relative_to(target))] = {'bytes': path.stat().st_size, 'sha256': hash_file(path)}
@@ -576,6 +599,9 @@ if __name__ == '__main__':
     parser.add_argument('--build-network', default='host', choices=['host', 'none', 'default'])
     parser.add_argument('--archive')
     parser.add_argument('--importer-image')
+    parser.add_argument('--image-name')
+    parser.add_argument('--image-tag')
+    parser.add_argument('--jobs', type=int, default=4)
     arguments = parser.parse_args()
     os.chdir(ROOT)
     (ROOT / '.cache').mkdir(exist_ok=True)

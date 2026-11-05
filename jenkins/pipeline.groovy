@@ -5,6 +5,10 @@ def ref = params.GIT_REF as String
 def kind = params.BUILD_KIND as String
 def target = (kind == 'service' ? params.SERVICE_TARGET : params.IMAGE_TARGET) as String
 def imageTag = params.IMAGE_TAG as String
+def compilerImage = (params.containsKey('COMPILER_IMAGE') ? params.COMPILER_IMAGE : cfg.builderImage) as String
+def compilerPolicy = (params.containsKey('COMPILER_IMAGE_PULL_POLICY') ? params.COMPILER_IMAGE_PULL_POLICY :
+    (cfg.compilerImagePullPolicy ?: 'Always')) as String
+XranCompiler.validate(compilerImage, compilerPolicy)
 if (!(sourceType in ['branch', 'tag', 'commit']) || !(kind in ['service', 'image'])) error('非法构建类型或引用类型')
 if (!(target in (kind == 'service' ? cfg.services + ['all', 'services_all'] : cfg.images))) error('非法构建目标')
 if (!ref || ref.startsWith('-') || ref.contains('\n')) error('非法 Git 引用')
@@ -14,15 +18,39 @@ def started = currentBuild.startTimeInMillis
 def metadata = [buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, job: env.JOB_NAME,
     userId: trigger?.userId ?: 'system', userName: trigger?.userName ?: 'system',
     kind: kind, target: target, imageTag: kind == 'image' ? imageTag : null,
+    builderImage: compilerImage, builderImagePullPolicy: compilerPolicy,
     startedAt: new Date(started).format("yyyy-MM-dd'T'HH:mm:ssXXX", TimeZone.getTimeZone('Asia/Shanghai'))]
 trigger = null // Cause 对象不跨 Pipeline 挂起点序列化。
 def reference = kind == 'image' ? "${cfg.registry}/${cfg.imageRepositories[target]}:${imageTag}" : ''
 def reservationKey = "${env.JOB_NAME}#${env.BUILD_NUMBER}".toString()
 def execute = {
     lock(label: 'xran-build-slot', quantity: 1) {
-        def yaml = new File('/var/xran/pod-' + kind + '.yaml').text.replace('XRAN_BUILD_NUMBER', env.BUILD_NUMBER)
-        podTemplate(yaml: yaml, idleMinutes: 0, podRetention: never(), showRawYaml: false) {
+        def pod = XranCompiler.template(new File('/var/xran/pod-' + kind + '.json').text,
+            compilerImage, compilerPolicy, env.BUILD_NUMBER)
+        def yaml = groovy.json.JsonOutput.toJson(pod)
+        pod = null
+        podTemplate(yaml: yaml, idleMinutes: 0, podRetention: never(), showRawYaml: false,
+            slaveConnectTimeout: (cfg.agentStartupTimeoutMinutes ?: 15) * 60 as int) {
+          try {
+            def agentReady = false
+            def executionFinished = false
+            def startupDeadline = System.currentTimeMillis() + (cfg.agentStartupTimeoutMinutes ?: 15) * 60000L
+            parallel('构建': {
+              try {
             node(POD_LABEL) {
+                timeout(time: (cfg.agentStartupTimeoutMinutes ?: 15) as int, unit: 'MINUTES') {
+                    waitUntil(initialRecurrencePeriod: 3000) {
+                        def info = XranCompiler.podInfo(cfg.namespace as String, env.BUILD_NUMBER)
+                        if (info.running && info.imageId) {
+                            metadata.builderImageId = info.imageId
+                            metadata.builderPod = info.pod
+                            agentReady = true
+                            return true
+                        }
+                        if (info.reason) echo "编译容器等待：${info.reason} ${info.message ?: ''}"
+                        return false
+                    }
+                }
                 def workspaceStats = {
                     return XranStorage.parseJson(sh(returnStdout: true, script:
                         '''python3 -c 'import os,shutil,json; s=shutil.disk_usage("."); print(json.dumps({"dev":os.stat(".").st_dev,"total":s.total,"free":s.free}))' ''').trim())
@@ -43,6 +71,16 @@ def execute = {
                 withEnv(environment) {
                     container('builder') {
                         try {
+                            stage('检查编译环境') {
+                                echo "编译镜像=${compilerImage}；拉取策略=${compilerPolicy}；实际镜像=${metadata.builderImageId}"
+                                sh '''set -eu
+                                    for tool in python3 git gcc g++ cmake pkg-config; do
+                                        command -v "$tool" >/dev/null || { echo "编译镜像缺少工具：$tool" >&2; exit 1; }
+                                    done
+                                    test -r /opt/xran/run-build.py || { echo '编译镜像缺少 /opt/xran/run-build.py，请使用本项目制作的兼容镜像' >&2; exit 1; }
+                                '''
+                                if (kind == 'image') sh 'command -v docker >/dev/null && test -r /opt/xran/base-images.tar'
+                            }
                             stage('磁盘检查') { echo groovy.json.JsonOutput.toJson(XranStorage.reserve(cfg,
                                 reservationKey, env.JOB_NAME, env.BUILD_NUMBER as int, workspaceStats())) }
                             stage('检出指定版本') {
@@ -57,7 +95,7 @@ def execute = {
                                 def checkout = XranStorage.parseJson(readFile('checkout.json'))
                                 metadata.putAll(checkout)
                                 currentBuild.displayName = "#${env.BUILD_NUMBER} ${target} ${checkout.commit.take(9)}"
-                                currentBuild.description = "${metadata.startedAt} | ${metadata.userId} | ${sourceType}:${ref} | commit=${checkout.commit}"
+                                currentBuild.description = "${metadata.startedAt} | ${metadata.userId} | ${sourceType}:${ref} | commit=${checkout.commit} | compiler=${compilerImage} (${compilerPolicy})"
                             }
                             stage('编译与打包') {
                                 if (kind == 'image' && cfg.registryCredentialsId) {
@@ -81,8 +119,6 @@ def execute = {
                             stage('归档与构建信息') {
                                 metadata.result = outcome
                                 metadata.durationMillis = System.currentTimeMillis() - started
-                                metadata.builderImage = cfg.builderImage
-                                metadata.builderImageId = cfg.imageIds?.get(cfg.builderImage)
                                 withEnv(["XRAN_BUILD_METADATA=${groovy.json.JsonOutput.toJson(metadata)}"]) {
                                     def status = sh(returnStatus: true, script: 'python3 /opt/xran/run-build.py collect')
                                     if (status != 0 && outcome == 'SUCCESS') {
@@ -108,6 +144,26 @@ def execute = {
                     }
                 }
             }
+              } finally { executionFinished = true }
+            }, '等待编译环境': {
+                // The Kubernetes plugin may replace a failed Pod repeatedly. Bound the
+                // entire provisioning interval, without limiting compilation after readiness.
+                while (!agentReady && !executionFinished) {
+                    if (System.currentTimeMillis() >= startupDeadline) {
+                        def info = XranCompiler.podInfo(cfg.namespace as String, env.BUILD_NUMBER)
+                        metadata.builderStartupError = info
+                        error("编译 Pod 启动超时：${compilerImage} (${compilerPolicy})；" + groovy.json.JsonOutput.toJson(info))
+                    }
+                    sleep(time: 3, unit: 'SECONDS')
+                }
+            }, failFast: true)
+          } catch (Exception problem) {
+              try {
+                  def info = XranCompiler.podInfo(cfg.namespace as String, env.BUILD_NUMBER)
+                  echo "编译镜像 ${compilerImage} (${compilerPolicy}) 的 Pod 状态：" + groovy.json.JsonOutput.toJson(info)
+              } catch (Exception diagnostic) { echo '无法取得 Pod 诊断：' + diagnostic.message }
+              throw problem
+          }
         }
     }
 }
@@ -118,6 +174,20 @@ timestamps {
                 def digest = java.security.MessageDigest.getInstance('SHA-256').digest(reference.getBytes('UTF-8')).encodeHex().toString()
                 lock(resource: 'xran-image-' + digest) { execute() }
             } else execute()
-        } finally { XranStorage.release(reservationKey) }
+        } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException interrupted) {
+            currentBuild.result = 'ABORTED'
+            throw interrupted
+        } catch (Exception failed) {
+            currentBuild.result = 'FAILURE'
+            throw failed
+        } finally {
+            XranStorage.release(reservationKey)
+            def record = new File(currentBuild.rawBuild.rootDir, 'xran-metadata.json')
+            if (!record.exists()) {
+                metadata.result = currentBuild.currentResult
+                metadata.durationMillis = System.currentTimeMillis() - started
+                record.text = groovy.json.JsonOutput.toJson(metadata)
+            }
+        }
     }
 }

@@ -16,7 +16,7 @@ def j = Jenkins.get()
 def cfg = new JsonSlurperClassic().parseText(new File('/var/xran/site.json').text)
 def support = new File('/opt/xran/storage.groovy').text
 def job = j.getItem('x-ran-cloud') ?: j.createProject(WorkflowJob, 'x-ran-cloud')
-def buildScript = support + '\n' + new File('/opt/xran/pipeline.groovy').text
+def buildScript = support + '\n' + new File('/opt/xran/compiler.groovy').text + '\n' + new File('/opt/xran/pipeline.groovy').text
 ScriptApproval.get().preapprove(buildScript, GroovyLanguage.get())
 job.definition = new CpsFlowDefinition(buildScript, false)
 // 初始化脚本会在重启/升级时再次运行，先移除历史定义，避免表单和 Action 重复。
@@ -27,6 +27,10 @@ job.addProperty(new ParametersDefinitionProperty([
     new ChoiceParameterDefinition('BUILD_KIND', ['service', 'image'] as String[], 'service=服务包；image=镜像'),
     new ChoiceParameterDefinition('REF_TYPE', ['branch', 'tag', 'commit'] as String[], '引用类型'),
     new StringParameterDefinition('GIT_REF', 'main', '分支名、tag 或唯一 commit SHA'),
+    new StringParameterDefinition('COMPILER_IMAGE', cfg.builderImage as String, '本次构建使用的编译镜像完整地址，包含 tag 或 @sha256 摘要'),
+    new ChoiceParameterDefinition('COMPILER_IMAGE_PULL_POLICY',
+        ([cfg.compilerImagePullPolicy ?: 'Always'] + ['Always', 'IfNotPresent', 'Never']).unique() as String[],
+        '编译镜像拉取策略：Always=联系仓库更新；IfNotPresent=优先本地；Never=仅使用节点已导入镜像'),
     new ChoiceParameterDefinition('SERVICE_TARGET', (cfg.services + ['all', 'services_all']) as String[], '服务构建目标'),
     new ChoiceParameterDefinition('IMAGE_TARGET', cfg.images as String[], '镜像构建目标'),
     new StringParameterDefinition('IMAGE_TAG', 'latest', '镜像标签；同镜像同标签将串行执行')

@@ -1,0 +1,1597 @@
+{
+  "status": "PASS",
+  "recordedAt": "2026-11-05T21:39:15+0800",
+  "scope": "Ubuntu 22.04 SDK and per-build compiler selection; production X-RAN-CLOUD source remains unavailable",
+  "sdk": {
+    "imageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+    "sourceArchiveCount": 22,
+    "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+    "aptArchiveCount": 228,
+    "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+    "defaultUid": 1000,
+    "buildNetwork": "none",
+    "ctestPassed": 2,
+    "additionalChecks": [
+      "protobuf-c code generation and compilation",
+      "ASN.1 generation",
+      "static archives for protobuf, gRPC, Abseil, OpenTelemetry and spdlog",
+      "shared library load for airtracer, ROHC, DPDK, gRPC and etcd"
+    ],
+    "exports": [
+      {
+        "image": "192.168.10.35/xnet/xran-compile:26.11.05",
+        "imageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+        "createdAt": "2026-11-05T13:12:36.259395432Z",
+        "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+        "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+        "bytes": 3349283328,
+        "sha256": "2ac1726d33ae88b8920590d7b449c073a4659ede8da494b26dfd05113a984cc7"
+      },
+      {
+        "image": "192.168.10.35/xnet/xran-compile:latest",
+        "imageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+        "createdAt": "2026-11-05T13:12:36.259395432Z",
+        "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+        "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+        "bytes": 3349283328,
+        "sha256": "f449fbaece85e5886abe0258599f01eee41dc6fb33b4a8b4107171aca32dc10a"
+      },
+      {
+        "image": "localhost:15050/xnet/custom-compile:26.11.05",
+        "imageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+        "createdAt": "2026-11-05T13:12:36.259395432Z",
+        "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+        "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+        "bytes": 3349283328,
+        "sha256": "3a79ecafdfd716090c90a20a67b1627801319610be61efcd4ab92db80ed4cafa"
+      }
+    ]
+  },
+  "unitTests": {
+    "status": "PASS",
+    "passed": 13
+  },
+  "initialStartupFailure": {
+    "build": 54,
+    "status": "FAIL",
+    "observedDurationMillis": 354145,
+    "note": "Single-Pod slaveConnectTimeout allowed repeated Pod creation; stopped test and added an overall provisioning watchdog. The next full run passed, including 60-second failure cases #65/#66."
+  },
+  "compilerIntegration": {
+    "namespace": "jenkins",
+    "startedAt": "2026-11-05T21:03:03+0800",
+    "checks": [
+      {
+        "name": "全部插件启用",
+        "status": "PASS",
+        "details": {
+          "count": 73
+        }
+      },
+      {
+        "name": "匿名访问及普通账号管理权限受限",
+        "status": "PASS",
+        "details": null
+      },
+      {
+        "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+        "status": "PASS",
+        "details": {
+          "builder1": {
+            "visibleJobs": [
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "43/consoleText": 404,
+              "build": 404
+            }
+          },
+          "builder2": {
+            "visibleJobs": [
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "43/consoleText": 404,
+              "build": 404
+            }
+          }
+        }
+      },
+      {
+        "name": "服务与镜像任务公共编译参数及默认值",
+        "status": "PASS",
+        "details": {
+          "BUILD_KIND": {
+            "_class": "hudson.model.ChoiceParameterDefinition",
+            "defaultParameterValue": {
+              "_class": "hudson.model.StringParameterValue",
+              "value": "service"
+            },
+            "name": "BUILD_KIND",
+            "choices": [
+              "service",
+              "image"
+            ]
+          },
+          "REF_TYPE": {
+            "_class": "hudson.model.ChoiceParameterDefinition",
+            "defaultParameterValue": {
+              "_class": "hudson.model.StringParameterValue",
+              "value": "branch"
+            },
+            "name": "REF_TYPE",
+            "choices": [
+              "branch",
+              "tag",
+              "commit"
+            ]
+          },
+          "GIT_REF": {
+            "_class": "hudson.model.StringParameterDefinition",
+            "defaultParameterValue": {
+              "_class": "hudson.model.StringParameterValue",
+              "value": "main"
+            },
+            "name": "GIT_REF"
+          },
+          "COMPILER_IMAGE": {
+            "_class": "hudson.model.StringParameterDefinition",
+            "defaultParameterValue": {
+              "_class": "hudson.model.StringParameterValue",
+              "value": "192.168.10.35/xnet/xran-compile:latest"
+            },
+            "name": "COMPILER_IMAGE"
+          },
+          "COMPILER_IMAGE_PULL_POLICY": {
+            "_class": "hudson.model.ChoiceParameterDefinition",
+            "defaultParameterValue": {
+              "_class": "hudson.model.StringParameterValue",
+              "value": "Always"
+            },
+            "name": "COMPILER_IMAGE_PULL_POLICY",
+            "choices": [
+              "Always",
+              "IfNotPresent",
+              "Never"
+            ]
+          },
+          "SERVICE_TARGET": {
+            "_class": "hudson.model.ChoiceParameterDefinition",
+            "defaultParameterValue": {
+              "_class": "hudson.model.StringParameterValue",
+              "value": "serviceA"
+            },
+            "name": "SERVICE_TARGET",
+            "choices": [
+              "serviceA",
+              "serviceB",
+              "serviceC",
+              "all",
+              "services_all"
+            ]
+          },
+          "IMAGE_TARGET": {
+            "_class": "hudson.model.ChoiceParameterDefinition",
+            "defaultParameterValue": {
+              "_class": "hudson.model.StringParameterValue",
+              "value": "imageA"
+            },
+            "name": "IMAGE_TARGET",
+            "choices": [
+              "imageA",
+              "imageB",
+              "imageC"
+            ]
+          },
+          "IMAGE_TAG": {
+            "_class": "hudson.model.StringParameterDefinition",
+            "defaultParameterValue": {
+              "_class": "hudson.model.StringParameterValue",
+              "value": "latest"
+            },
+            "name": "IMAGE_TAG"
+          }
+        }
+      },
+      {
+        "name": "真实插件环境的模板隔离与非法输入检查",
+        "status": "PASS",
+        "details": {
+          "status": "PASS",
+          "templateCases": 18,
+          "invalidReferencesRejected": 5,
+          "invalidPolicyRejected": true
+        }
+      },
+      {
+        "name": "Always 服务包及实际 Pod 镜像 ID",
+        "status": "PASS",
+        "details": {
+          "build": 55,
+          "metadataImageId": "localhost:15050/xnet/xran-compile@sha256:6ddacad26009f23b54529a8083869c125db8f1a0e8f9f1e4265c343d5e952612",
+          "pod": {
+            "pod": "x-ran-cloud-55-ld84n-wxbfj-9rg57",
+            "image": "localhost:15050/xnet/xran-compile:latest",
+            "policy": "Always",
+            "imageId": "localhost:15050/xnet/xran-compile@sha256:6ddacad26009f23b54529a8083869c125db8f1a0e8f9f1e4265c343d5e952612",
+            "waiting": null,
+            "resources": {
+              "limits": {
+                "cpu": "3750m",
+                "ephemeral-storage": "20224Mi",
+                "memory": "7680Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "1Gi",
+                "memory": "1Gi"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "IfNotPresent 使用已导入内网地址镜像",
+        "status": "PASS",
+        "details": {
+          "build": 56,
+          "metadataImageId": "localhost:15050/xnet/xran-compile@sha256:8652ab174b1c14d84085c4b4d4e18f9eeabdf79e41f57861ce3a20b1146ce118",
+          "pod": {
+            "pod": "x-ran-cloud-56-gbdv0-g1qzs-tvc1g",
+            "image": "192.168.10.35/xnet/xran-compile:latest",
+            "policy": "IfNotPresent",
+            "imageId": "localhost:15050/xnet/xran-compile@sha256:8652ab174b1c14d84085c4b4d4e18f9eeabdf79e41f57861ce3a20b1146ce118",
+            "waiting": null,
+            "resources": {
+              "limits": {
+                "cpu": "3750m",
+                "ephemeral-storage": "20224Mi",
+                "memory": "7680Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "1Gi",
+                "memory": "1Gi"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Never 使用已导入内网地址镜像",
+        "status": "PASS",
+        "details": {
+          "build": 57,
+          "metadataImageId": "localhost:15050/xnet/xran-compile@sha256:8652ab174b1c14d84085c4b4d4e18f9eeabdf79e41f57861ce3a20b1146ce118",
+          "pod": {
+            "pod": "x-ran-cloud-57-4dww6-qm47j-ntggc",
+            "image": "192.168.10.35/xnet/xran-compile:latest",
+            "policy": "Never",
+            "imageId": "localhost:15050/xnet/xran-compile@sha256:8652ab174b1c14d84085c4b4d4e18f9eeabdf79e41f57861ce3a20b1146ce118",
+            "waiting": null,
+            "resources": {
+              "limits": {
+                "cpu": "3750m",
+                "ephemeral-storage": "20224Mi",
+                "memory": "7680Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "1Gi",
+                "memory": "1Gi"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "指定另一个 SDK 版本构建业务镜像并下载运行",
+        "status": "PASS",
+        "details": {
+          "build": 58,
+          "metadataImageId": "localhost:15050/xnet/xran-compile@sha256:9a1e32c5830ad762f5dfba9899456ae77df030251f38ae28e2620ca5685f63ed",
+          "pod": {
+            "pod": "x-ran-cloud-58-7rznn-615jr-qcsdm",
+            "image": "localhost:15050/xnet/xran-compile:verification-variant",
+            "policy": "Always",
+            "imageId": "localhost:15050/xnet/xran-compile@sha256:9a1e32c5830ad762f5dfba9899456ae77df030251f38ae28e2620ca5685f63ed",
+            "waiting": null,
+            "resources": {
+              "limits": {
+                "cpu": "2500m",
+                "ephemeral-storage": "10Gi",
+                "memory": "6656Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "1Gi",
+                "memory": "1Gi"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "不同编译镜像并发运行且互不影响",
+        "status": "PASS",
+        "details": {
+          "builds": [
+            59,
+            60
+          ],
+          "pods": {
+            "59": {
+              "pod": "x-ran-cloud-59-m40tt-hf1fl-7h0nj",
+              "image": "localhost:15050/xnet/xran-compile:latest",
+              "policy": "Always",
+              "imageId": "localhost:15050/xnet/xran-compile@sha256:6ddacad26009f23b54529a8083869c125db8f1a0e8f9f1e4265c343d5e952612",
+              "waiting": null,
+              "resources": {
+                "limits": {
+                  "cpu": "3750m",
+                  "ephemeral-storage": "20224Mi",
+                  "memory": "7680Mi"
+                },
+                "requests": {
+                  "cpu": "500m",
+                  "ephemeral-storage": "1Gi",
+                  "memory": "1Gi"
+                }
+              }
+            },
+            "60": {
+              "pod": "x-ran-cloud-60-x8bg8-f1r3l-b0wwh",
+              "image": "localhost:15050/xnet/xran-compile:verification-variant",
+              "policy": "Always",
+              "imageId": "localhost:15050/xnet/xran-compile@sha256:9a1e32c5830ad762f5dfba9899456ae77df030251f38ae28e2620ca5685f63ed",
+              "waiting": null,
+              "resources": {
+                "limits": {
+                  "cpu": "2500m",
+                  "ephemeral-storage": "10Gi",
+                  "memory": "6656Mi"
+                },
+                "requests": {
+                  "cpu": "500m",
+                  "ephemeral-storage": "1Gi",
+                  "memory": "1Gi"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "同 tag 已更新时 IfNotPresent 仍使用节点缓存",
+        "status": "PASS",
+        "details": {
+          "build": 61,
+          "metadataImageId": "localhost:15050/xnet/xran-compile@sha256:6ddacad26009f23b54529a8083869c125db8f1a0e8f9f1e4265c343d5e952612",
+          "pod": {
+            "pod": "x-ran-cloud-61-dhxb4-d1ctp-f78zr",
+            "image": "localhost:15050/xnet/xran-compile:latest",
+            "policy": "IfNotPresent",
+            "imageId": "localhost:15050/xnet/xran-compile@sha256:6ddacad26009f23b54529a8083869c125db8f1a0e8f9f1e4265c343d5e952612",
+            "waiting": null,
+            "resources": {
+              "limits": {
+                "cpu": "3750m",
+                "ephemeral-storage": "20224Mi",
+                "memory": "7680Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "1Gi",
+                "memory": "1Gi"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "同 tag 已更新时 Always 使用新摘要",
+        "status": "PASS",
+        "details": {
+          "build": 62,
+          "metadataImageId": "localhost:15050/xnet/xran-compile@sha256:9a1e32c5830ad762f5dfba9899456ae77df030251f38ae28e2620ca5685f63ed",
+          "pod": {
+            "pod": "x-ran-cloud-62-1brh4-z256t-1mxx2",
+            "image": "localhost:15050/xnet/xran-compile:latest",
+            "policy": "Always",
+            "imageId": "localhost:15050/xnet/xran-compile@sha256:9a1e32c5830ad762f5dfba9899456ae77df030251f38ae28e2620ca5685f63ed",
+            "waiting": null,
+            "resources": {
+              "limits": {
+                "cpu": "3750m",
+                "ephemeral-storage": "20224Mi",
+                "memory": "7680Mi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "ephemeral-storage": "1Gi",
+                "memory": "1Gi"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "非法编译镜像引用明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 63
+        }
+      },
+      {
+        "name": "不兼容的编译镜像明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 64
+        }
+      },
+      {
+        "name": "缺少镜像时 Never 有界失败并给出诊断",
+        "status": "PASS",
+        "details": {
+          "build": 65,
+          "durationMillis": 61026,
+          "result": "FAILURE"
+        }
+      },
+      {
+        "name": "缺少镜像时 Always 有界失败并给出诊断",
+        "status": "PASS",
+        "details": {
+          "build": 66,
+          "durationMillis": 60532,
+          "result": "FAILURE"
+        }
+      }
+    ],
+    "builds": [
+      {
+        "number": 55,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "sdk-1793883783",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 56,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceB",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "sdk-1793883783",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "IfNotPresent"
+        }
+      },
+      {
+        "number": 57,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceC",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "sdk-1793883783",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 58,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "sdk-1793883783",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:verification-variant",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 59,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 60,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageB",
+          "IMAGE_TAG": "sdk-parallel-1793883783",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:verification-variant",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 61,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "sdk-1793883783",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "IfNotPresent"
+        }
+      },
+      {
+        "number": 62,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "sdk-1793883783",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 63,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "ubuntu:latest\nprivileged: true",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 64,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/pull-probe:jammy",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 65,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:missing-1793883783",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 66,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:missing-1793883783",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      }
+    ],
+    "status": "PASS",
+    "finishedAt": "2026-11-05T21:11:00+0800"
+  },
+  "browser": {
+    "serviceForm": {
+      "BUILD_KIND": {
+        "visible": true,
+        "value": "service"
+      },
+      "REF_TYPE": {
+        "visible": true,
+        "value": "branch"
+      },
+      "GIT_REF": {
+        "visible": true,
+        "value": "main"
+      },
+      "COMPILER_IMAGE": {
+        "visible": true,
+        "value": "192.168.10.35/xnet/xran-compile:latest"
+      },
+      "COMPILER_IMAGE_PULL_POLICY": {
+        "visible": true,
+        "value": "Always"
+      },
+      "SERVICE_TARGET": {
+        "visible": true,
+        "value": "serviceA"
+      },
+      "IMAGE_TARGET": {
+        "visible": false,
+        "value": "imageA"
+      },
+      "IMAGE_TAG": {
+        "visible": false,
+        "value": "latest"
+      }
+    },
+    "imageForm": {
+      "COMPILER_IMAGE": {
+        "visible": true,
+        "value": "192.168.10.35/xnet/xran-compile:latest"
+      },
+      "COMPILER_IMAGE_PULL_POLICY": {
+        "visible": true,
+        "value": "Always"
+      },
+      "SERVICE_TARGET": {
+        "visible": false,
+        "value": "serviceA"
+      },
+      "IMAGE_TARGET": {
+        "visible": true,
+        "value": "imageA"
+      },
+      "IMAGE_TAG": {
+        "visible": true,
+        "value": "latest"
+      }
+    },
+    "switchRetention": {
+      "status": "PASS",
+      "image": {
+        "visible": true,
+        "value": "localhost:15050/xnet/xran-compile:latest"
+      },
+      "policy": {
+        "visible": true,
+        "value": "Never"
+      }
+    },
+    "history": [
+      {
+        "build": 55,
+        "status": "PASS",
+        "data": {
+          "BUILD_KIND": {
+            "visible": true,
+            "value": "service"
+          },
+          "COMPILER_IMAGE": {
+            "visible": true,
+            "value": "localhost:15050/xnet/xran-compile:latest"
+          },
+          "COMPILER_IMAGE_PULL_POLICY": {
+            "visible": true,
+            "value": "Always"
+          },
+          "SERVICE_TARGET": {
+            "visible": true,
+            "value": "serviceA"
+          },
+          "IMAGE_TARGET": {
+            "visible": false,
+            "value": "imageA"
+          },
+          "IMAGE_TAG": {
+            "visible": false,
+            "value": "sdk-1793883783"
+          }
+        }
+      },
+      {
+        "build": 58,
+        "status": "PASS",
+        "data": {
+          "BUILD_KIND": {
+            "visible": true,
+            "value": "image"
+          },
+          "COMPILER_IMAGE": {
+            "visible": true,
+            "value": "localhost:15050/xnet/xran-compile:verification-variant"
+          },
+          "COMPILER_IMAGE_PULL_POLICY": {
+            "visible": true,
+            "value": "Always"
+          },
+          "SERVICE_TARGET": {
+            "visible": false,
+            "value": "serviceA"
+          },
+          "IMAGE_TARGET": {
+            "visible": true,
+            "value": "imageA"
+          },
+          "IMAGE_TAG": {
+            "visible": true,
+            "value": "sdk-1793883783"
+          }
+        }
+      },
+      {
+        "build": 43,
+        "status": "PASS",
+        "data": {
+          "BUILD_KIND": {
+            "visible": true,
+            "value": "service"
+          },
+          "COMPILER_IMAGE": null,
+          "COMPILER_IMAGE_PULL_POLICY": null,
+          "SERVICE_TARGET": {
+            "visible": true,
+            "value": "serviceC"
+          },
+          "IMAGE_TARGET": {
+            "visible": false,
+            "value": "imageA"
+          },
+          "IMAGE_TAG": {
+            "visible": false,
+            "value": "latest"
+          }
+        }
+      },
+      {
+        "build": 35,
+        "status": "PASS",
+        "data": {
+          "BUILD_KIND": {
+            "visible": true,
+            "value": "image"
+          },
+          "COMPILER_IMAGE": null,
+          "COMPILER_IMAGE_PULL_POLICY": null,
+          "SERVICE_TARGET": {
+            "visible": false,
+            "value": "serviceA"
+          },
+          "IMAGE_TARGET": {
+            "visible": true,
+            "value": "imageB"
+          },
+          "IMAGE_TAG": {
+            "visible": true,
+            "value": "ui-2026-11-05"
+          }
+        }
+      }
+    ],
+    "finalSubmission": {
+      "status": "PASS",
+      "build": 76,
+      "submission": "native browser Build with Parameters form",
+      "user": "builder1",
+      "metadata": {
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+        "ref": "db3051980abe0cc90204f771b96ebb7a728341b2",
+        "refType": "commit",
+        "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+        "buildNumber": "76",
+        "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/76/",
+        "job": "x-ran-cloud",
+        "userId": "builder1",
+        "userName": "Builder One",
+        "kind": "service",
+        "target": "serviceC",
+        "imageTag": null,
+        "builderImage": "localhost:15050/xnet/xran-compile:latest",
+        "builderImagePullPolicy": "Always",
+        "startedAt": "2026-11-05T21:32:32+08:00",
+        "builderImageId": "localhost:15050/xnet/xran-compile@sha256:58629dc97020050755751cd5f989edbb49067da9315256c7b29e7b4364ec7d46",
+        "builderPod": "x-ran-cloud-76-hf958-xf4q5-l79zk",
+        "result": "SUCCESS",
+        "durationMillis": 19236,
+        "files": [
+          {
+            "name": "serviceC.tar.gz",
+            "size": 2497,
+            "sha256": "e247541dad2fbc31025a4533e078cadbadd4aa7bf2f0a6cf209909f73293a817"
+          }
+        ],
+        "collectionErrors": [],
+        "finishedAt": "2026-11-05T13:32:51.586668+00:00"
+      },
+      "registryManifestDigest": "sha256:58629dc97020050755751cd5f989edbb49067da9315256c7b29e7b4364ec7d46",
+      "registryConfigDigest": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "downloadChecksumVerified": true,
+      "serviceContentsVerified": true
+    },
+    "finalHistory": {
+      "status": "PASS",
+      "data": {
+        "BUILD_KIND": {
+          "visible": true,
+          "value": "service"
+        },
+        "COMPILER_IMAGE": {
+          "visible": true,
+          "value": "localhost:15050/xnet/xran-compile:latest"
+        },
+        "COMPILER_IMAGE_PULL_POLICY": {
+          "visible": true,
+          "value": "Always"
+        },
+        "SERVICE_TARGET": {
+          "visible": true,
+          "value": "serviceC"
+        },
+        "IMAGE_TARGET": {
+          "visible": false,
+          "value": "imageA"
+        },
+        "IMAGE_TAG": {
+          "visible": false,
+          "value": "latest"
+        }
+      }
+    }
+  },
+  "finalDeployment": {
+    "status": "PASS",
+    "pipelineSha256": "fe622ae8fabd36555c74971211fc6e0b2e1d410f2b3eb19633e10dd1191d3df6",
+    "controllerImage": "docker.io/xran-ci/controller:2.580.2-6",
+    "controllerImageId": "sha256:5e879c2f2ee650a7c7cd9164b44dfcb30b7d04d8ca6a5d8eb24b92ac94c071ee",
+    "controllerReady": true,
+    "defaultBuilderImage": "192.168.10.35/xnet/xran-compile:latest",
+    "defaultPullPolicy": "Always",
+    "concurrency": 6,
+    "temporaryStorageGiB": 20,
+    "pvcSize": "250Gi",
+    "agentStartupTimeoutMinutes": 15
+  },
+  "finalFunctional": {
+    "namespace": "jenkins",
+    "startedAt": "2026-11-05T21:27:27+0800",
+    "checks": [
+      {
+        "name": "全部插件启用",
+        "status": "PASS",
+        "details": {
+          "count": 73
+        }
+      },
+      {
+        "name": "匿名访问及普通账号管理权限受限",
+        "status": "PASS",
+        "details": null
+      },
+      {
+        "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+        "status": "PASS",
+        "details": {
+          "builder1": {
+            "visibleJobs": [
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "45/consoleText": 404,
+              "build": 404
+            }
+          },
+          "builder2": {
+            "visibleJobs": [
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "45/consoleText": 404,
+              "build": 404
+            }
+          }
+        }
+      },
+      {
+        "name": "serviceA 分支",
+        "status": "PASS",
+        "details": {
+          "build": 67,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "serviceB 演示分支",
+        "status": "PASS",
+        "details": {
+          "build": 68,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "serviceC tag",
+        "status": "PASS",
+        "details": {
+          "build": 69,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "带注释 tag",
+        "status": "PASS",
+        "details": {
+          "build": 70,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "all 多包",
+        "status": "PASS",
+        "details": {
+          "build": 71,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "services_all 历史完整 SHA",
+        "status": "PASS",
+        "details": {
+          "build": 72,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "唯一短 SHA",
+        "status": "PASS",
+        "details": {
+          "build": 73,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageA build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 74,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageB build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 75,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageC build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 77,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "不存在的 Git 引用明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 78
+        }
+      },
+      {
+        "name": "非法标签明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 79
+        }
+      },
+      {
+        "name": "push 失败仍能下载并运行有效镜像 tar",
+        "status": "PASS",
+        "details": {
+          "build": 80
+        }
+      }
+    ],
+    "builds": [
+      {
+        "number": 67,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 68,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "demo/feature",
+          "SERVICE_TARGET": "serviceB",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 69,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "tag",
+          "GIT_REF": "demo-v1.0.0",
+          "SERVICE_TARGET": "serviceC",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 70,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "tag",
+          "GIT_REF": "demo-v1.0.0-annotated",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 71,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "all",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 72,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "commit",
+          "GIT_REF": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+          "SERVICE_TARGET": "services_all",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 73,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "commit",
+          "GIT_REF": "db3051980",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 74,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "verify-1793885251",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 75,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageB",
+          "IMAGE_TAG": "verify-1793885251",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 77,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageC",
+          "IMAGE_TAG": "verify-1793885251",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 78,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "missing-ci-reference",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 79,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "bad;touch /tmp/injected",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      },
+      {
+        "number": 80,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "push-failure-ci",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Never"
+        }
+      }
+    ],
+    "status": "PASS",
+    "finishedAt": "2026-11-05T21:36:15+0800"
+  },
+  "finalArtifactMetadata": {
+    "67": {
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+      "ref": "main",
+      "refType": "branch",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "67",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/67/",
+      "job": "x-ran-cloud",
+      "userId": "builder1",
+      "userName": "Builder One",
+      "kind": "service",
+      "target": "serviceA",
+      "imageTag": null,
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:27:36+08:00",
+      "builderImageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "builderPod": "x-ran-cloud-67-l79qh-l58bp-rc2ft",
+      "result": "SUCCESS",
+      "durationMillis": 20800,
+      "files": [
+        {
+          "name": "serviceA.tar.gz",
+          "size": 2498,
+          "sha256": "9ba0fc8e503f8b69ff261d20f2c93f755bbe0308663e51a1f22b9c1fc3f779b8"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:27:58.125717+00:00"
+    },
+    "68": {
+      "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+      "ref": "demo/feature",
+      "refType": "branch",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "68",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/68/",
+      "job": "x-ran-cloud",
+      "userId": "builder2",
+      "userName": "Builder Two",
+      "kind": "service",
+      "target": "serviceB",
+      "imageTag": null,
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:28:11+08:00",
+      "builderImageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "builderPod": "x-ran-cloud-68-080gc-n22mv-ks5s8",
+      "result": "SUCCESS",
+      "durationMillis": 18466,
+      "files": [
+        {
+          "name": "serviceB.tar.gz",
+          "size": 2495,
+          "sha256": "1af5d99d6fc0c036a9686b8934d898305d3e0bf8a686ead3606154e5740f953f"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:28:30.815969+00:00"
+    },
+    "69": {
+      "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+      "ref": "demo-v1.0.0",
+      "refType": "tag",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "69",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/69/",
+      "job": "x-ran-cloud",
+      "userId": "builder1",
+      "userName": "Builder One",
+      "kind": "service",
+      "target": "serviceC",
+      "imageTag": null,
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:28:41+08:00",
+      "builderImageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "builderPod": "x-ran-cloud-69-89rvs-8mjmb-z28t5",
+      "result": "SUCCESS",
+      "durationMillis": 17650,
+      "files": [
+        {
+          "name": "serviceC.tar.gz",
+          "size": 2494,
+          "sha256": "9d30ac565e4c73325eb1805b747da158c18f087f2b22687ddf6d27998e48e3c0"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:29:00.016565+00:00"
+    },
+    "70": {
+      "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+      "ref": "demo-v1.0.0-annotated",
+      "refType": "tag",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "70",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/70/",
+      "job": "x-ran-cloud",
+      "userId": "builder2",
+      "userName": "Builder Two",
+      "kind": "service",
+      "target": "serviceA",
+      "imageTag": null,
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:29:11+08:00",
+      "builderImageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "builderPod": "x-ran-cloud-70-8bq9n-6dwpc-gdhfx",
+      "result": "SUCCESS",
+      "durationMillis": 18231,
+      "files": [
+        {
+          "name": "serviceA.tar.gz",
+          "size": 2496,
+          "sha256": "4d92deea3e7c97677c39295b16276423a3f86342c6aedf1e6007bec84b245c04"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:29:30.573309+00:00"
+    },
+    "71": {
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+      "ref": "main",
+      "refType": "branch",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "71",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/71/",
+      "job": "x-ran-cloud",
+      "userId": "builder1",
+      "userName": "Builder One",
+      "kind": "service",
+      "target": "all",
+      "imageTag": null,
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:29:41+08:00",
+      "builderImageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "builderPod": "x-ran-cloud-71-s99px-gsss2-2vkh6",
+      "result": "SUCCESS",
+      "durationMillis": 17746,
+      "files": [
+        {
+          "name": "serviceA.tar.gz",
+          "size": 2499,
+          "sha256": "8f5c0ad82b1586cc3c4c562b3701f1a0dc6a963ddded39b623d75b600ca38af9"
+        },
+        {
+          "name": "serviceB.tar.gz",
+          "size": 2500,
+          "sha256": "fe062a84f50d4341ff387946719d0b7f80eeedbff6d319e6ef31734dffbf65be"
+        },
+        {
+          "name": "serviceC.tar.gz",
+          "size": 2496,
+          "sha256": "44ef14c197d63336ac7550d6b4ac37d0ea970062ab90e48cee10144de19a85e6"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:30:00.118967+00:00"
+    },
+    "72": {
+      "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+      "ref": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+      "refType": "commit",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "72",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/72/",
+      "job": "x-ran-cloud",
+      "userId": "builder2",
+      "userName": "Builder Two",
+      "kind": "service",
+      "target": "services_all",
+      "imageTag": null,
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:30:11+08:00",
+      "builderImageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "builderPod": "x-ran-cloud-72-6z8c3-3h3fc-sj4x7",
+      "result": "SUCCESS",
+      "durationMillis": 17055,
+      "files": [
+        {
+          "name": "L2L3_1105213028_c8ebfd1f2.tar.gz",
+          "size": 2948,
+          "sha256": "e79f743cbb8472304e32b3846b1fe1fe786027466445e653ca66e323db02c2c4"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:30:29.427981+00:00"
+    },
+    "73": {
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+      "ref": "db3051980",
+      "refType": "commit",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "73",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/73/",
+      "job": "x-ran-cloud",
+      "userId": "builder1",
+      "userName": "Builder One",
+      "kind": "service",
+      "target": "serviceA",
+      "imageTag": null,
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:30:42+08:00",
+      "builderImageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "builderPod": "x-ran-cloud-73-5qp5x-rd0nz-2nw6x",
+      "result": "SUCCESS",
+      "durationMillis": 18287,
+      "files": [
+        {
+          "name": "serviceA.tar.gz",
+          "size": 2499,
+          "sha256": "b8f230e29faffef8bf07ebe890cb0f355eeb3a236fb3237191260d49abbd2a34"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:31:00.647697+00:00"
+    },
+    "74": {
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+      "ref": "main",
+      "refType": "branch",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "74",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/74/",
+      "job": "x-ran-cloud",
+      "userId": "builder2",
+      "userName": "Builder Two",
+      "kind": "image",
+      "target": "imageA",
+      "imageTag": "verify-1793885251",
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:31:12+08:00",
+      "builderImageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "builderPod": "x-ran-cloud-74-f343t-hqpqv-63b0k",
+      "result": "SUCCESS",
+      "durationMillis": 26050,
+      "imageReference": "xran-registry:5000/xran-demo/imagea:verify-1793885251",
+      "pushStatus": "success",
+      "imageId": "sha256:5fbdf6955d144d0e94af51fba132ec1e20a964fde63e1e6fc2afe1bdd81448f2",
+      "repoDigests": [
+        "xran-registry:5000/xran-demo/imagea@sha256:481bba607232fcd99fc2b560db3e01cc8cd7bcc52433a1f3da4992fc891702f5"
+      ],
+      "files": [
+        {
+          "name": "imageA.tar",
+          "size": 80658944,
+          "sha256": "fdfa7bfb0fa6154a695a67a0939fd16d64c22b3eb6b165c1c05d3e878fb46994"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:31:38.540720+00:00"
+    },
+    "75": {
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+      "ref": "main",
+      "refType": "branch",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "75",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/75/",
+      "job": "x-ran-cloud",
+      "userId": "builder1",
+      "userName": "Builder One",
+      "kind": "image",
+      "target": "imageB",
+      "imageTag": "verify-1793885251",
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:32:17+08:00",
+      "builderImageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+      "builderPod": "x-ran-cloud-75-p48l2-6k4qh-1gm5t",
+      "result": "SUCCESS",
+      "durationMillis": 29786,
+      "imageReference": "xran-registry:5000/xran-demo/imageb:verify-1793885251",
+      "pushStatus": "success",
+      "imageId": "sha256:78f3159319d16f88c69a24fd04d42d46dad3ecc8591e990185fac297bf0876af",
+      "repoDigests": [
+        "xran-registry:5000/xran-demo/imageb@sha256:cef206948ddb067af0284b341f6a015186d341925daba4cb160d4af3552874eb"
+      ],
+      "files": [
+        {
+          "name": "imageB.tar",
+          "size": 80658944,
+          "sha256": "4dde609ae43e98ee2e3722772a8d4eb9396f4ae32a153ae97cbeb45d6276c399"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:32:47.289844+00:00"
+    },
+    "77": {
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+      "ref": "main",
+      "refType": "branch",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "77",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/77/",
+      "job": "x-ran-cloud",
+      "userId": "builder2",
+      "userName": "Builder Two",
+      "kind": "image",
+      "target": "imageC",
+      "imageTag": "verify-1793885251",
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:33:27+08:00",
+      "builderImageId": "localhost:15050/xnet/xran-compile@sha256:58629dc97020050755751cd5f989edbb49067da9315256c7b29e7b4364ec7d46",
+      "builderPod": "x-ran-cloud-77-d2ds5-jz3n4-cxdwx",
+      "result": "SUCCESS",
+      "durationMillis": 31146,
+      "imageReference": "xran-registry:5000/xran-demo/imagec:verify-1793885251",
+      "pushStatus": "success",
+      "imageId": "sha256:71a5d3fcef5617ff00eb4ce6e2fae5b3e17afc45e2e3dc8acf822388a298bb1d",
+      "repoDigests": [
+        "xran-registry:5000/xran-demo/imagec@sha256:4033dd2284fba0d6d128bf88cb796c43d367f585a23a41138b6fca981de589e5"
+      ],
+      "files": [
+        {
+          "name": "imageC.tar",
+          "size": 80658944,
+          "sha256": "a7c5708749a1db951b3481fff78e3f03b7c9a4664aac56153abfda32c3736163"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:33:58.586978+00:00"
+    },
+    "80": {
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+      "ref": "main",
+      "refType": "branch",
+      "repository": "http://xran-demo:8000/X-RAN-CLOUD.git",
+      "buildNumber": "80",
+      "buildUrl": "http://10.2.0.119:32080/job/x-ran-cloud/80/",
+      "job": "x-ran-cloud",
+      "userId": "builder1",
+      "userName": "Builder One",
+      "kind": "image",
+      "target": "imageA",
+      "imageTag": "push-failure-ci",
+      "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+      "builderImagePullPolicy": "Never",
+      "startedAt": "2026-11-05T21:35:22+08:00",
+      "builderImageId": "localhost:15050/xnet/xran-compile@sha256:58629dc97020050755751cd5f989edbb49067da9315256c7b29e7b4364ec7d46",
+      "builderPod": "x-ran-cloud-80-l93xg-5cgx5-3kt33",
+      "result": "FAILURE",
+      "durationMillis": 21525,
+      "imageReference": "127.0.0.1:1/xran-demo/imagea:push-failure-ci",
+      "pushStatus": "failed-or-not-reached",
+      "imageId": "sha256:2671c338f60092533dcb6e4bb154eb2a3b5129c8b4df7966845f6dc4179abdcb",
+      "repoDigests": [],
+      "files": [
+        {
+          "name": "imageA.tar",
+          "size": 80658944,
+          "sha256": "cc2fe7f292be30fe69eeab8ffc94d619644a8d3c1a6a9987838e41331db0d407"
+        }
+      ],
+      "collectionErrors": [],
+      "finishedAt": "2026-11-05T13:35:44.010544+00:00"
+    }
+  },
+  "registryLimit": {
+    "requestedRegistryReachableFromVerificationHost": false,
+    "requestedRegistryPushed": false,
+    "testRegistry": "localhost:15050",
+    "defaultCompilerImage": "192.168.10.35/xnet/xran-compile:latest",
+    "defaultPullPolicy": "Always"
+  }
+}
