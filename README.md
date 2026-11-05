@@ -59,9 +59,9 @@ make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.
 
 ## 使用
 
-1. 选择 BUILD_KIND=service 或 image。
-2. 选择 REF_TYPE=branch/tag/commit，输入 GIT_REF；短 SHA 必须唯一。
-3. 填写公共参数 COMPILER_IMAGE，选择 COMPILER_IMAGE_PULL_POLICY；分别默认为上述编译镜像和 Always。
+1. 填写公共参数 COMPILER_IMAGE，选择 COMPILER_IMAGE_PULL_POLICY；分别默认为上述编译镜像和 Always。
+2. 选择 BUILD_KIND=service 或 image。
+3. 选择 REF_TYPE=branch/tag/commit，输入 GIT_REF；短 SHA 必须唯一。
 4. 服务模式显示 SERVICE_TARGET（serviceA/B/C、all、services_all）；镜像模式显示 IMAGE_TARGET 和 IMAGE_TAG。
 5. 在该次构建的 Artifacts 下载文件，核对 SHA256SUMS 和 metadata.json。
 

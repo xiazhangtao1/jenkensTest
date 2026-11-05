@@ -17,6 +17,16 @@
 
   function update() {
     const kind = parameter("BUILD_KIND");
+    if (history && kind) {
+      let next = kind;
+      ["COMPILER_IMAGE_PULL_POLICY", "COMPILER_IMAGE"].forEach(name => {
+        const row = parameter(name);
+        if (row && row.parentNode === kind.parentNode) {
+          if (row.nextElementSibling !== next) next.before(row);
+          next = row;
+        }
+      });
+    }
     const select = kind && kind.querySelector('select[name="value"]');
     const value = select ? select.value : kind?.querySelector('.jenkins-quote')?.textContent.trim();
     if (!["service", "image"].includes(value)) return;
