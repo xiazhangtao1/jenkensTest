@@ -1593,5 +1593,23 @@
     "testRegistry": "localhost:15050",
     "defaultCompilerImage": "192.168.10.35/xnet/xran-compile:latest",
     "defaultPullPolicy": "Always"
+  },
+  "cleanCheckout": {
+    "status": "PASS",
+    "finishedAt": "2026-11-05T21:41:55+0800",
+    "sourceCommit": "28dd10401ba10299c5cabd7a5956ea919a07bf70",
+    "originalCompileDepUsed": false,
+    "jenkinsPluginCacheRequired": false,
+    "preparedInputs": [
+      ".cache/compile-apt",
+      ".cache/base-images.tar",
+      "Docker base images already loaded"
+    ],
+    "command": "python3 scripts/compile-image.py build --offline --no-export --image-name localhost:15050/xnet/checkout-check --image-tag 26.11.05",
+    "image": "localhost:15050/xnet/checkout-check:26.11.05",
+    "imageId": "sha256:7f25bb936c6456d1a2e64306b9663f65e78457dddd8f330651e55cb2be2123f7",
+    "sdkSmokePassed": true,
+    "ctestPassed": 2,
+    "existingDockerLayerCacheUsed": true
   }
 }

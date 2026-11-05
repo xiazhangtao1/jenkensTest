@@ -45,6 +45,9 @@ Jenkins 专项验收 16 项通过（#55–66），覆盖 Always/IfNotPresent/Nev
 Always 实际拉取的 Registry 摘要对应最终 SDK 配置 ID，下载包内容和校验值正确，历史 Parameters 显示正确。
 最终部署的流水线 SHA256 与仓库三段 Groovy 拼接结果一致；并发 6、临时存储 20GiB、PVC 250Gi 保持原配置。
 
+从已提交版本 `28dd104` 的干净检出运行独立 SDK 离线入口，仅提供 APT 缓存、基础镜像归档及主机已加载的镜像，
+不使用原 compileDep 或 Jenkins 插件缓存；复用 Docker 构建层后得到同一最终镜像 ID，两个 CTest 和附加 SDK 检查再次通过。
+
 验证机无法路由到 `192.168.10.35`，Always 联调使用现有演示 Registry 的临时本机转发；
 没有向指定内网 Registry 推送镜像。最终部署保留 `192.168.10.35/xnet/xran-compile:latest` 和 Always 默认值，
 仅使用节点导入镜像时须选择 Never。其他离线基础设施容器仍使用 Never。
