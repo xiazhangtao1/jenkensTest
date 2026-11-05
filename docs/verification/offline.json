@@ -1,0 +1,296 @@
+{
+  "namespace": "jenkins-offline-verify",
+  "startedAt": "2026-11-05T15:42:53+0800",
+  "checks": [
+    {
+      "name": "全部插件启用",
+      "status": "PASS",
+      "details": {
+        "count": 73
+      }
+    },
+    {
+      "name": "匿名访问及普通账号管理权限受限",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "serviceA 分支",
+      "status": "PASS",
+      "details": {
+        "build": 1,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "serviceB 演示分支",
+      "status": "PASS",
+      "details": {
+        "build": 2,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "serviceC tag",
+      "status": "PASS",
+      "details": {
+        "build": 3,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "带注释 tag",
+      "status": "PASS",
+      "details": {
+        "build": 4,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "all 多包",
+      "status": "PASS",
+      "details": {
+        "build": 5,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "services_all 历史完整 SHA",
+      "status": "PASS",
+      "details": {
+        "build": 6,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "唯一短 SHA",
+      "status": "PASS",
+      "details": {
+        "build": 7,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "imageA build/save/push/load",
+      "status": "PASS",
+      "details": {
+        "build": 8,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "imageB 离线 build/save/push/load",
+      "status": "PASS",
+      "details": {
+        "build": 10
+      }
+    },
+    {
+      "name": "imageC 离线 build/save/push/load",
+      "status": "PASS",
+      "details": {
+        "build": 11
+      }
+    },
+    {
+      "name": "离线不存在引用明确失败",
+      "status": "PASS",
+      "details": {
+        "build": 12
+      }
+    },
+    {
+      "name": "离线非法镜像标签明确失败",
+      "status": "PASS",
+      "details": {
+        "build": 13
+      }
+    },
+    {
+      "name": "离线 push 失败保留有效 tar",
+      "status": "PASS",
+      "details": {
+        "build": 14
+      }
+    }
+  ],
+  "builds": [
+    {
+      "number": 1,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 2,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "demo/feature",
+        "SERVICE_TARGET": "serviceB",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 3,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "tag",
+        "GIT_REF": "demo-v1.0.0",
+        "SERVICE_TARGET": "serviceC",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 4,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "tag",
+        "GIT_REF": "demo-v1.0.0-annotated",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 5,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "all",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 6,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "commit",
+        "GIT_REF": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+        "SERVICE_TARGET": "services_all",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 7,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "commit",
+        "GIT_REF": "db3051980",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 8,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "verify-1793864574"
+      }
+    },
+    {
+      "number": 9,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageB",
+        "IMAGE_TAG": "verify-1793864574"
+      }
+    },
+    {
+      "number": 10,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageB",
+        "IMAGE_TAG": "offline-verify-1793867466"
+      }
+    },
+    {
+      "number": 11,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageC",
+        "IMAGE_TAG": "offline-verify-1793867532"
+      }
+    },
+    {
+      "number": 12,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "missing-ci-reference",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 13,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "bad;touch /tmp/injected"
+      }
+    },
+    {
+      "number": 14,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "offline-push-failure"
+      }
+    }
+  ],
+  "status": "PASS",
+  "finishedAt": "2026-11-05T16:34:48+0800",
+  "failedAttempts": [
+    {
+      "number": 9,
+      "result": "ABORTED",
+      "reason": "Existing CPU admission pool exhausted with integer per-container quota; CPU split updated with unchanged total."
+    }
+  ]
+}

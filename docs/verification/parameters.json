@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "sharedParameters": [
+    "BUILD_KIND",
+    "REF_TYPE",
+    "GIT_REF"
+  ],
+  "serviceOnly": [
+    "SERVICE_TARGET"
+  ],
+  "imageOnly": [
+    "IMAGE_TARGET",
+    "IMAGE_TAG"
+  ],
+  "preservesInputOnToggle": true,
+  "builds": [
+    {
+      "buildNumber": "34",
+      "kind": "service",
+      "target": "serviceC",
+      "imageTag": null,
+      "userId": "builder1",
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+      "result": "SUCCESS"
+    },
+    {
+      "buildNumber": "35",
+      "kind": "image",
+      "target": "imageB",
+      "imageTag": "ui-2026-11-05",
+      "userId": "builder1",
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+      "result": "SUCCESS"
+    }
+  ]
+}

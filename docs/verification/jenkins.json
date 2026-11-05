@@ -1,0 +1,542 @@
+{
+  "namespace": "jenkins",
+  "startedAt": "2026-11-05T15:09:43+0800",
+  "checks": [
+    {
+      "name": "全部插件启用",
+      "status": "PASS",
+      "details": {
+        "count": 73
+      }
+    },
+    {
+      "name": "匿名访问及普通账号管理权限受限",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "serviceA 分支",
+      "status": "PASS",
+      "details": {
+        "build": 10,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "serviceB 演示分支",
+      "status": "PASS",
+      "details": {
+        "build": 11,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "serviceC tag",
+      "status": "PASS",
+      "details": {
+        "build": 12,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "带注释 tag",
+      "status": "PASS",
+      "details": {
+        "build": 13,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "all 多包",
+      "status": "PASS",
+      "details": {
+        "build": 14,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "services_all 历史完整 SHA",
+      "status": "PASS",
+      "details": {
+        "build": 15,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "唯一短 SHA",
+      "status": "PASS",
+      "details": {
+        "build": 16,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "imageA build/save/push/load",
+      "status": "PASS",
+      "details": {
+        "build": 17,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "imageB build/save/push/load",
+      "status": "PASS",
+      "details": {
+        "build": 18,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "imageC build/save/push/load",
+      "status": "PASS",
+      "details": {
+        "build": 19,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "不存在的 Git 引用明确失败",
+      "status": "PASS",
+      "details": {
+        "build": 20
+      }
+    },
+    {
+      "name": "非法标签明确失败",
+      "status": "PASS",
+      "details": {
+        "build": 21
+      }
+    },
+    {
+      "name": "push 失败仍能下载并运行有效镜像 tar",
+      "status": "PASS",
+      "details": {
+        "build": 22
+      }
+    },
+    {
+      "name": "七任务提交，最多六个并发",
+      "status": "PASS",
+      "details": {
+        "builds": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "maximumPods": 6
+      }
+    },
+    {
+      "name": "同标签串行，其他目标并行",
+      "status": "PASS",
+      "details": {
+        "builds": [
+          30,
+          31,
+          32
+        ]
+      }
+    },
+    {
+      "name": "取消任务",
+      "status": "PASS",
+      "details": {
+        "build": 33
+      }
+    },
+    {
+      "name": "磁盘压力、最早回收、保留保护、审计和空间不足拒绝",
+      "status": "PASS",
+      "details": {
+        "oldestDeleted": "x-ran-cloud#30",
+        "protectedBuild": "x-ran-cloud#32",
+        "rejectedWhenInsufficient": true,
+        "audit": true
+      }
+    },
+    {
+      "name": "六个不同标签镜像并发构建",
+      "status": "PASS",
+      "details": {
+        "builds": [
+          36,
+          37,
+          38,
+          39,
+          40,
+          41
+        ],
+        "maximumPods": 6
+      }
+    }
+  ],
+  "builds": [
+    {
+      "number": 10,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 11,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "demo/feature",
+        "SERVICE_TARGET": "serviceB",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 12,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "tag",
+        "GIT_REF": "demo-v1.0.0",
+        "SERVICE_TARGET": "serviceC",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 13,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "tag",
+        "GIT_REF": "demo-v1.0.0-annotated",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 14,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "all",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 15,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "commit",
+        "GIT_REF": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+        "SERVICE_TARGET": "services_all",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 16,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "commit",
+        "GIT_REF": "db3051980",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 17,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "verify-1793862584"
+      }
+    },
+    {
+      "number": 18,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageB",
+        "IMAGE_TAG": "verify-1793862584"
+      }
+    },
+    {
+      "number": 19,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageC",
+        "IMAGE_TAG": "verify-1793862584"
+      }
+    },
+    {
+      "number": 20,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "missing-ci-reference",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 21,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "bad;touch /tmp/injected"
+      }
+    },
+    {
+      "number": 22,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "push-failure-ci"
+      }
+    },
+    {
+      "number": 23,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 24,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceB",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 25,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceC",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 26,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 27,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceB",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 28,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceC",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 29,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 30,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "same-tag-ci"
+      }
+    },
+    {
+      "number": 31,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "tag",
+        "GIT_REF": "demo-v1.0.0",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "same-tag-ci"
+      }
+    },
+    {
+      "number": 32,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceB",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 33,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    },
+    {
+      "number": 36,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "parallel-ci-1793867134-0"
+      }
+    },
+    {
+      "number": 37,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageB",
+        "IMAGE_TAG": "parallel-ci-1793867134-1"
+      }
+    },
+    {
+      "number": 38,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageC",
+        "IMAGE_TAG": "parallel-ci-1793867134-2"
+      }
+    },
+    {
+      "number": 39,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "parallel-ci-1793867134-3"
+      }
+    },
+    {
+      "number": 40,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageB",
+        "IMAGE_TAG": "parallel-ci-1793867134-4"
+      }
+    },
+    {
+      "number": 41,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageC",
+        "IMAGE_TAG": "parallel-ci-1793867134-5"
+      }
+    }
+  ],
+  "status": "PASS",
+  "finishedAt": "2026-11-05T16:28:04+0800"
+}

@@ -1,0 +1,75 @@
+{
+  "namespace": "jenkins-restore-verify-3",
+  "startedAt": "2026-11-05T16:46:43+0800",
+  "checks": [
+    {
+      "name": "全部插件启用",
+      "status": "PASS",
+      "details": {
+        "count": 73
+      }
+    },
+    {
+      "name": "匿名访问及普通账号管理权限受限",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "全新 PVC 恢复全部构建历史、清理审计、流水线和参数定义",
+      "status": "PASS",
+      "details": {
+        "buildCount": 41,
+        "auditSHA256": "6e5abc0f9bf9635bdbb4471f198b04f7968c7bb7f0bf66fb83cfd3506bed7d55"
+      }
+    },
+    {
+      "name": "恢复后的历史产物可下载校验及使用",
+      "status": "PASS",
+      "details": {
+        "build": 34,
+        "kind": "service"
+      }
+    },
+    {
+      "name": "恢复后的历史产物可下载校验及使用",
+      "status": "PASS",
+      "details": {
+        "build": 35,
+        "kind": "image"
+      }
+    },
+    {
+      "name": "参数联动脚本随镜像和恢复持久化",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "恢复后可提交新的实际构建",
+      "status": "PASS",
+      "details": {
+        "build": 42
+      }
+    },
+    {
+      "name": "备份归档权限0600",
+      "status": "PASS",
+      "details": null
+    }
+  ],
+  "builds": [
+    {
+      "number": 42,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceB",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    }
+  ],
+  "status": "PASS",
+  "finishedAt": "2026-11-05T16:47:24+0800"
+}

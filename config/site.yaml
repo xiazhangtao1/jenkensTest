@@ -1,0 +1,28 @@
+# 内网迁移主要修改此文件。密码、SSH 私钥、Registry 密码通过 Secret 配置。
+namespace: jenkins
+release: jenkins
+nodePort: 32080
+jenkinsUrl: http://10.2.0.119:32080/
+storageClass: jenkins-local-path
+pvcSize: 250Gi
+concurrency: 6
+buildCpuLimit: 4
+buildMemoryGiB: 8
+temporaryStorageGiB: 20
+minimumFreeGiB: 50
+minimumFreePercent: 10
+buildTimeoutMinutes: 240
+demo: true
+# demo 模式使用同命名空间只读 Git 镜像及独立 Registry。
+gitUrl: http://xran-demo:8000/X-RAN-CLOUD.git
+gitCredentialsId: ''
+registry: xran-registry:5000
+registryCredentialsId: ''
+registryInsecure: true
+services: [serviceA, serviceB, serviceC]
+images: [imageA, imageB, imageC]
+# 真实项目镜像名到 Registry 仓库路径的映射，供元数据与推送检查使用。
+imageRepositories: {imageA: xran-demo/imagea, imageB: xran-demo/imageb, imageC: xran-demo/imagec}
+# 集群、Git、Registry、apt 源始终绕过代理。内网一般留空。
+proxy: ''
+noProxy: localhost,127.0.0.1,.svc,.cluster.local,10.2.0.119,172.30.0.0/16,192.168.10.0/24

@@ -1,0 +1,16 @@
+.git
+.state
+dist
+AGENTS.md
+.cache/images
+.cache/charts
+.cache/tools
+.cache/reports
+.cache/*
+!.cache/plugins/
+!.cache/apt-archives/
+!.cache/base-images.tar
+!.cache/demo.git/
+__pycache__
+.playwright-cli
+output

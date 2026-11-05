@@ -1,0 +1,4 @@
+deb http://192.168.10.36/ubuntu_22_04/ jammy main restricted universe multiverse
+deb http://192.168.10.36/ubuntu_22_04/ jammy-updates main restricted universe multiverse
+deb http://192.168.10.36/ubuntu_22_04/ jammy-backports main restricted universe multiverse
+deb http://192.168.10.36/ubuntu_22_04/ jammy-security main restricted universe multiverse

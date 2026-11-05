@@ -1,0 +1,10 @@
+kubernetes
+workflow-aggregator
+configuration-as-code
+git
+credentials-binding
+ssh-agent
+lockable-resources
+matrix-auth
+timestamper
+simple-theme-plugin

@@ -1,0 +1,42 @@
+{
+  "allImagesNever": [
+    {
+      "pod": "jenkins-0",
+      "container": "init",
+      "policy": "Never"
+    },
+    {
+      "pod": "jenkins-0",
+      "container": "jenkins",
+      "policy": "Never"
+    },
+    {
+      "pod": "x-ran-cloud-8-pdrwt-8cfsx-j629f",
+      "container": "jnlp",
+      "policy": "Never"
+    },
+    {
+      "pod": "x-ran-cloud-8-pdrwt-8cfsx-j629f",
+      "container": "builder",
+      "policy": "Never"
+    },
+    {
+      "pod": "x-ran-cloud-8-pdrwt-8cfsx-j629f",
+      "container": "dind",
+      "policy": "Never"
+    },
+    {
+      "pod": "xran-demo-6ccc9dc4f9-m6wcm",
+      "container": "xran-demo",
+      "policy": "Never"
+    },
+    {
+      "pod": "xran-registry-784997779d-vkfgr",
+      "container": "xran-registry",
+      "policy": "Never"
+    }
+  ],
+  "publicEgressBlocked": true,
+  "curlExitCode": 28,
+  "detail": "curl: (28) Connection timeout after 5001 ms\ncommand terminated with exit code 28"
+}
