@@ -276,7 +276,7 @@ def render(args):
         {'id': name, 'name': display, 'password': '${' + password + '}'} for name, display, password in [
             ('admin', 'CI Administrator', 'ADMIN_PASSWORD'), ('builder1', 'Builder One', 'BUILDER1_PASSWORD'),
             ('builder2', 'Builder Two', 'BUILDER2_PASSWORD')]]}}
-    authorization = {'globalMatrix': {'entries': [
+    authorization = {'projectMatrix': {'entries': [
         {'user': {'name': 'admin', 'permissions': ['Overall/Administer']}},
         {'group': {'name': 'authenticated', 'permissions': ['Overall/Read', 'Job/Read', 'Job/Build', 'Job/Cancel', 'View/Read']}}
     ]}}

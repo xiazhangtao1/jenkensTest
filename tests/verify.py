@@ -28,6 +28,7 @@ class Verification:
         self.clients = {name: JenkinsAPI(self.cfg['jenkinsUrl'], name, users[name.upper() + '_PASSWORD'])
                         for name in ['builder1', 'builder2']}
         self.report = {'namespace': self.cfg['namespace'], 'startedAt': time.strftime('%FT%T%z'), 'checks': [], 'builds': []}
+        self.report_path = Path(args.report) if args.report else self.state / 'verification.json'
         self.downloads = self.state / 'downloads'
         self.downloads.mkdir(exist_ok=True)
         self.head = subprocess.check_output(['git', '-C', args.source, 'rev-parse', 'main'], text=True).strip()
@@ -36,7 +37,7 @@ class Verification:
                      'SERVICE_TARGET': 'serviceA', 'IMAGE_TARGET': 'imageA', 'IMAGE_TAG': 'latest'}
 
     def save(self):
-        (self.state / 'verification.json').write_text(json.dumps(self.report, ensure_ascii=False, indent=2) + '\n')
+        self.report_path.write_text(json.dumps(self.report, ensure_ascii=False, indent=2) + '\n')
 
     def record(self, name, details=None):
         self.report['checks'].append({'name': name, 'status': 'PASS', 'details': details})
@@ -69,6 +70,32 @@ class Verification:
         except urllib.error.HTTPError as e:
             assert e.code == 403
         self.record('匿名访问及普通账号管理权限受限')
+
+    def maintenance_access(self):
+        job = 'job/storage-maintenance/'
+        details = self.admin.get(job + 'api/json?tree=name,lastBuild[number]')
+        assert details['name'] == 'storage-maintenance' and details['lastBuild']
+        last = details['lastBuild']['number']
+        with self.admin.request(job + 'configure') as response:
+            assert response.status == 200
+        results = {}
+        for name, client in self.clients.items():
+            visible = [item['name'] for item in client.get('api/json?tree=jobs[name]')['jobs']]
+            assert 'x-ran-cloud' in visible and 'storage-maintenance' not in visible, visible
+            with client.request('') as response:
+                assert b'href="job/storage-maintenance/' not in response.read()
+            client.get('job/x-ran-cloud/api/json')
+            denied = {}
+            for path, form in [('', None), ('api/json', None), ('config.xml', None),
+                               (f'{last}/consoleText', None), ('build', {})]:
+                try:
+                    with client.request(job + path, form):
+                        raise AssertionError(f'{name} 可访问维护任务 {path}')
+                except urllib.error.HTTPError as error:
+                    assert error.code in (403, 404), (path, error.code)
+                    denied[path or 'job'] = error.code
+            results[name] = {'visibleJobs': visible, 'deniedEndpoints': denied}
+        self.record('维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限', results)
 
     def submit(self, user='builder1', **changes):
         params = dict(self.base, **changes)
@@ -226,10 +253,12 @@ class Verification:
     def run(self):
         try:
             self.ready()
-            self.functional()
-            if not self.args.quick:
-                self.concurrency()
-                self.storage()
+            self.maintenance_access()
+            if not self.args.permissions_only:
+                self.functional()
+                if not self.args.quick:
+                    self.concurrency()
+                    self.storage()
             self.report['status'] = 'PASS'
         except Exception as error:
             self.report.update(status='FAIL', error=str(error))
@@ -245,4 +274,6 @@ if __name__ == '__main__':
     parser.add_argument('--source', default='/home/xiazhangtao/code/X-RAN-CLOUD')
     parser.add_argument('--quick', action='store_true')
     parser.add_argument('--services-only', action='store_true')
+    parser.add_argument('--permissions-only', action='store_true', help='只检查权限，不提交构建或执行清理测试')
+    parser.add_argument('--report', help='指定报告路径，避免覆盖已有完整验收报告')
     Verification(parser.parse_args()).run()

@@ -6,6 +6,8 @@ import hudson.model.ParametersDefinitionProperty
 import hudson.model.ChoiceParameterDefinition
 import hudson.model.StringParameterDefinition
 import hudson.triggers.TimerTrigger
+import hudson.security.AuthorizationMatrixProperty
+import org.jenkinsci.plugins.matrixauth.inheritance.NonInheritingStrategy
 import org.jenkins.plugins.lockableresources.LockableResourcesManager
 import org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval
 import org.jenkinsci.plugins.scriptsecurity.scripts.languages.GroovyLanguage
@@ -35,8 +37,13 @@ def maintenance = j.getItem('storage-maintenance') ?: j.createProject(WorkflowJo
 def maintenanceScript = support + '\n' + new File('/opt/xran/maintenance.groovy').text
 ScriptApproval.get().preapprove(maintenanceScript, GroovyLanguage.get())
 maintenance.definition = new CpsFlowDefinition(maintenanceScript, false)
+// 不继承 authenticated 的任务权限；Overall/Administer 仍由插件保留。
+while (maintenance.getProperty(AuthorizationMatrixProperty) != null) {
+    maintenance.removeProperty(AuthorizationMatrixProperty)
+}
+maintenance.addProperty(new AuthorizationMatrixProperty([:], new NonInheritingStrategy()))
 maintenance.addTrigger(new TimerTrigger('H/15 * * * *'))
-maintenance.description = '磁盘余量与清理审计；无固定天数、次数或产物容量淘汰。'
+maintenance.description = '仅管理员可见：磁盘余量与清理审计；无固定天数、次数或产物容量淘汰。'
 maintenance.save()
 def locks = LockableResourcesManager.get()
 (1..(cfg.concurrency as int)).each { i ->

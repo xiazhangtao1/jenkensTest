@@ -6,6 +6,7 @@ Jenkins 2.580.2、官方 Helm chart 5.10.10，锁定的 73 个插件全部启用
 | 验证 | 结果 | 证据 |
 |---|---|---|
 | 运行时/资源配置测试 | 7 项通过；包含真实 Git HTTP 检出、C 编译和 tar 校验 | tests/test_runtime.py、tests/test_config.py |
+| 维护任务权限 | 7 项通过；管理员访问、手动/定时维护、普通账号隔离及构建下载均正常 | [maintenance-permissions.json](verification/maintenance-permissions.json) |
 | Jenkins 主实例 | 20 项通过，30 次实际构建包含预期失败与取消场景 | [jenkins.json](verification/jenkins.json) |
 | 原生参数页 | 服务/镜像整行条件显示、双向切换、输入保留、普通账号页面提交均通过 | [parameters.json](verification/parameters.json) |
 | 全新 PVC 离线首启 | 15 项通过，全部服务与镜像模式、引用选择、下载、失败留存 | [offline.json](verification/offline.json) |
@@ -13,6 +14,12 @@ Jenkins 2.580.2、官方 Helm chart 5.10.10，锁定的 73 个插件全部启用
 | 新 PVC 备份恢复 | 8 项通过；41 次历史、审计、参数、脚本一致，历史服务/镜像可下载使用，恢复后新构建 #42 成功 | [restore.json](verification/restore.json) |
 | 工具链离线重建 | Docker build --network none 实际成功 | docker/builder.Dockerfile、config/images.lock.json |
 | 离线打包 | 已实际导出并校验文件 SHA256、73 个插件发布校验值、8 个运行镜像 ID | 最终目录的 MANIFEST.json、SHA256SUMS |
+
+`storage-maintenance` 使用项目权限矩阵并关闭普通任务权限继承，仅具有 Overall/Administer 的管理员可见。
+builder1、builder2 的首页和 API 清单仅显示 x-ran-cloud，维护任务直链、API、配置、日志和构建请求均返回 404。
+管理员手动维护 #22、TimerTrigger 维护 #23 成功；builder1 的 serviceB 构建 #42 成功并核对下载产物。
+只读权限回归可执行 `python3 tests/verify.py --permissions-only --report .state/jenkins/maintenance-permissions.json`，
+不会提交构建或执行磁盘压力清理测试。
 
 页面模式：BUILD_KIND=service 仅显示 SERVICE_TARGET；BUILD_KIND=image 仅显示 IMAGE_TARGET、IMAGE_TAG。
 REF_TYPE/GIT_REF 始终可见。实际从页面提交的 #34 serviceC 和 #35 imageB 均成功，

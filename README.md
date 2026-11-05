@@ -41,6 +41,7 @@ make deploy
 默认入口 `http://10.2.0.119:32080/`，可通过 jenkinsUrl 修改。初始账号为 admin、builder1、builder2，
 随机密码保存于 `.state/jenkins/users.json`（0600）。通过管理员的 Users 页面创建正式个人账号；
 验收账号可在交付后停用。普通账号没有任务配置、脚本控制台和流水线重放权限。
+`storage-maintenance` 仅管理员可见和操作；普通账号使用 `x-ran-cloud`，自动磁盘维护照常运行。
 
 ## 使用
 

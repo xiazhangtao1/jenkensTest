@@ -1,0 +1,102 @@
+{
+  "namespace": "jenkins",
+  "startedAt": "2026-11-05T17:24:53+0800",
+  "checks": [
+    {
+      "name": "全部插件启用",
+      "status": "PASS",
+      "details": {
+        "count": 73
+      }
+    },
+    {
+      "name": "匿名访问及普通账号管理权限受限",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+      "status": "PASS",
+      "details": {
+        "builder1": {
+          "visibleJobs": [
+            "x-ran-cloud"
+          ],
+          "deniedEndpoints": {
+            "job": 404,
+            "api/json": 404,
+            "config.xml": 404,
+            "20/consoleText": 404,
+            "build": 404
+          }
+        },
+        "builder2": {
+          "visibleJobs": [
+            "x-ran-cloud"
+          ],
+          "deniedEndpoints": {
+            "job": 404,
+            "api/json": 404,
+            "config.xml": 404,
+            "20/consoleText": 404,
+            "build": 404
+          }
+        }
+      }
+    },
+    {
+      "name": "部署后项目权限策略、单套权限/参数及原定时配置正确",
+      "status": "PASS",
+      "details": {
+        "strategy": "ProjectMatrixAuthorizationStrategy",
+        "inheritance": "NonInheritingStrategy",
+        "propertyCount": 1,
+        "timer": "H/15 * * * *",
+        "parameterSets": 1
+      }
+    },
+    {
+      "name": "管理员可手动运行维护任务",
+      "status": "PASS",
+      "details": {
+        "build": 22,
+        "result": "SUCCESS"
+      }
+    },
+    {
+      "name": "实际 TimerTrigger 调度仍成功执行磁盘维护",
+      "status": "PASS",
+      "details": {
+        "build": 23,
+        "result": "SUCCESS",
+        "cause": "TimerTriggerCause"
+      }
+    },
+    {
+      "name": "普通账号服务构建与产物下载不受影响",
+      "status": "PASS",
+      "details": {
+        "build": 42,
+        "result": "SUCCESS",
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+        "userId": "builder1"
+      }
+    }
+  ],
+  "builds": [
+    {
+      "number": 42,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceB",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest"
+      }
+    }
+  ],
+  "status": "PASS",
+  "finishedAt": "2026-11-05T17:27:48+0800"
+}

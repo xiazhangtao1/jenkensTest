@@ -11,6 +11,8 @@
 
 清理提示在首页、触发任务日志、storage-maintenance 和数据卷 xran-storage/cleanup.jsonl 中，
 记录构建号、commit 摘要、字节数和前后余量。无法满足安全空间时拒绝继续构建。
+`storage-maintenance` 仅具有 Overall/Administer 权限的管理员可见和操作，普通账号无法通过
+首页、直链或 API 查看和触发。定时维护以 Jenkins 系统身份运行，不受此限制。
 日志、历史元数据也占用空间；没有可删产物时，由管理员根据审计决定扩容或解除保留。
 
 ```bash
