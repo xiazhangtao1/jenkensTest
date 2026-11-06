@@ -1,6 +1,6 @@
 PYTHON ?= python3
 SOURCE ?= /home/xiazhangtao/code/X-RAN-CLOUD
-OPEN5GS_SOURCE ?= /home/xiazhangtao/code/open5gs
+XCN_SOURCE ?= $(or $(OPEN5GS_SOURCE),$(wildcard $(CURDIR)/../xcn),$(wildcard $(CURDIR)/../ICT_CN),$(wildcard $(CURDIR)/../open5gs),$(CURDIR)/../xcn)
 SITE ?= config/site.yaml
 IMAGE_NAME ?= 192.168.10.35/xnet/xran-compile
 IMAGE_TAG ?= latest
@@ -17,7 +17,7 @@ compile-image:
 push-compile-image:
 	$(PYTHON) scripts/compile-image.py push --image-name $(call shell_quote,$(IMAGE_NAME)) --image-tag $(call shell_quote,$(IMAGE_TAG))
 prepare images render import-images deploy bundle backup:
-	$(PYTHON) scripts/ci.py $@ --site $(call shell_quote,$(SITE)) --source $(call shell_quote,$(SOURCE)) --open5gs-source $(call shell_quote,$(OPEN5GS_SOURCE)) $(COMPILE_FLAGS)
+	$(PYTHON) scripts/ci.py $@ --site $(call shell_quote,$(SITE)) --source $(call shell_quote,$(SOURCE)) --xcn-source $(call shell_quote,$(XCN_SOURCE)) $(COMPILE_FLAGS)
 test:
 	$(PYTHON) -m unittest discover -s tests -p 'test_*.py' -v
 verify:

@@ -29,8 +29,8 @@ registryInsecure: true
 services: [serviceA, serviceB, serviceC]
 images: [imageA, imageB, imageC]
 imageRepositories: {imageA: xran-demo/imagea, imageB: xran-demo/imageb, imageC: xran-demo/imagec}
-open5gs:
-  # Jenkins 入口仍叫 open5gs；远端仓库改名为 ICT_CN 不影响相对路径。
+xcn:
+  # Jenkins 入口仍叫 xcn；远端仓库改名为 ICT_CN 不影响相对路径。
   gitUrl: ssh://xiazhangtao@192.168.10.82:29418/ICT_CN
   gitCredentialsId: intranet-gerrit-ssh
   offline: true

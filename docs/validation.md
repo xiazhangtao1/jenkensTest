@@ -1,3 +1,21 @@
+# xcn 命名迁移验收（2026-11-06）
+
+主实例已部署 Controller `2.580.2-15`、内部插件 `1.0.3`，业务入口为 `x-ran-cloud` 和 `xcn`。
+原发布任务原地重命名，102 次既有业务构建的参数、结果、长期保留标记、根元数据 SHA256 和产物清单均未变。
+管理员保存的资源、离线模式及其他设置保留原值；原始审计保留，新增一次命名迁移事件。
+
+- Python 回归 21 项通过；插件完全断网构建 11 项测试中 10 项通过、1 项框架跳过，SpotBugs 无问题。
+- 独立实例重命名、重复启动与配置审计幂等验证通过；六组版本参数及历史回填、六个共享槽位、同版本串行和跨项目存储回收通过。
+- 原成功发布的四个包通过新任务 URL 下载，SHA256、Helm 渲染及三个镜像导入后的断网运行检查通过。
+- 新旧两个真实编译镜像的适配器均验证离线参数、四包归档及 xcn 元数据兼容；测试使用有效小型归档，并未重新编译完整业务。
+- 独立实例实际创建 xcn 编译 Pod，基础镜像挂载与元数据使用新名称；所选 main 缺少发布入口，按预期失败并保留诊断。
+- 主实例服务 #98、镜像 #99 成功，实际 Pod 与入场快照均为 4 CPU / 8GiB / 20GiB，编译镜像 ID 和元数据一致。
+- 普通用户浏览器首页显示 xcn、维护任务隐藏；构建表单六参数与默认日期正确；原历史 Chart/app 版本可见并完成 HTTP 实际复制粘贴。
+
+证据：[xcn-renaming.json](verification/xcn-renaming.json)。历史 Git 引用与原始验收数据保留真实值，当前说明统一使用 xcn 项目名称。
+
+---
+
 # 内网迁移与两小时维护验收（2026-11-06）
 
 主实例已更新为 Controller `2.580.2-13`，`storage-maintenance` 定时计划为 `H H/2 * * *`。
@@ -18,7 +36,7 @@
 # 构建平台网页设置验收（2026-11-06）
 
 主实例已部署 Controller `2.580.2-12`、内部插件 `xran-build-platform:1.0.1`。管理员入口为 **Manage Jenkins → System（系统配置）→ 构建平台设置**。
-默认并发 6，三套 Pod 预算各 4 CPU / 8GiB / 20GiB，默认编译环境 latest / Always，Open5gs 离线构建开启。
+默认并发 6，三套 Pod 预算各 4 CPU / 8GiB / 20GiB，默认编译环境 latest / Always，xcn 离线构建开启。
 
 | 验收 | 结果与证据 |
 | --- | --- |
@@ -27,9 +45,9 @@
 | 独立源码副本重建 | 没有 Git 元数据、没有官方插件原始归档，仅靠交付的 Maven 缓存与构建镜像，断网 clean verify 成功；[报告](verification/platform-independent-offline.json) |
 | 原生配置与权限 | 浏览器实际保存、资源预览、旧表单返回 400 冲突；普通用户预览/应用/状态接口均 403；[报告](verification/platform-browser.json) |
 | 动态并发与超时 | 6→2→4，统计所有运行中槽位；排队用新版本，运行中保留旧快照；重启、取消、同标签等待与超过 1 分钟的排队测试通过；[报告](verification/platform-admission.json) |
-| 三类实际 Pod | 服务 5 CPU/9GiB/8GiB、镜像 6 CPU/10GiB/12GiB、Open5gs 4 CPU/8GiB/20GiB；容器资源及工作区 sizeLimit 与快照相符；[服务](verification/platform-resources-service.json)、[镜像](verification/platform-resources-image.json)、[Open5gs](verification/platform-resources-open5gs.json) |
+| 三类实际 Pod | 服务 5 CPU/9GiB/8GiB、镜像 6 CPU/10GiB/12GiB、xcn 4 CPU/8GiB/20GiB；容器资源及工作区 sizeLimit 与快照相符；[服务](verification/platform-resources-service.json)、[镜像](verification/platform-resources-image.json)、[xcn](verification/platform-resources-open5gs.json) |
 | 实时磁盘阈值与预留 | 管理员修改阈值立即被检查使用；预留按入场预算累计；最早回收、运行中/长期保留保护、提示审计及空间不足拒绝通过；[报告](verification/platform-shared-verification.json) |
-| Open5gs 完整发布 | develop 分支在线构建成功，四个文件可下载且 SHA256 一致，Helm lint/render、三个镜像导入后的断网运行检查通过；[报告](verification/platform-open5gs-release.json) |
+| xcn 完整发布 | develop 分支在线构建成功，四个文件可下载且 SHA256 一致，Helm lint/render、三个镜像导入后的断网运行检查通过；[报告](verification/platform-open5gs-release.json) |
 | 参数与页面回归 | 版本保存/历史修复/默认日期、隐藏 OFFLINE、BUILD_KIND 条件显示、HTTP 实际复制粘贴、维护任务隔离通过；[参数报告](verification/platform-parameters-verification.json) |
 | 全新离线 PVC | 74 个插件全部启用，分支/tag/commit、服务、多包、大包、三镜像及失败产物保留等 16 项通过；[报告](verification/platform-offline.json) |
 | 数据恢复 | 配置版本 21、21 条审计和完整配置与备份一致；站点默认并发 6/离线 true 不覆盖保存的并发 3/离线 false；[报告](verification/platform-restore.json) |
@@ -39,7 +57,7 @@
 实际 Pod 验收发现 Kubernetes 插件会覆盖 YAML 中的工作区卷配置，已显式设置 workspaceVolume.sizeLimit 并复验。
 存储验收发现 GroovyShell 对复合加法中的 long 转换存在类型异常，已改为显式 long 累计，并以运行中的 2GiB 预留验证。
 
-Open5gs 完整发布使用 `open5gs-basev277-develop`，未改动业务 main；内网 Registry 的非致命推送失败如实记入元数据，有效本地包仍可下载。
+xcn 完整发布使用验收脚本默认的发布开发分支，未改动业务 main；内网 Registry 的非致命推送失败如实记入元数据，有效本地包仍可下载。
 主实例保持离线业务默认值；当前外网环境的真实编译显式选择 Never，迁入内网后仍需验证内网 APT/Registry 连通性。
 
 ---
@@ -48,10 +66,10 @@ Open5gs 完整发布使用 `open5gs-basev277-develop`，未改动业务 main；�
 
 # 验证结果
 
-## open5gs 站点离线模式与参数文案（2026-11-06）
+## xcn 站点离线模式与参数文案（2026-11-06）
 
 主实例已部署 Controller `2.580.2-10`，构建页面移除 `OFFLINE`，现为 6 个参数。
-模式统一读取管理员站点配置 `open5gs.offline`，默认 `true`；新构建仍记录实际模式，已有历史保持原值。
+模式统一读取管理员站点配置 `xcn.offline`，默认 `true`；新构建仍记录实际模式，已有历史保持原值。
 两个版本说明已分别改为“Chart 版本，默认当天日期”和“应用版本，默认当天日期”。
 
 20 项 Python 测试通过，包括配置默认值、布尔类型校验，以及配置变化对应的 Pod 哈希。
@@ -63,9 +81,9 @@ Open5gs 完整发布使用 `open5gs-basev277-develop`，未改动业务 main；�
 主实例恢复接单，5 条已有历史的全部参数及元数据哈希一致。
 普通用户浏览器核对六参数表单、两处精简文案及默认日期，历史 HTTP 复制、X-RAN-CLOUD 条件显示和权限回归通过。
 使用 `--number 1 --online` 复验原在线成功发布，四包 SHA256、Helm lint/template、三个镜像导入和断网运行均通过。
-本轮没有在不可达的内网 APT 上重复完整业务编译。证据见 [open5gs-site-mode.json](verification/open5gs-site-mode.json)。
+本轮没有在不可达的内网 APT 上重复完整业务编译。证据见 [xcn-site-mode.json](verification/open5gs-site-mode.json)。
 
-## open5gs 历史版本与 HTTP 复制修复（2026-11-06）
+## xcn 历史版本与 HTTP 复制修复（2026-11-06）
 
 主实例已升级 Controller `2.580.2-9`。新构建在参数校验后将实际 Chart/app 版本写入历史 Parameters；
 启动时按各次构建保存的元数据补齐空版本，已回填主实例 4 条历史。成功发布 #1 的两个版本均为 `26.11.6`，
@@ -78,11 +96,11 @@ Open5gs 完整发布使用 `open5gs-basev277-develop`，未改动业务 main；�
 普通用户真实 HTTP 浏览器中，#1 两个版本可见且均实际点击复制、粘贴校验成功，HTTPS 限制提示已移除。
 X-RAN-CLOUD 服务/镜像历史的条件显示、复制，新建表单双向切换和输入保留，以及普通用户首页权限均通过。
 HTTPS 下继续使用 Jenkins 原生剪贴板功能。19 项 Python 测试通过；复验 #1 下载的四个产物 SHA256、
-Helm lint/template 和三个镜像断网运行全部通过，没有重新编译业务。证据见 [parameters-open5gs.json](verification/parameters-open5gs.json)。
+Helm lint/template 和三个镜像断网运行全部通过，没有重新编译业务。证据见 [parameters-xcn.json](verification/parameters-open5gs.json)。
 
-## open5gs 扩展（2026-11-06）
+## xcn 扩展（2026-11-06）
 
-主实例已部署 Controller `2.580.2-8`，新增独立 `open5gs` 任务，原 `x-ran-cloud` 保持可用。
+主实例已部署 Controller `2.580.2-8`，新增独立 `xcn` 任务，原 `x-ran-cloud` 保持可用。
 编译镜像已增加 Helm 3.17.3、PyYAML 和发布适配器，最终配置 ID：
 `sha256:c35fc07fbb6ac293b26bf4dbb222dc5e014b07304708e56adf814307520e2b51`。
 断网重建得到同一 ID，导出的 image.tar/manifest.json 校验通过，原有 SDK 两个 CTest 和附加检查通过。
@@ -90,7 +108,7 @@ Helm lint/template 和三个镜像断网运行全部通过，没有重新编译�
 | 验证 | 实际结果 |
 |---|---|
 | Python 自动化测试 | 19 项通过，包括产物缺失/损坏/版本不符、OFFLINE 参数和临时空间边界 |
-| 完整 open5gs 发布 | 主实例 #1 SUCCESS；真实 develop 提交 `49a9671f78814b27c171c681a8acb75ecf255f94`，约 37 分钟 |
+| 完整 xcn 发布 | 主实例 #1 SUCCESS；真实 develop 提交 `49a9671f78814b27c171c681a8acb75ecf255f94`，约 37 分钟 |
 | 四个产物 | 普通账号下载 runtime/webui/monitor tar 和 `xcn-26.11.6.tgz`，全部 SHA256/大小匹配 |
 | 下载后使用 | 三个 tar 均实际导入、断网运行检查通过；Chart 使用所选提交的站点测试 values，lint 和 34 个模板对象通过 |
 | 引用和失败提示 | 真实 tag/短 SHA 精确检出；#2 非法 Chart 版本失败；#3 默认 main 缺少发布入口明确失败 |
@@ -101,13 +119,13 @@ Helm lint/template 和三个镜像断网运行全部通过，没有重新编译�
 | 离线网络 | DNS 正常，NetworkPolicy 阻止公网 HTTP；源码检出使用命名空间内网 Git 镜像 |
 | 全新 Docker 基础镜像恢复 | 镜像列表为空且 `--network none`，自动加载包内 Ubuntu/VPP 并重新导出成功，无预热镜像依赖 |
 | X-RAN-CLOUD 回归 | 主实例 #81–93，共 16 项检查通过，包含服务、镜像、分支/tag/完整及短 SHA、下载运行、推送失败留存和权限 |
-| 页面 | 七个 open5gs 参数顺序/默认值正确，模拟另一天重新打开表单生成新日期；两项目历史 Parameters 保留原行为 |
+| 页面 | 七个 xcn 参数顺序/默认值正确，模拟另一天重新打开表单生成新日期；两项目历史 Parameters 保留原行为 |
 
-完整证据见 [open5gs.json](verification/open5gs.json)。共享锁测试保留真实参数校验和两层锁，在获得槽位后用短等待代替编译；
+完整证据见 [xcn.json](verification/open5gs.json)。共享锁测试保留真实参数校验和两层锁，在获得槽位后用短等待代替编译；
 压力测试仅作用于专用验收 PVC，验证运行中、标记保留的版本不被清理以及提示/审计。两个临时验收 Controller 已暂停。
 主实例两任务的流水线 SHA256 与仓库一致、没有按天数/次数丢弃策略，Jenkins 已恢复正常接单。
 
-本次完整发布使用真实 `open5gs-basev277-develop` 且 OFFLINE=false；没有修改 open5gs 业务源码或 main。
+本次完整发布使用验收脚本默认的发布开发分支且 OFFLINE=false；没有修改 xcn 业务源码或 main。
 内网 Registry `192.168.10.35` 不可达，三个业务镜像推送均记录为 failed，构建摘要/日志明确提示，四个有效包仍可下载。
 未声称向内网仓库推送成功；内网 APT `192.168.10.36` 下的完整 OFFLINE 业务编译需迁入后验证。
 平台默认编译镜像及策略仍为指定内网地址和 Always，本机已导入镜像可选择 Never。

@@ -28,7 +28,7 @@ def main():
     users = json.loads((directory / 'users.json').read_text())
     admin = JenkinsAPI(cfg['jenkinsUrl'], 'admin', users['ADMIN_PASSWORD'])
     clients = {name: JenkinsAPI(cfg['jenkinsUrl'], 'builder1', users['BUILDER1_PASSWORD'], job=name)
-               for name in ['x-ran-cloud', 'open5gs']}
+               for name in ['x-ran-cloud', 'xcn']}
     report = {'namespace': cfg['namespace'], 'checks': []}
     builds, originals = [], {}
 
@@ -94,7 +94,7 @@ def main():
                 assert error.code == 403, (action, error.code)
         _, preview = admin.post(descriptor + 'preview', {'serviceCpu': 6})
         assert '5750m' in preview and 'service' in preview
-        _, invalid = admin.post(descriptor + 'preview', {'open5gsDindMemoryGiB': 8})
+        _, invalid = admin.post(descriptor + 'preview', {'xcnDindMemoryGiB': 8})
         assert 'error' in invalid.lower(), invalid
         record('管理员资源预览及普通用户接口拒绝', {'actions': ['preview', 'reapply', 'state']})
         for name in clients:
@@ -110,7 +110,7 @@ def main():
                 JenkinsAPI(cfg['jenkinsUrl'], 'admin', users['ADMIN_PASSWORD'], job=name).set_pipeline(originals[name].replace(marker, body + marker, 1))
         short_flows()
         initial = save(concurrency=6, buildTimeoutMinutes=240, agentStartupTimeoutMinutes=15)
-        batch = [submit('x-ran-cloud' if i % 2 == 0 else 'open5gs') for i in range(8)]
+        batch = [submit('x-ran-cloud' if i % 2 == 0 else 'xcn') for i in range(8)]
         until(lambda: len(state()['leases']) == 6)
         old = state()
         active = [pair for pair in batch if key(pair) in old['leases']]
@@ -154,9 +154,9 @@ def main():
         # A same-tag waiter holds neither a lease nor a global lock.
         save(concurrency=2)
         same = 'platform-same-' + str(time.time_ns())
-        first = submit('open5gs', APP_VERSION=same)
+        first = submit('xcn', APP_VERSION=same)
         until(lambda: key(first) in state()['leases'])
-        second = submit('open5gs', APP_VERSION=same)
+        second = submit('xcn', APP_VERSION=same)
         time.sleep(3)
         assert key(second) not in state()['leases']
         independent = submit()
@@ -171,10 +171,10 @@ def main():
             for label, same_tag in [('全局槽位', False), ('同标签', True)]:
                 save(concurrency=1, buildTimeoutMinutes=240, agentStartupTimeoutMinutes=15)
                 params = dict(APP_VERSION='timeout-' + str(time.time_ns())) if same_tag else {}
-                first = submit('open5gs' if same_tag else 'x-ran-cloud', **params)
+                first = submit('xcn' if same_tag else 'x-ran-cloud', **params)
                 until(lambda: key(first) in state()['leases'])
                 save(buildTimeoutMinutes=1, agentStartupTimeoutMinutes=1)
-                waiter = submit('open5gs' if same_tag else 'x-ran-cloud', **params)
+                waiter = submit('xcn' if same_tag else 'x-ran-cloud', **params)
                 # Polling continues to produce visible output in the caller's log.
                 deadline = time.time() + 65
                 while time.time() < deadline:

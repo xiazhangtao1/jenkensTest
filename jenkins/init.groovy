@@ -13,6 +13,15 @@ import org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval
 import org.jenkinsci.plugins.scriptsecurity.scripts.languages.GroovyLanguage
 
 def j = Jenkins.get()
+// Rename the original job in place so build numbers, logs and artifacts survive.
+def legacyReleaseJob = j.getItem('open5gs')
+if (legacyReleaseJob != null) {
+    if (j.getItem('xcn') != null) throw new IllegalStateException('xcn 任务已存在，拒绝覆盖发布历史')
+    if (legacyReleaseJob.isInQueue() || legacyReleaseJob.builds.any { it.isBuilding() }) {
+        throw new IllegalStateException('请等待发布构建完成后再迁移 xcn 任务名称')
+    }
+    legacyReleaseJob.renameTo('xcn')
+}
 def cfg = new JsonSlurperClassic().parseText(new File('/var/xran/site.json').text)
 def platform = io.xran.jenkins.BuildPlatformConfiguration.get()
 platform.initialize(cfg)
@@ -40,12 +49,12 @@ job.addProperty(new ParametersDefinitionProperty([
 ]))
 job.description = 'X-RAN-CLOUD 参数化构建。登录后提交构建；历史包持续保存，磁盘压力时按最早完成时间清理未标记保留产物。'
 job.save()
-def open5gs = j.getItem('open5gs') ?: j.createProject(WorkflowJob, 'open5gs')
-open5gs.definition = new CpsFlowDefinition(buildScript, false)
-while (open5gs.getProperty(ParametersDefinitionProperty) != null) {
-    open5gs.removeProperty(ParametersDefinitionProperty)
+def xcn = j.getItem('xcn') ?: j.createProject(WorkflowJob, 'xcn')
+xcn.definition = new CpsFlowDefinition(buildScript, false)
+while (xcn.getProperty(ParametersDefinitionProperty) != null) {
+    xcn.removeProperty(ParametersDefinitionProperty)
 }
-open5gs.addProperty(new ParametersDefinitionProperty([
+xcn.addProperty(new ParametersDefinitionProperty([
     new StringParameterDefinition('COMPILER_IMAGE', cfg.builderImage as String, '编译环境'),
     new ChoiceParameterDefinition('COMPILER_IMAGE_PULL_POLICY',
         ([cfg.compilerImagePullPolicy ?: 'Always'] + ['Always', 'IfNotPresent', 'Never']).unique() as String[], '拉取策略'),
@@ -54,13 +63,13 @@ open5gs.addProperty(new ParametersDefinitionProperty([
     new StringParameterDefinition('CHART_VERSION', '', 'Chart 版本，默认当天日期'),
     new StringParameterDefinition('APP_VERSION', '', '应用版本，默认当天日期')
 ]))
-open5gs.description = 'open5gs 发布构建：三个镜像包和一个 Helm Chart。默认 main；版本留空按上海时区的构建日期生成。'
-open5gs.save()
+xcn.description = 'xcn 发布构建：三个镜像包和一个 Helm Chart。默认 main；版本留空按上海时区的构建日期生成。'
+xcn.save()
 // Repair only empty historical versions, using that build's actual metadata.
 // Completed runs without metadata or with explicit values remain untouched.
 def compiler = new GroovyShell(j.pluginManager.uberClassLoader).evaluate(
     support + '\n' + new File('/opt/xran/compiler.groovy').text + '\nreturn XranCompiler')
-println('open5gs historical versions restored: ' + compiler.restoreVersions(open5gs))
+println('xcn historical versions restored: ' + compiler.restoreVersions(xcn))
 def maintenance = j.getItem('storage-maintenance') ?: j.createProject(WorkflowJob, 'storage-maintenance')
 def maintenanceScript = support + '\n' + new File('/opt/xran/maintenance.groovy').text
 ScriptApproval.get().preapprove(maintenanceScript, GroovyLanguage.get())
@@ -73,7 +82,7 @@ maintenance.addProperty(new AuthorizationMatrixProperty([:], new NonInheritingSt
 // 每两小时一次，使用 Jenkins 哈希错开分钟与小时。
 maintenance.addTrigger(new TimerTrigger('H H/2 * * *'))
 def cleanupNotice = (maintenance.description ?: '').find(/(?s)最近清理：.*/)
-maintenance.description = 'X-RAN-CLOUD CI：历史包持续保存；同时管理 open5gs。磁盘压力时回收最早未保留产物。清理明细见 storage-maintenance。' +
+maintenance.description = 'X-RAN-CLOUD CI：历史包持续保存；同时管理 xcn。磁盘压力时回收最早未保留产物。清理明细见 storage-maintenance。' +
     (cleanupNotice ? '\n' + cleanupNotice : '')
 maintenance.save()
 // systemMessage 对所有登录用户公开；管理员提示由受限任务提供。

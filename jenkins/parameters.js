@@ -2,7 +2,7 @@
 (() => {
   "use strict";
   const root = document.head.dataset.rooturl || "";
-  if (!location.pathname.slice(root.length).replace(/\/$/, "").endsWith("/job/open5gs/build")) return;
+  if (!location.pathname.slice(root.length).replace(/\/$/, "").endsWith("/job/xcn/build")) return;
   async function defaults() {
     let now = new Date();
     try {
@@ -27,7 +27,7 @@
 // copying available through a synchronous, user-initiated browser copy command.
 (() => {
   "use strict";
-  if (window.isSecureContext || !/\/job\/(?:open5gs|x-ran-cloud)\/[^/]+\/parameters\/?$/.test(location.pathname)) return;
+  if (window.isSecureContext || !/\/job\/(?:xcn|x-ran-cloud)\/[^/]+\/parameters\/?$/.test(location.pathname)) return;
 
   function start() {
     document.querySelectorAll('#main-panel .jenkins-quote .jenkins-copy-button:not([data-xran-http-copy])').forEach(original => {

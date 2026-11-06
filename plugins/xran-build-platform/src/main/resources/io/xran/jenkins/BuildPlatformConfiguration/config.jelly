@@ -13,8 +13,8 @@
       <f:entry title="默认拉取策略" field="compilerImagePullPolicy">
         <f:select value="${instance.form.compilerImagePullPolicy}" />
       </f:entry>
-      <f:entry title="Open5gs 离线构建" field="open5gsOffline">
-        <f:checkbox checked="${instance.form.open5gsOffline}" />
+      <f:entry title="xcn 离线构建" field="xcnOffline">
+        <f:checkbox checked="${instance.form.xcnOffline}" />
       </f:entry>
       <f:entry title="服务包 Pod CPU 总上限（核）" field="serviceCpu">
         <f:number value="${instance.form.serviceCpu}" min="2" max="128" step="1" />
@@ -37,22 +37,22 @@
       <f:entry title="镜像 DinD 内存（GiB）" field="imageDindMemoryGiB">
         <f:number value="${instance.form.imageDindMemoryGiB}" min="2" max="1022" step="1" />
       </f:entry>
-      <f:entry title="Open5gs Pod CPU 总上限（核）" field="open5gsCpu">
-        <f:number value="${instance.form.open5gsCpu}" min="2" max="128" step="1" />
+      <f:entry title="xcn Pod CPU 总上限（核）" field="xcnCpu">
+        <f:number value="${instance.form.xcnCpu}" min="2" max="128" step="1" />
       </f:entry>
-      <f:entry title="Open5gs Pod 内存总上限（GiB）" field="open5gsMemoryGiB">
-        <f:number value="${instance.form.open5gsMemoryGiB}" min="2" max="1024" step="1" />
+      <f:entry title="xcn Pod 内存总上限（GiB）" field="xcnMemoryGiB">
+        <f:number value="${instance.form.xcnMemoryGiB}" min="2" max="1024" step="1" />
       </f:entry>
-      <f:entry title="Open5gs Pod 临时存储总上限（GiB）" field="open5gsTemporaryStorageGiB">
-        <f:number value="${instance.form.open5gsTemporaryStorageGiB}" min="1" max="1024" step="1" />
+      <f:entry title="xcn Pod 临时存储总上限（GiB）" field="xcnTemporaryStorageGiB">
+        <f:number value="${instance.form.xcnTemporaryStorageGiB}" min="1" max="1024" step="1" />
       </f:entry>
-      <f:entry title="Open5gs DinD 内存（GiB）" field="open5gsDindMemoryGiB">
-        <f:number value="${instance.form.open5gsDindMemoryGiB}" min="2" max="1022" step="1" />
+      <f:entry title="xcn DinD 内存（GiB）" field="xcnDindMemoryGiB">
+        <f:number value="${instance.form.xcnDindMemoryGiB}" min="2" max="1022" step="1" />
       </f:entry>
-      <f:entry title="Open5gs 内层 Docker 构建内存（GiB）" field="innerBuildMemoryGiB">
+      <f:entry title="xcn 内层 Docker 构建内存（GiB）" field="innerBuildMemoryGiB">
         <f:number value="${instance.form.innerBuildMemoryGiB}" min="1" max="1021" step="1" />
       </f:entry>
-      <f:entry title="Open5gs 内层构建并行数" field="buildJobs">
+      <f:entry title="xcn 内层构建并行数" field="buildJobs">
         <f:number value="${instance.form.buildJobs}" min="1" max="128" step="1" />
       </f:entry>
       <f:entry title="入场后总超时（分钟，包含 Pod 启动）" field="buildTimeoutMinutes">
@@ -68,7 +68,7 @@
         <f:number value="${instance.form.minimumFreePercent}" min="0" max="79" step="1" />
       </f:entry>
       <f:entry>
-        <f:validateButton title="预览内部资源分配" progress="计算中…" method="preview" with="concurrency,compilerImage,compilerImagePullPolicy,open5gsOffline,serviceCpu,serviceMemoryGiB,serviceTemporaryStorageGiB,imageCpu,imageMemoryGiB,imageTemporaryStorageGiB,imageDindMemoryGiB,open5gsCpu,open5gsMemoryGiB,open5gsTemporaryStorageGiB,open5gsDindMemoryGiB,innerBuildMemoryGiB,buildJobs,buildTimeoutMinutes,agentStartupTimeoutMinutes,minimumFreeGiB,minimumFreePercent" />
+        <f:validateButton title="预览内部资源分配" progress="计算中…" method="preview" with="concurrency,compilerImage,compilerImagePullPolicy,xcnOffline,serviceCpu,serviceMemoryGiB,serviceTemporaryStorageGiB,imageCpu,imageMemoryGiB,imageTemporaryStorageGiB,imageDindMemoryGiB,xcnCpu,xcnMemoryGiB,xcnTemporaryStorageGiB,xcnDindMemoryGiB,innerBuildMemoryGiB,buildJobs,buildTimeoutMinutes,agentStartupTimeoutMinutes,minimumFreeGiB,minimumFreePercent" />
         <f:validateButton title="重新应用配置" progress="应用中…" method="reapply" />
       </f:entry>
       <f:advanced title="最近修改审计（完整记录保存在 Jenkins 数据目录）">

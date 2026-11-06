@@ -29,8 +29,8 @@ services: [serviceA, serviceB, serviceC]
 images: [imageA, imageB, imageC]
 # 真实项目镜像名到 Registry 仓库路径的映射，供元数据与推送检查使用。
 imageRepositories: {imageA: xran-demo/imagea, imageB: xran-demo/imageb, imageC: xran-demo/imagec}
-open5gs:
-  gitUrl: http://xran-demo:8000/open5gs.git
+xcn:
+  gitUrl: http://xran-demo:8000/xcn.git
   gitCredentialsId: ''
   # 初次导入的离线模式；后续在构建平台设置修改，构建页面不提供此参数。
   offline: true

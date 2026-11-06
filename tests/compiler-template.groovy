@@ -4,13 +4,13 @@ def references = ['192.168.10.35/xnet/xran-compile:latest',
 def policies = ['Always', 'IfNotPresent', 'Never']
 int checked = 0
 int resourceCases = 0
-['service', 'image', 'open5gs'].findAll { templates.containsKey(it) }.each { kind ->
+['service', 'image', 'xcn'].findAll { templates.containsKey(it) }.each { kind ->
     // The caller provides rendered JSON; the live deployment can use the previous version.
     def text = templates[kind]
     def original = XranStorage.parseJson(text)
     references.each { reference ->
         policies.each { policy ->
-            def job = kind == 'open5gs' ? 'open5gs' : 'x-ran-cloud'
+            def job = kind == 'xcn' ? 'xcn' : 'x-ran-cloud'
             def pod = XranCompiler.template(text, reference, policy, '123', job)
             def builder = pod.spec.containers.find { it.name == 'builder' }
             assert builder.image == reference && builder.imagePullPolicy == policy
@@ -27,7 +27,7 @@ int resourceCases = 0
     def snapshot = [settingsVersion: 123, resourceProfile: kind, resourceAllocation: allocation,
         config: io.xran.jenkins.PlatformSettings.runtime(settings, kind)]
     def defaultPod = XranCompiler.template(text, references[0], 'Never', '124',
-        kind == 'open5gs' ? 'open5gs' : 'x-ran-cloud', snapshot)
+        kind == 'xcn' ? 'xcn' : 'x-ran-cloud', snapshot)
     defaultPod.spec.containers.each { container ->
         assert container.resources == original.spec.containers.find { it.name == container.name }.resources
     }
@@ -37,7 +37,7 @@ int resourceCases = 0
     snapshot.resourceAllocation = io.xran.jenkins.PlatformSettings.allocation(settings, kind)
     snapshot.config = io.xran.jenkins.PlatformSettings.runtime(settings, kind)
     def changed = XranCompiler.template(text, references[0], 'Never', '125',
-        kind == 'open5gs' ? 'open5gs' : 'x-ran-cloud', snapshot)
+        kind == 'xcn' ? 'xcn' : 'x-ran-cloud', snapshot)
     assert changed.spec.containers.sum { (it.resources.limits.cpu - 'm') as int } == 6000
     assert changed.spec.containers.sum { (it.resources.limits.memory - 'Mi') as int } == 12 * 1024
     assert changed.spec.containers.sum { (it.resources.limits['ephemeral-storage'] - 'Mi') as int } == 7 * 1024

@@ -1,6 +1,13 @@
-# open5gs 发布构建
+# xcn 发布构建
 
-入口：Jenkins → **open5gs** → **Build with Parameters**。独立于 `x-ran-cloud`，两者共用六个构建槽位和磁盘压力回收。
+入口：Jenkins → **xcn** → **Build with Parameters**。独立于 `x-ran-cloud`，两者共用六个构建槽位和磁盘压力回收。
+
+升级前先完成运行中和排队的构建，并保留 Jenkins HOME 备份。初始化会将原发布任务原地迁移为 `xcn`，
+保留原构建编号、日志、参数和归档；已有资源配置自动迁移，具体数值不恢复为默认值。重复启动不会重复迁移。
+如果新旧任务同时存在，初始化会拒绝覆盖历史，由管理员先处理名称冲突。
+
+历史记录中的 Git 引用、commit、编译镜像及校验和保留当时的真实值。业务仓库仍通过配置的地址拉取，
+内网使用 `xcn.gitUrl: ssh://xiazhangtao@192.168.10.82:29418/ICT_CN`。
 
 | 参数 | 默认值 / 用途 |
 |---|---|
@@ -15,19 +22,19 @@
 
 HTTP 访问时，历史 Parameters 页的复制按钮使用浏览器兼容方式；HTTPS 下保留 Jenkins 原生复制功能。
 
-离线模式由管理员在 **Manage Jenkins → 系统配置 → 构建平台设置 → Open5gs 离线构建** 统一配置，默认开启，构建表单不提供 `OFFLINE`。勾选时给业务脚本增加 `--offline`；外网调试时管理员取消勾选。保存后对新入场构建立刻生效。
+离线模式由管理员在 **Manage Jenkins → 系统配置 → 构建平台设置 → xcn 离线构建** 统一配置，默认开启，构建表单不提供 `OFFLINE`。勾选时给业务脚本增加 `--offline`；外网调试时管理员取消勾选。保存后对新入场构建立刻生效。
 
-`config/site.yaml` 中的 `open5gs.offline` 只提供首次启动的初始值。
+`config/site.yaml` 中的 `xcn.offline` 只提供首次启动的初始值。
 普通用户和旧 API 客户端传入的 `OFFLINE` 不影响此配置。每次构建的实际模式仍记录在摘要和 `metadata.json` 中；已有历史按原值保留。
 这里控制的是业务脚本的 `--offline`，与部署工具自身的 `--offline`（基础设施拉取策略和网络配置）分别设置。
 
-外网闭环使用 `open5gs-basev277-develop`，由管理员将上述配置设为 `false`。该分支已有发布入口；目前 `main` 缺少此入口，选择它会明确失败，不会切换分支，也不修改业务仓库。
+外网闭环使用验收脚本默认的发布开发分支，由管理员将上述配置设为 `false`。该分支已有发布入口；目前 `main` 缺少此入口，选择它会明确失败，不会切换分支，也不修改业务仓库。
 
 流水线精确检出后，在所选提交的 `helm` 目录执行：
 
 ```bash
 ./build-release.sh --offline 26.11.6 26.11.6
-# 管理员关闭 Open5gs 离线构建时执行：
+# 管理员关闭 xcn 离线构建时执行：
 ./build-release.sh 26.11.6 26.11.6
 ```
 
@@ -40,26 +47,26 @@ HTTP 访问时，历史 Parameters 页的复制按钮使用浏览器兼容方式
 同 APP_VERSION 的发布先串行等待，再申请全局槽位，避免两个构建同时覆盖相同镜像标签。
 
 Pod 初始默认总上限为 4 CPU、8GiB 内存、20GiB 临时存储。DinD 为 **4GiB**，编译容器为 3584MiB，Agent 为 512MiB。
-默认 open5gs 的嵌套 Docker build 额度为 3GiB、并行 2，给 DinD daemon 留出空间；这些是不同层级的限制，不叠加成额外内存。管理员可在 [构建平台设置](platform-settings.md) 单独修改 Open5gs 资源配置。
+默认 xcn 的嵌套 Docker build 额度为 3GiB、并行 2，给 DinD daemon 留出空间；这些是不同层级的限制，不叠加成额外内存。管理员可在 [构建平台设置](platform-settings.md) 单独修改 xcn 资源配置。
 嵌套容器挂在 DinD cgroup 下，共同受 4GiB 上限约束。X-RAN-CLOUD 镜像任务的 DinD 同样为 4GiB。
 
-编译镜像包含 Helm 3.17.3、PyYAML 及原 SDK。Ubuntu/VPP 基础镜像由独立 `open5gs-bases` init 容器复制到共享卷，每次导入自己的 DinD，不共享宿主 Docker socket。
-离线包提供这些镜像以及包含 vendor 依赖的 open5gs Git bundle；APT 包仍通过业务脚本指定的软件源安装，内网应确认 `192.168.10.36` 可达。
+编译镜像包含 Helm 3.17.3、PyYAML 及原 SDK。Ubuntu/VPP 基础镜像由独立 `xcn-bases` init 容器复制到共享卷，每次导入自己的 DinD，不共享宿主 Docker socket。
+离线包提供这些镜像以及包含 vendor 依赖的 xcn Git bundle；APT 包仍通过业务脚本指定的软件源安装，内网应确认 `192.168.10.36` 可达。
 
-迁移时配置 `config/site.yaml` 的 `open5gs.gitUrl`、Git/Registry 凭据及基础镜像。
+迁移时配置 `config/site.yaml` 的 `xcn.gitUrl`、Git/Registry 凭据及基础镜像。
 `ubuntuImage`、`vppImage` 须与该业务提交 Dockerfile/build 脚本使用的镜像引用一致。
 
 真实验证（默认使用 develop 和已导入镜像，构建模式跟随站点配置，不会修改业务源码）：
 
 ```bash
-python3 tests/verify-open5gs.py
+python3 tests/verify-xcn.py
 # 接续已有长时间构建并检查下载产物：
-python3 tests/verify-open5gs.py --number 1 --online
+python3 tests/verify-xcn.py --number 1 --online
 ```
 
 脚本实际下载四个文件、校验 SHA256，执行 Helm lint/template，导入并断网检查三个镜像。
 Chart 要求显式站点网络地址，渲染默认读取所选提交的 `helm/tests/site-values.yaml`，也可用 `--values /路径/values.yaml` 指定。
-测试 values 只用于渲染检查，不部署业务。结果位于 `.state/jenkins/open5gs-release.json`。
+测试 values 只用于渲染检查，不部署业务。结果位于 `.state/jenkins/xcn-release.json`。
 `--offline` / `--online` 仅断言预期模式，不会改变 Jenkins 后台配置。
 
 默认版本保存与历史回填的专项验收使用 `python3 tests/verify-parameters.py --site /路径/验收-site.yaml`。

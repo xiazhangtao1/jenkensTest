@@ -2,7 +2,7 @@
 def j=Jenkins.get()
 def cfg=new JsonSlurperClassic().parseText(new File('/var/xran/site.json').text)
 assert cfg.verificationInstance == true: '磁盘压力测试只能在 verificationInstance: true 的独立验收实例运行'
-def jobs=['x-ran-cloud','open5gs'].collect { j.getItem(it) }
+def jobs=['x-ran-cloud','xcn'].collect { j.getItem(it) }
 def finished=jobs.collectMany { job -> job.builds.findAll { !it.isBuilding() && it.getArtifactsDir().exists() } }.sort { a,b -> (a.startTimeInMillis+a.duration) <=> (b.startTimeInMillis+b.duration) }
 assert finished.size() >= 3
 def previous=finished.collectEntries { [(it.externalizableId): it.isKeepLog()] }

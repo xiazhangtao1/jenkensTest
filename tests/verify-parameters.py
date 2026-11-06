@@ -23,12 +23,12 @@ def main():
     assert cfg.get('verificationInstance') is True and cfg['namespace'] != 'jenkins', '需要独立验收实例'
     state = ROOT / '.state' / cfg['namespace']
     users = json.loads((state / 'users.json').read_text())
-    admin = JenkinsAPI(cfg['jenkinsUrl'], 'admin', users['ADMIN_PASSWORD'], job='open5gs')
-    builder = JenkinsAPI(cfg['jenkinsUrl'], 'builder1', users['BUILDER1_PASSWORD'], job='open5gs')
-    original = json.loads(admin.script("println(groovy.json.JsonOutput.toJson(jenkins.model.Jenkins.get().getItem('open5gs').definition.script));return null"))
+    admin = JenkinsAPI(cfg['jenkinsUrl'], 'admin', users['ADMIN_PASSWORD'], job='xcn')
+    builder = JenkinsAPI(cfg['jenkinsUrl'], 'builder1', users['BUILDER1_PASSWORD'], job='xcn')
+    original = json.loads(admin.script("println(groovy.json.JsonOutput.toJson(jenkins.model.Jenkins.get().getItem('xcn').definition.script));return null"))
     expected_source = '\n'.join((ROOT / 'jenkins' / name).read_text() for name in ['storage.groovy', 'compiler.groovy', 'pipeline.groovy'])
     assert original == expected_source, '部署脚本与当前仓库不一致'
-    expected_offline = json.loads(admin.script("println(groovy.json.JsonOutput.toJson(io.xran.jenkins.BuildPlatformConfiguration.get().effective('open5gs').open5gsOffline));return null"))
+    expected_offline = json.loads(admin.script("println(groovy.json.JsonOutput.toJson(io.xran.jenkins.BuildPlatformConfiguration.get().effective('xcn').xcnOffline));return null"))
     report = {'namespace': cfg['namespace'], 'offline': expected_offline, 'checks': []}
     numbers = []
 
@@ -66,7 +66,7 @@ def main():
             assert submitted['CHART_VERSION'] == (chart or date_version), submitted
             assert submitted['APP_VERSION'] == (app or date_version), submitted
             assert 'OFFLINE' not in submitted and submitted['GIT_REF'] == 'main'
-            metadata = json.loads(admin.script("println(new File(jenkins.model.Jenkins.get().getItem('open5gs').getBuildByNumber(" +
+            metadata = json.loads(admin.script("println(new File(jenkins.model.Jenkins.get().getItem('xcn').getBuildByNumber(" +
                 str(number) + ").rootDir,'xran-metadata.json').text);return null"))
             assert metadata['offline'] is expected_offline, metadata
             assert submitted['COMPILER_IMAGE_PULL_POLICY'] == 'Always'
@@ -76,7 +76,7 @@ def main():
         support = '\n'.join((ROOT / 'jenkins' / name).read_text() for name in ['storage.groovy', 'compiler.groovy'])
         fixtures = ','.join(str(n) for n in numbers[:3] + [numbers[4]])
         migration = script(support + '''
-def job = jenkins.model.Jenkins.get().getItem('open5gs')
+def job = jenkins.model.Jenkins.get().getItem('xcn')
 def runs = [''' + fixtures + '''].collect { job.getBuildByNumber(it) }
 def reset = { run, values ->
     run.replaceAction(run.getAction(hudson.model.ParametersAction).createUpdated(values.collect { name, value ->

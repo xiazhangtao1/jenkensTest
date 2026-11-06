@@ -23,7 +23,7 @@ class ReleaseTests(unittest.TestCase):
         runner.SOURCE = self.root / 'source'
         runner.PUBLISH = self.root / 'publish'
         (runner.SOURCE / 'helm').mkdir(parents=True)
-        self.env = patch.dict(os.environ, XRAN_KIND='open5gs', XRAN_TARGET='release', XRAN_CHART_VERSION='26.11.6',
+        self.env = patch.dict(os.environ, XRAN_KIND='xcn', XRAN_TARGET='release', XRAN_CHART_VERSION='26.11.6',
                               XRAN_IMAGE_TAG='26.11.6', XRAN_REGISTRY='192.168.10.35',
                               XRAN_OFFLINE='false', XRAN_BUILD_METADATA=json.dumps({'result': 'SUCCESS'}))
         self.env.start()

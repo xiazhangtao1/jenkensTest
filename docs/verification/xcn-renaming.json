@@ -1,0 +1,570 @@
+{
+  "status": "PASS",
+  "main": {
+    "status": "PASS",
+    "controllerImage": "docker.io/xran-ci/controller:2.580.2-15",
+    "historyPreserved": {
+      "x-ran-cloud": 97,
+      "xcn": 5
+    },
+    "parametersResultsKeepFlagsMetadataAndArtifactsUnchanged": true,
+    "settingsValuesPreserved": true,
+    "originalAuditPreserved": true,
+    "versionBefore": 1,
+    "versionAfter": 2,
+    "maintenanceCron": "H H/2 * * *",
+    "acceptingBuilds": true
+  },
+  "migration": {
+    "status": "PASS",
+    "namespace": "jenkins-platform-release",
+    "historyPreserved": {
+      "x-ran-cloud": 3,
+      "xcn": 2
+    },
+    "historyParametersResultsMetadataAndArtifactListsUnchanged": true,
+    "settingsValuesPreserved": true,
+    "originalAuditPreserved": true,
+    "versionBefore": 4,
+    "versionAfter": 5,
+    "migrationReason": "xcn-project-rename"
+  },
+  "idempotence": {
+    "status": "PASS",
+    "savedVersion": 7,
+    "completeStateAndAuditUnchanged": true,
+    "newAuditLabels": true
+  },
+  "parameters": {
+    "namespace": "jenkins-platform-release",
+    "offline": false,
+    "checks": [
+      {
+        "name": "API 实际参数保存及后台构建模式 #3",
+        "status": "PASS",
+        "details": {
+          "parameters": {
+            "CHART_VERSION": "26.11.6",
+            "APP_VERSION": "26.11.6",
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main"
+          },
+          "offline": false
+        }
+      },
+      {
+        "name": "API 实际参数保存及后台构建模式 #4",
+        "status": "PASS",
+        "details": {
+          "parameters": {
+            "CHART_VERSION": "26.11.6",
+            "APP_VERSION": "26.11.6",
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main"
+          },
+          "offline": false
+        }
+      },
+      {
+        "name": "API 实际参数保存及后台构建模式 #5",
+        "status": "PASS",
+        "details": {
+          "parameters": {
+            "CHART_VERSION": "26.11.6",
+            "APP_VERSION": "26.11.6",
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main"
+          },
+          "offline": false
+        }
+      },
+      {
+        "name": "API 实际参数保存及后台构建模式 #6",
+        "status": "PASS",
+        "details": {
+          "parameters": {
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main",
+            "CHART_VERSION": "2.3.4-rc.1",
+            "APP_VERSION": "26.11.06-custom"
+          },
+          "offline": false
+        }
+      },
+      {
+        "name": "API 实际参数保存及后台构建模式 #7",
+        "status": "PASS",
+        "details": {
+          "parameters": {
+            "APP_VERSION": "26.11.6",
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main",
+            "CHART_VERSION": "4.5.6"
+          },
+          "offline": false
+        }
+      },
+      {
+        "name": "API 实际参数保存及后台构建模式 #8",
+        "status": "PASS",
+        "details": {
+          "parameters": {
+            "CHART_VERSION": "5.6.7",
+            "APP_VERSION": "release-test",
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main"
+          },
+          "offline": false
+        }
+      },
+      {
+        "name": "按历史元数据回填、显式值保护、缺失元数据跳过、幂等及磁盘重载",
+        "status": "PASS",
+        "details": {
+          "numbers": [
+            3,
+            4,
+            5,
+            7
+          ],
+          "versions": [
+            {
+              "CHART_VERSION": "25.1.2",
+              "APP_VERSION": "25.1.2-release",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+              "COMPILER_IMAGE_PULL_POLICY": "Always",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main"
+            },
+            {
+              "CHART_VERSION": "",
+              "APP_VERSION": "",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+              "COMPILER_IMAGE_PULL_POLICY": "Always",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main"
+            },
+            {
+              "CHART_VERSION": "26.11.6",
+              "APP_VERSION": "26.11.6",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+              "COMPILER_IMAGE_PULL_POLICY": "Always",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main"
+            },
+            {
+              "APP_VERSION": "25.3.4",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+              "COMPILER_IMAGE_PULL_POLICY": "Always",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "CHART_VERSION": "4.5.6"
+            }
+          ],
+          "explicitPreserved": true,
+          "missingMetadataSkipped": true,
+          "idempotent": true,
+          "reloadVerified": true
+        }
+      }
+    ],
+    "status": "PASS"
+  },
+  "shared": {
+    "namespace": "jenkins-platform-release",
+    "checks": [
+      {
+        "name": "三类 Pod 模板及镜像参数校验",
+        "status": "PASS",
+        "details": {
+          "status": "PASS",
+          "templateCases": 27,
+          "resourceCases": 3,
+          "invalidReferencesRejected": 5,
+          "invalidPolicyRejected": true
+        }
+      },
+      {
+        "name": "相同构建号按项目分别选择 Pod",
+        "status": "PASS",
+        "details": {
+          "xran": "shared-pod-check-xran",
+          "xcn": "shared-pod-check-xcn"
+        }
+      },
+      {
+        "name": "两项目合计六个槽位、其余排队",
+        "status": "PASS",
+        "details": {
+          "builds": [
+            [
+              "x-ran-cloud",
+              4
+            ],
+            [
+              "xcn",
+              9
+            ],
+            [
+              "x-ran-cloud",
+              5
+            ],
+            [
+              "xcn",
+              10
+            ],
+            [
+              "x-ran-cloud",
+              6
+            ],
+            [
+              "xcn",
+              11
+            ],
+            [
+              "x-ran-cloud",
+              7
+            ],
+            [
+              "xcn",
+              12
+            ]
+          ],
+          "maximumSlots": 6,
+          "queued": true
+        }
+      },
+      {
+        "name": "xcn 相同 APP_VERSION 等待标签锁且不占额外槽位",
+        "status": "PASS",
+        "details": {
+          "builds": [
+            [
+              "xcn",
+              13
+            ],
+            [
+              "xcn",
+              14
+            ]
+          ],
+          "maximumSlots": 1
+        }
+      },
+      {
+        "name": "跨项目最早回收、运行/保留保护、提示审计及空间不足拒绝",
+        "status": "PASS",
+        "details": {
+          "oldestDeleted": "x-ran-cloud#9",
+          "protectedBuild": "xcn#15",
+          "secondDeleted": "xcn#16",
+          "runningProtected": [
+            "xcn#17"
+          ],
+          "rejectedWhenInsufficient": true,
+          "audit": true,
+          "liveDiskThreshold": true,
+          "reservationUsesBuildSnapshot": true
+        }
+      }
+    ],
+    "status": "PASS"
+  },
+  "permissions": {
+    "namespace": "jenkins",
+    "startedAt": "2026-11-06T18:07:38+0800",
+    "checks": [
+      {
+        "name": "全部插件启用",
+        "status": "PASS",
+        "details": {
+          "count": 74
+        }
+      },
+      {
+        "name": "匿名访问及普通账号管理权限受限",
+        "status": "PASS",
+        "details": null
+      },
+      {
+        "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+        "status": "PASS",
+        "details": {
+          "builder1": {
+            "visibleJobs": [
+              "x-ran-cloud",
+              "xcn"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "132/consoleText": 404,
+              "build": 404
+            }
+          },
+          "builder2": {
+            "visibleJobs": [
+              "x-ran-cloud",
+              "xcn"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "132/consoleText": 404,
+              "build": 404
+            }
+          }
+        }
+      }
+    ],
+    "builds": [],
+    "status": "PASS",
+    "finishedAt": "2026-11-06T18:07:42+0800"
+  },
+  "compilerAdapterCompatibility": [
+    {
+      "project": "xcn",
+      "kind": "xcn",
+      "files": 4,
+      "offline": true,
+      "compiler": "previous",
+      "image": "sha256:c35fc07fbb6ac293b26bf4dbb222dc5e014b07304708e56adf814307520e2b51",
+      "status": "PASS"
+    },
+    {
+      "project": "xcn",
+      "kind": "xcn",
+      "files": 4,
+      "offline": true,
+      "compiler": "current",
+      "image": "192.168.10.35/xnet/xran-compile:latest",
+      "status": "PASS"
+    }
+  ],
+  "historicalRelease": {
+    "status": "PASS",
+    "build": 1,
+    "checks": [
+      {
+        "name": "精确提交、构建人、时间、日期版本及编译镜像",
+        "status": "PASS"
+      },
+      {
+        "name": "普通账号下载四个产物及 SHA256 完整性",
+        "status": "PASS"
+      },
+      {
+        "name": "Helm lint 与模板渲染",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-runtime 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-webui 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-monitor 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "推送状态如实记录；非致命 push 失败仍保留有效产物",
+        "status": "PASS"
+      }
+    ]
+  },
+  "pythonTests": {
+    "passed": 21
+  },
+  "plugin": {
+    "version": "1.0.3",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "network": "none"
+  },
+  "actualBuilds": {
+    "service": {
+      "job": "x-ran-cloud",
+      "number": 98,
+      "settingsVersion": 2,
+      "resourceProfile": "service",
+      "admittedAt": "2026-11-06T18:08:49.536638123+08:00",
+      "pod": "x-ran-cloud-98-47kld-32pm9-3qr3q",
+      "resources": {
+        "jnlp": {
+          "limits": {
+            "cpu": "250m",
+            "ephemeral-storage": "256Mi",
+            "memory": "512Mi"
+          },
+          "requests": {
+            "cpu": "100m",
+            "ephemeral-storage": "64Mi",
+            "memory": "256Mi"
+          }
+        },
+        "builder": {
+          "limits": {
+            "cpu": "3750m",
+            "ephemeral-storage": "20224Mi",
+            "memory": "7680Mi"
+          },
+          "requests": {
+            "cpu": "500m",
+            "ephemeral-storage": "1Gi",
+            "memory": "1Gi"
+          }
+        }
+      },
+      "totals": {
+        "cpu": 4.0,
+        "memory": 8589934592,
+        "ephemeral-storage": 21474836480
+      },
+      "selected": {
+        "concurrency": 6,
+        "buildTimeoutMinutes": 240,
+        "agentStartupTimeoutMinutes": 15,
+        "minimumFreeGiB": 50,
+        "minimumFreePercent": 10,
+        "compilerImagePullPolicy": "Always",
+        "innerBuildMemoryGiB": 3,
+        "buildJobs": 2,
+        "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+        "buildCpuLimit": 4,
+        "buildMemoryGiB": 8,
+        "temporaryStorageGiB": 20,
+        "dindMemoryGiB": 0,
+        "xcnOffline": true
+      },
+      "currentSettingsVersion": 2,
+      "status": "PASS",
+      "metadata": {
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+        "settingsVersion": 2,
+        "resourceProfile": "service",
+        "admittedAt": "2026-11-06T18:08:49.536638123+08:00",
+        "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+        "builderImagePullPolicy": "Never"
+      }
+    },
+    "image": {
+      "job": "x-ran-cloud",
+      "number": 99,
+      "settingsVersion": 2,
+      "resourceProfile": "image",
+      "admittedAt": "2026-11-06T18:08:57.377687455+08:00",
+      "pod": "x-ran-cloud-99-8mf1s-td4pj-wzbmb",
+      "resources": {
+        "jnlp": {
+          "limits": {
+            "cpu": "250m",
+            "ephemeral-storage": "256Mi",
+            "memory": "512Mi"
+          },
+          "requests": {
+            "cpu": "100m",
+            "ephemeral-storage": "64Mi",
+            "memory": "256Mi"
+          }
+        },
+        "builder": {
+          "limits": {
+            "cpu": "2500m",
+            "ephemeral-storage": "10Gi",
+            "memory": "3584Mi"
+          },
+          "requests": {
+            "cpu": "500m",
+            "ephemeral-storage": "1Gi",
+            "memory": "1Gi"
+          }
+        },
+        "dind": {
+          "limits": {
+            "cpu": "1250m",
+            "ephemeral-storage": "9984Mi",
+            "memory": "4Gi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "ephemeral-storage": "1Gi",
+            "memory": "256Mi"
+          }
+        }
+      },
+      "totals": {
+        "cpu": 4.0,
+        "memory": 8589934592,
+        "ephemeral-storage": 21474836480
+      },
+      "selected": {
+        "concurrency": 6,
+        "buildTimeoutMinutes": 240,
+        "agentStartupTimeoutMinutes": 15,
+        "minimumFreeGiB": 50,
+        "minimumFreePercent": 10,
+        "compilerImagePullPolicy": "Always",
+        "innerBuildMemoryGiB": 3,
+        "buildJobs": 2,
+        "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+        "buildCpuLimit": 4,
+        "buildMemoryGiB": 8,
+        "temporaryStorageGiB": 20,
+        "dindMemoryGiB": 4,
+        "xcnOffline": true
+      },
+      "currentSettingsVersion": 2,
+      "status": "PASS",
+      "metadata": {
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+        "settingsVersion": 2,
+        "resourceProfile": "image",
+        "admittedAt": "2026-11-06T18:08:57.377687455+08:00",
+        "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+        "builderImagePullPolicy": "Never"
+      }
+    }
+  },
+  "browser": {
+    "ordinaryHomeXcnVisible": true,
+    "ordinaryMaintenanceHidden": true,
+    "adminXcnResourceLabels": true,
+    "buildParameters": 6,
+    "defaultVersions": "26.11.6",
+    "historicalChartAndAppVisible": true,
+    "actualHttpCopyPaste": "26.11.6"
+  },
+  "businessSourcesModified": false,
+  "realIntranetReached": false,
+  "actualXcnPod": {
+    "status": "PASS",
+    "buildNumber": 18,
+    "expectedResult": "FAILURE",
+    "reason": "selected main lacks helm/build-release.sh",
+    "project": "xcn",
+    "kind": "xcn",
+    "resourceProfile": "xcn",
+    "builderPod": "xcn-18-qn0nq-fqkxk-zv2q3",
+    "builderImageId": "sha256:ba0181cf748c67aef3654daaa5691706af966701f2834cbfc5ba2ada31fcd9bc",
+    "canonicalGitEndpoint": true
+  }
+}

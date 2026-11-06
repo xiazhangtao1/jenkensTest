@@ -23,7 +23,7 @@ class ConfigurationTests(unittest.TestCase):
     def test_both_pod_profiles_enforce_total_resources(self):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False))
         self.assertEqual(cfg['concurrency'], 6)
-        for kind in ['service', 'image', 'open5gs']:
+        for kind in ['service', 'image', 'xcn']:
             pod = ci.pod_template(cfg, kind)
             limits = [c['resources']['limits'] for c in pod['spec']['containers']]
             self.assertEqual(sum(memory(x['ephemeral-storage']) for x in limits), 20 * 1024)
@@ -36,13 +36,13 @@ class ConfigurationTests(unittest.TestCase):
                 dind = next(c for c in pod['spec']['containers'] if c['name'] == 'dind')
                 self.assertEqual(memory(dind['resources']['limits']['memory']), 4096)
                 self.assertEqual(dind['command'], ['sh', '/etc/xran/dind-start.sh'])
-            if kind == 'open5gs':
-                self.assertEqual(pod['spec']['initContainers'][0]['image'], cfg['open5gsBasesImage'])
-                self.assertLess(cfg['open5gs']['innerBuildMemoryGiB'], cfg['dindMemoryGiB'])
+            if kind == 'xcn':
+                self.assertEqual(pod['spec']['initContainers'][0]['image'], cfg['xcnBasesImage'])
+                self.assertLess(cfg['xcn']['innerBuildMemoryGiB'], cfg['dindMemoryGiB'])
 
     def test_offline_profiles_keep_selected_compiler_policy(self):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace='jenkins-offline-verify', offline=True))
-        for kind in ['service', 'image', 'open5gs']:
+        for kind in ['service', 'image', 'xcn']:
             containers = ci.pod_template(cfg, kind)['spec']['containers']
             self.assertTrue(all(c['imagePullPolicy'] == ('Always' if c['name'] == 'builder' else 'Never')
                                 for c in containers))
@@ -56,7 +56,7 @@ class ConfigurationTests(unittest.TestCase):
         cfg = ci.config(args)
         cfg['compilerImagePullPolicy'] = 'IfNotPresent'
         cfg['compilerImagePullSecrets'] = ['compile-registry']
-        for kind in ['service', 'image', 'open5gs']:
+        for kind in ['service', 'image', 'xcn']:
             pod = ci.pod_template(cfg, kind)
             builder = next(c for c in pod['spec']['containers'] if c['name'] == 'builder')
             self.assertEqual(builder['image'], 'registry.local:5000/team/sdk:26.11.05')
@@ -67,9 +67,26 @@ class ConfigurationTests(unittest.TestCase):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False))
         self.assertEqual(cfg['builderImage'], '192.168.10.35/xnet/xran-compile:latest')
         self.assertEqual(cfg['compilerImagePullPolicy'], 'Always')
-        self.assertIs(cfg['open5gs']['offline'], True)
+        self.assertIs(cfg['xcn']['offline'], True)
 
-    def test_open5gs_mode_is_a_site_setting(self):
+    def test_previous_site_configuration_keeps_project_values(self):
+        source = yaml.safe_load((REPO / 'config/site.yaml').read_text())
+        legacy = source.pop('xcn')
+        legacy.update(gitUrl='ssh://tester@192.168.10.82:29418/ICT_CN', offline=False)
+        source['open5gs'] = legacy
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'site.yaml'
+            path.write_text(yaml.safe_dump(source))
+            cfg = ci.config(SimpleNamespace(site=path, namespace=None, offline=True))
+            self.assertNotIn('open5gs', cfg)
+            self.assertEqual(cfg['xcn'], legacy)
+            pod = ci.pod_template(cfg, 'xcn')
+            builder = next(c for c in pod['spec']['containers'] if c['name'] == 'builder')
+            mounts = {v['mountPath'] for v in builder['volumeMounts']}
+            self.assertIn('/opt/xran/xcn-bases', mounts)
+            self.assertIn('/opt/xran/open5gs-bases', mounts)
+
+    def test_xcn_mode_is_a_site_setting(self):
         source = yaml.safe_load((REPO / 'config/site.yaml').read_text())
         with tempfile.TemporaryDirectory() as directory:
             site = Path(directory) / 'site.yaml'
@@ -77,20 +94,20 @@ class ConfigurationTests(unittest.TestCase):
             for value in [None, True, False, 'false', 0]:
                 with self.subTest(value=value):
                     if value is None:
-                        source['open5gs'].pop('offline', None)
+                        source['xcn'].pop('offline', None)
                     else:
-                        source['open5gs']['offline'] = value
+                        source['xcn']['offline'] = value
                     site.write_text(yaml.safe_dump(source))
                     if isinstance(value, bool) or value is None:
                         cfg = ci.config(args)
-                        self.assertIs(cfg['open5gs']['offline'], True if value is None else value)
+                        self.assertIs(cfg['xcn']['offline'], True if value is None else value)
                     else:
-                        with self.assertRaisesRegex(ValueError, 'open5gs.offline'):
+                        with self.assertRaisesRegex(ValueError, 'xcn.offline'):
                             ci.config(args)
 
             hashes = []
             for value in [True, False]:
-                source['open5gs']['offline'] = value
+                source['xcn']['offline'] = value
                 site.write_text(yaml.safe_dump(source))
                 with patch.object(ci, 'state_dir', return_value=Path(directory)):
                     ci.render(args)
@@ -102,7 +119,7 @@ class ConfigurationTests(unittest.TestCase):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False))
         for size in [1, 2, 6, 20]:
             cfg['temporaryStorageGiB'] = size
-            for kind in ['service', 'image', 'open5gs']:
+            for kind in ['service', 'image', 'xcn']:
                 with self.subTest(size=size, kind=kind):
                     containers = ci.pod_template(cfg, kind)['spec']['containers']
                     self.assertEqual(sum(memory(c['resources']['limits']['ephemeral-storage']) for c in containers), size * 1024)

@@ -81,7 +81,10 @@ def release_build():
     if not script.is_file():
         raise RuntimeError('当前 Git 引用缺少 helm/build-release.sh，请选择具备发布入口的分支/tag/commit')
     chart, app = os.environ['XRAN_CHART_VERSION'], os.environ['XRAN_IMAGE_TAG']
-    ensure_docker('/opt/xran/open5gs-bases/images.tar')
+    archive = '/opt/xran/xcn-bases/images.tar'
+    if not Path(archive).is_file():
+        archive = '/opt/xran/open5gs-bases/images.tar'  # compatibility with earlier Pod templates
+    ensure_docker(archive)
     # The upstream script keeps old outputs on failure; remove only this run's
     # expected files in the isolated checkout to prevent stale publication.
     for name in ['xcn-runtime.tar', 'xcn-webui.tar', 'xcn-monitor.tar', f'xcn-{chart}.tgz']:
@@ -106,13 +109,15 @@ def release_build():
 def build():
     target = os.environ['XRAN_TARGET']
     kind = os.environ['XRAN_KIND']
+    if kind == 'open5gs':  # previous compiler adapter protocol
+        kind = 'xcn'
     if kind == 'service':
         run(['./build.sh', '-c', '-m', target], SOURCE / 'services')
     elif kind == 'image':
         ensure_docker('/opt/xran/base-images.tar')
         run(['./images-build.sh', target, os.environ['XRAN_IMAGE_TAG']],
             SOURCE / 'platform/k8s/images-build')
-    elif kind == 'open5gs':
+    elif kind == 'xcn':
         release_build()
     else:
         raise ValueError('未知构建类型')
@@ -188,7 +193,7 @@ def collect_release():
 
 def collect():
     """即使 push 失败，也只发布通过 tar 完整性检查的已有文件。"""
-    if os.environ['XRAN_KIND'] == 'open5gs':
+    if os.environ['XRAN_KIND'] in ('xcn', 'open5gs'):
         return collect_release()
     PUBLISH.mkdir(exist_ok=True)
     meta = json.loads((ROOT / 'checkout.json').read_text()) if (ROOT / 'checkout.json').exists() else {}

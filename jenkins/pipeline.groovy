@@ -1,28 +1,28 @@
 // 仅管理员可修改的受信流水线；被选择的业务分支只提供源码和原构建脚本。
 def cfg = XranStorage.parseJson(new File('/var/xran/site.json').text)
 def project = env.JOB_NAME as String
-def isOpen5gs = project == 'open5gs'
-if (!(project in ['x-ran-cloud', 'open5gs'])) error('未知构建项目')
-if (isOpen5gs) cfg.putAll(cfg.open5gs as Map)
+def isXcn = project == 'xcn'
+if (!(project in ['x-ran-cloud', 'xcn'])) error('未知构建项目')
+if (isXcn) cfg.putAll(cfg.xcn as Map)
 def sourceType = params.REF_TYPE as String
 def ref = params.GIT_REF as String
-def kind = isOpen5gs ? 'open5gs' : params.BUILD_KIND as String
-def target = isOpen5gs ? 'release' : (kind == 'service' ? params.SERVICE_TARGET : params.IMAGE_TARGET) as String
+def kind = isXcn ? 'xcn' : params.BUILD_KIND as String
+def target = isXcn ? 'release' : (kind == 'service' ? params.SERVICE_TARGET : params.IMAGE_TARGET) as String
 def today = new Date(currentBuild.startTimeInMillis).format('yy.M.d', TimeZone.getTimeZone('Asia/Shanghai'))
-def chartVersion = isOpen5gs ? ((params.CHART_VERSION as String)?.trim() ?: today) : ''
-def imageTag = isOpen5gs ? ((params.APP_VERSION as String)?.trim() ?: today) : params.IMAGE_TAG as String
+def chartVersion = isXcn ? ((params.CHART_VERSION as String)?.trim() ?: today) : ''
+def imageTag = isXcn ? ((params.APP_VERSION as String)?.trim() ?: today) : params.IMAGE_TAG as String
 def offline = false // resolved from the settings snapshot at admission
 def needsDocker = kind != 'service'
 def compilerImage = (params.containsKey('COMPILER_IMAGE') ? params.COMPILER_IMAGE : XranCompiler.defaults(kind).builderImage) as String
 def compilerPolicy = (params.containsKey('COMPILER_IMAGE_PULL_POLICY') ? params.COMPILER_IMAGE_PULL_POLICY :
     XranCompiler.defaults(kind).compilerImagePullPolicy) as String
 XranCompiler.validate(compilerImage, compilerPolicy)
-if (!(sourceType in ['branch', 'tag', 'commit']) || !(kind in ['service', 'image', 'open5gs'])) error('非法构建类型或引用类型')
-if (!isOpen5gs && !(target in (kind == 'service' ? cfg.services + ['all', 'services_all'] : cfg.images))) error('非法构建目标')
+if (!(sourceType in ['branch', 'tag', 'commit']) || !(kind in ['service', 'image', 'xcn'])) error('非法构建类型或引用类型')
+if (!isXcn && !(target in (kind == 'service' ? cfg.services + ['all', 'services_all'] : cfg.images))) error('非法构建目标')
 if (!ref || ref.startsWith('-') || ref.contains('\n')) error('非法 Git 引用')
 if (needsDocker && !(imageTag ==~ /[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}/)) error('非法镜像标签')
-if (isOpen5gs && !(chartVersion ==~ /(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?/)) error('非法 Chart 版本，请使用不带前导零的 SemVer')
-if (isOpen5gs) XranCompiler.recordVersions(currentBuild.rawBuild, [CHART_VERSION: chartVersion, APP_VERSION: imageTag])
+if (isXcn && !(chartVersion ==~ /(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?/)) error('非法 Chart 版本，请使用不带前导零的 SemVer')
+if (isXcn) XranCompiler.recordVersions(currentBuild.rawBuild, [CHART_VERSION: chartVersion, APP_VERSION: imageTag])
 def trigger = currentBuild.rawBuild.getCause(hudson.model.Cause.UserIdCause)
 def started = currentBuild.startTimeInMillis
 def metadata = [buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, job: env.JOB_NAME, project: project,
@@ -30,9 +30,9 @@ def metadata = [buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, job: env
     kind: kind, target: target, imageTag: kind == 'image' ? imageTag : null,
     builderImage: compilerImage, builderImagePullPolicy: compilerPolicy,
     startedAt: new Date(started).format("yyyy-MM-dd'T'HH:mm:ssXXX", TimeZone.getTimeZone('Asia/Shanghai'))]
-if (isOpen5gs) metadata.putAll([chartVersion: chartVersion, appVersion: imageTag])
+if (isXcn) metadata.putAll([chartVersion: chartVersion, appVersion: imageTag])
 trigger = null // Cause 对象不跨 Pipeline 挂起点序列化。
-def reference = isOpen5gs ? "${cfg.registry}/xcn/releases:${imageTag}" : (kind == 'image' ? "${cfg.registry}/${cfg.imageRepositories[target]}:${imageTag}" : '')
+def reference = isXcn ? "${cfg.registry}/xcn/releases:${imageTag}" : (kind == 'image' ? "${cfg.registry}/${cfg.imageRepositories[target]}:${imageTag}" : '')
 def reservationKey = "${env.JOB_NAME}#${env.BUILD_NUMBER}".toString()
 def execute = {
   def finished = false
@@ -41,10 +41,10 @@ def execute = {
       def snapshot = XranCompiler.admit(currentBuild.rawBuild, kind)
       if (snapshot != null) {
         cfg.putAll(snapshot.config)
-        offline = isOpen5gs && cfg.open5gsOffline == true
+        offline = isXcn && cfg.xcnOffline == true
         metadata.putAll([settingsVersion: snapshot.settingsVersion, resourceProfile: snapshot.resourceProfile,
             resourceAllocation: snapshot.resourceAllocation, admittedAt: snapshot.admittedAt])
-        if (isOpen5gs) metadata.offline = offline
+        if (isXcn) metadata.offline = offline
         def deadline = (snapshot.admittedAtMillis as long) + (cfg.buildTimeoutMinutes as long) * 60000L
         def remainingSeconds = Math.max(1L, (long)Math.ceil((deadline - System.currentTimeMillis()) / 1000.0d))
         if (deadline <= System.currentTimeMillis()) error('构建入场后总超时已到期')
@@ -85,7 +85,8 @@ def execute = {
                 def failure = null
                 def environment = [
                     "XRAN_GIT_URL=${cfg.gitUrl}", "XRAN_REF_TYPE=${sourceType}", "XRAN_REF=${ref}",
-                    "XRAN_KIND=${kind}", "XRAN_TARGET=${target}", "XRAN_IMAGE_TAG=${imageTag}",
+                    // Retain the adapter protocol accepted by existing compiler image tags.
+                    "XRAN_KIND=${isXcn ? 'open5gs' : kind}", "XRAN_TARGET=${target}", "XRAN_IMAGE_TAG=${imageTag}",
                     "XRAN_REGISTRY=${cfg.registry}", "IMAGE_REGISTRY=${cfg.registry}",
                     "XRAN_IMAGE_REFERENCE=${reference}", "XRAN_SERVICES=${groovy.json.JsonOutput.toJson(cfg.services)}",
                     "XRAN_CHART_VERSION=${chartVersion}", "XRAN_OFFLINE=${offline}",
@@ -108,7 +109,7 @@ def execute = {
                                     test -r /opt/xran/run-build.py || { echo '编译镜像缺少 /opt/xran/run-build.py，请使用本项目制作的兼容镜像' >&2; exit 1; }
                                 '''
                                 if (needsDocker) sh 'command -v docker >/dev/null && test -r /opt/xran/base-images.tar'
-                                if (isOpen5gs) sh 'command -v helm >/dev/null && python3 -c "import yaml" && test -r /opt/xran/open5gs-bases/images.tar'
+                                if (isXcn) sh 'command -v helm >/dev/null && python3 -c "import yaml" && test -r /opt/xran/xcn-bases/images.tar'
                             }
                             stage('磁盘检查') { echo groovy.json.JsonOutput.toJson(XranStorage.reserve(cfg,
                                 reservationKey, env.JOB_NAME, env.BUILD_NUMBER as int, workspaceStats())) }
@@ -125,7 +126,7 @@ def execute = {
                                 metadata.putAll(checkout)
                                 currentBuild.displayName = "#${env.BUILD_NUMBER} ${target} ${checkout.commit.take(9)}"
                                 currentBuild.description = "${metadata.startedAt} | ${metadata.userId} | ${sourceType}:${ref} | commit=${checkout.commit} | compiler=${compilerImage} (${compilerPolicy})"
-                                if (isOpen5gs) currentBuild.description += " | chart=${chartVersion} app=${imageTag} offline=${offline}"
+                                if (isXcn) currentBuild.description += " | chart=${chartVersion} app=${imageTag} offline=${offline}"
                             }
                             stage('编译与打包') {
                                 if (needsDocker && cfg.registryCredentialsId) {

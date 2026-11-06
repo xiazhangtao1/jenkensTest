@@ -67,7 +67,7 @@ class XranStorage {
     }
 
     @NonCPS static List candidates() {
-        def jobs = ['x-ran-cloud', 'open5gs'].collect { Jenkins.get().getItemByFullName(it) }.findAll { it != null }
+        def jobs = ['x-ran-cloud', 'xcn'].collect { Jenkins.get().getItemByFullName(it) }.findAll { it != null }
         return jobs.collectMany { job -> job.builds.findAll { run ->
             !run.isBuilding() && !run.isKeepLog() && run.getArtifactsDir().exists() &&
                 !new File(run.rootDir, 'xran-cleaned.json').exists()

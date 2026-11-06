@@ -40,7 +40,7 @@ class XranCompiler {
                 if (file.isFile()) {
                     try {
                         def record = XranStorage.parseJson(file.getText('UTF-8'))
-                        if (record.project == 'open5gs' && record.buildNumber?.toString() == run.number.toString() &&
+                        if (record.project in ['xcn', 'open5gs'] && record.buildNumber?.toString() == run.number.toString() &&
                             record.chartVersion instanceof String && record.appVersion instanceof String) {
                             if (recordVersions(run, [CHART_VERSION: record.chartVersion, APP_VERSION: record.appVersion], true)) restored++
                         }

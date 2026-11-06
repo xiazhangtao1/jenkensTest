@@ -21,7 +21,7 @@ public class BuildPlatformConfigurationTest {
     private BuildPlatformConfiguration seed() throws Exception {
         j.jenkins.clouds.add(new KubernetesCloud("test"));
         BuildPlatformConfiguration c = BuildPlatformConfiguration.get();
-        c.initialize(Map.of("concurrency", 6, "open5gs", Map.of("offline", true)));
+        c.initialize(Map.of("concurrency", 6, "xcn", Map.of("offline", true)));
         assertTrue(c.getStatus(), c.getStatus().contains("已生效"));
         return c;
     }
@@ -53,7 +53,7 @@ public class BuildPlatformConfigurationTest {
 
     @Test public void budgetsAreValidatedBeforeSave() throws Exception {
         BuildPlatformConfiguration c = seed();
-        for (String key : new String[] {"concurrency", "serviceCpu", "open5gsMemoryGiB", "innerBuildMemoryGiB", "agentStartupTimeoutMinutes"}) {
+        for (String key : new String[] {"concurrency", "serviceCpu", "xcnMemoryGiB", "innerBuildMemoryGiB", "agentStartupTimeoutMinutes"}) {
             JSONObject edit = c.getForm();
             edit.put("revision", c.getRevision());
             edit.put(key, key.equals("innerBuildMemoryGiB") ? 4 : 0);
@@ -65,9 +65,32 @@ public class BuildPlatformConfigurationTest {
         assertThrows(IllegalArgumentException.class, () -> PlatformSettings.validate(fraction));
         for (int temporary : new int[] {1, 2, 6, 20}) {
             JSONObject s = c.getForm();
-            for (String p : new String[] {"service", "image", "open5gs"}) s.put(p + "TemporaryStorageGiB", temporary);
+            for (String p : new String[] {"service", "image", "xcn"}) s.put(p + "TemporaryStorageGiB", temporary);
             PlatformSettings.validate(s);
         }
+    }
+
+    @Test public void savedProjectSettingsKeepValuesAcrossRename() {
+        JSONObject expected = PlatformSettings.defaults();
+        expected.put("concurrency", 3);
+        expected.put("xcnCpu", 7);
+        expected.put("xcnMemoryGiB", 12);
+        expected.put("xcnOffline", false);
+        expected.put("compilerImage", "registry.local/open5gs/sdk:stable");
+        JSONObject previous = JSONObject.fromObject(expected.toString());
+        for (Object name : expected.keySet()) {
+            String key = name.toString();
+            if (key.startsWith("xcn")) previous.put("open5gs" + key.substring(3), previous.remove(key));
+        }
+        JSONObject upgraded = PlatformSettings.upgradeNames(previous);
+        assertEquals(expected, PlatformSettings.validate(upgraded));
+        assertEquals(upgraded, PlatformSettings.upgradeNames(upgraded));
+        assertFalse(previous.containsKey("xcnCpu"));
+        previous.put("xcnCpu", 8);
+        assertThrows(IllegalArgumentException.class, () -> PlatformSettings.upgradeNames(previous));
+        JSONObject oldSite = new JSONObject();
+        oldSite.put("open5gs", Map.of("offline", false));
+        assertFalse(PlatformSettings.migrate(oldSite).getBoolean("xcnOffline"));
     }
 
     @Test public void trustedPipelineParsesWithInstalledPlugin() throws Exception {
@@ -98,7 +121,7 @@ public class BuildPlatformConfigurationTest {
         BuildPlatformConfiguration c = seed();
         JSONObject expected = c.getForm();
         expected.put("minimumFreePercent", 0);
-        expected.put("open5gsOffline", false);
+        expected.put("xcnOffline", false);
         expected.put("compilerImagePullPolicy", "Never");
         JSONObject submitted = JSONObject.fromObject(expected.toString());
         submitted.put("revision", c.getRevision());
@@ -110,6 +133,8 @@ public class BuildPlatformConfigurationTest {
         var admin = j.createWebClient().login("admin");
         var page = admin.goTo("configure");
         assertTrue(page.asNormalizedText().contains("构建平台设置"));
+        assertTrue(page.asNormalizedText().contains("xcn 离线构建"));
+        assertFalse(page.asNormalizedText().contains("open5gs"));
         try { j.submit(page.getFormByName("config")); }
         catch (org.htmlunit.FailingHttpStatusCodeException error) {
             System.err.println(error.getResponse().getContentAsString());

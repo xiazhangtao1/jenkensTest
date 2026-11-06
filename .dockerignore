@@ -14,8 +14,8 @@ AGENTS.md
 !.cache/compile-sources/
 !.cache/compile-extra-apt/
 !.cache/compile-tools/
-!.cache/open5gs-base-images.tar
-!.cache/open5gs.git/
+!.cache/xcn-base-images.tar
+!.cache/xcn.git/
 !.cache/base-images.tar
 !.cache/demo.git/
 __pycache__

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""真实 open5gs 发布验收；可用 --number 接续已有构建，避免重复长时间编译。"""
+"""真实 xcn 发布验收；可用 --number 接续已有构建，避免重复长时间编译。"""
 import argparse
 import datetime as dt
 import hashlib
@@ -16,6 +16,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from jenkins_api import JenkinsAPI
+from ci import default_xcn_source
 
 
 def run(command, **kwargs):
@@ -25,7 +26,7 @@ def run(command, **kwargs):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--site', default='config/site.yaml')
-    parser.add_argument('--source', default=str(ROOT.parent / 'open5gs'))
+    parser.add_argument('--source', default=default_xcn_source())
     parser.add_argument('--number', type=int)
     parser.add_argument('--ref-type', choices=['branch', 'tag', 'commit'], default='branch')
     parser.add_argument('--ref', default='open5gs-basev277-develop')
@@ -44,25 +45,25 @@ def main():
     cfg = yaml.safe_load(Path(args.site).read_text())
     state = ROOT / '.state' / cfg['namespace']
     users = json.loads((state / 'users.json').read_text())
-    admin = JenkinsAPI(cfg['jenkinsUrl'], 'admin', users['ADMIN_PASSWORD'], job='open5gs')
-    expected_offline = (json.loads(admin.script("println(groovy.json.JsonOutput.toJson(io.xran.jenkins.BuildPlatformConfiguration.get().effective('open5gs').open5gsOffline));return null"))
+    admin = JenkinsAPI(cfg['jenkinsUrl'], 'admin', users['ADMIN_PASSWORD'], job='xcn')
+    expected_offline = (json.loads(admin.script("println(groovy.json.JsonOutput.toJson(io.xran.jenkins.BuildPlatformConfiguration.get().effective('xcn').xcnOffline));return null"))
                         if args.expected_offline is None else args.expected_offline)
-    api = JenkinsAPI(cfg['jenkinsUrl'], 'builder1', users['BUILDER1_PASSWORD'], job='open5gs')
+    api = JenkinsAPI(cfg['jenkinsUrl'], 'builder1', users['BUILDER1_PASSWORD'], job='xcn')
     params = dict(COMPILER_IMAGE=args.compiler_image, COMPILER_IMAGE_PULL_POLICY=args.pull_policy,
                   REF_TYPE=args.ref_type, GIT_REF=args.ref,
                   CHART_VERSION=args.chart_version, APP_VERSION=args.app_version)
     number = args.number or api.wait_number(api.trigger(params))
-    target = state / 'downloads' / 'open5gs' / str(number)
+    target = state / 'downloads' / 'xcn' / str(number)
     target.mkdir(parents=True, exist_ok=True)
     report = {'number': number, 'url': api.url + api.job_path + str(number) + '/', 'checks': []}
-    report_path = state / 'open5gs-release.json'
+    report_path = state / 'xcn-release.json'
 
     def record(name, details=None):
         report['checks'].append({'name': name, 'status': 'PASS', 'details': details})
         report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
         print('PASS:', name, flush=True)
 
-    print(f'等待 open5gs #{number}，超时 {args.timeout} 秒', flush=True)
+    print(f'等待 xcn #{number}，超时 {args.timeout} 秒', flush=True)
     build = api.wait(number, timeout=args.timeout)
     console = api.console(number)
     (target / 'console.log').write_text(console)
@@ -75,13 +76,13 @@ def main():
     if args.ref_type == 'commit': reference = args.ref
     expected_sha = run(['git', '-C', args.source, 'rev-parse', reference + '^{commit}'])
     assert meta['commit'] == expected_sha, (meta['commit'], expected_sha)
-    assert meta['userId'] == 'builder1' and meta['project'] == 'open5gs'
+    assert meta['userId'] == 'builder1' and meta['project'] in ('xcn', 'open5gs')
     assert meta['result'] == 'SUCCESS' and meta['durationMillis'] > 0 and meta['finishedAt']
     assert meta['builderImage'] == args.compiler_image and meta['builderImageId']
     assert meta['builderImagePullPolicy'] == args.pull_policy and meta['offline'] is expected_offline
     if args.number is None:
         assert isinstance(meta['settingsVersion'], int) and meta['settingsVersion'] > 0
-        assert meta['resourceProfile'] == 'open5gs' and meta['admittedAt']
+        assert meta['resourceProfile'] == 'xcn' and meta['admittedAt']
         assert set(meta['resourceAllocation']) == {'jnlp', 'builder', 'dind'}
     today = dt.datetime.fromisoformat(meta['startedAt']).astimezone(ZoneInfo('Asia/Shanghai'))
     date_version = f'{today.year % 100:02d}.{today.month}.{today.day}'

@@ -49,17 +49,17 @@ editor config/site.local.yaml
 
 必须将 `JENKINS_NODE_IP` 改成实际 Jenkins 节点 IP，并核对 NodePort、StorageClass、服务/镜像清单、
 Registry 仓库映射和拉取凭据。示例的 `services`、`images`、`imageRepositories` 仍是演示名称，需要按内网脚本填写。
-示例已设置 `demo: false`、部署离线模式和 Open5gs 首次默认离线模式。
+示例已设置 `demo: false`、部署离线模式和 xcn 首次默认离线模式。
 
 两个源码地址分别为：
 
 | Jenkins 配置项 | 内网地址 |
 | --- | --- |
 | `gitUrl` | `ssh://xiazhangtao@192.168.10.82:29418/X-RAN-CLOUD` |
-| `open5gs.gitUrl` | `ssh://xiazhangtao@192.168.10.82:29418/ICT_CN` |
+| `xcn.gitUrl` | `ssh://xiazhangtao@192.168.10.82:29418/ICT_CN` |
 
 两项目都检出到工作区 `source/`，脚本通过相对路径执行，不依赖远端仓库外层名字。
-Jenkins 业务任务名仍为 `x-ran-cloud` 和 `open5gs`，保留各自历史；无需改成 `ICT_CN`。
+Jenkins 业务任务名仍为 `x-ran-cloud` 和 `xcn`，保留各自历史；无需改成 `ICT_CN`。
 分支/tag/commit 选择方式与外网一致，默认 main；内网 main 必须已有 `helm/build-release.sh` 等所需入口。
 TLS Registry 设置 registryInsecure: false；proxy 通常留空，noProxy 包含 API、Pod/Service CIDR、内网域名与 apt 源。
 
@@ -121,7 +121,7 @@ Pod 出口限制为本命名空间与 RFC1918 内网。
 若 CPU webhook 直接指定 Pod.nodeName，脚本只给 Jenkins Pending PVC 补齐实际节点注解，兼容延迟绑定。
 
 首次上线先在验收 namespace 的全新 PVC 上验证，再完成服务包及镜像 build/save/push/download；
-Open5gs 检查三个镜像 tar 和 Chart 四个下载文件、SHA256、构建人/时间/完整 commit。
+xcn 检查三个镜像 tar 和 Chart 四个下载文件、SHA256、构建人/时间/完整 commit。
 验收不能依赖旧 HOME 缓存；生产迁移可以按备份恢复流程保留原有 HOME。
 
 ## 保留已有 Jenkins 的迁移
@@ -136,7 +136,7 @@ python3 scripts/ci.py backup --site config/site.yaml --archive /mnt/backup/jenki
 原 HOME、初始账号 `xran-users`、SSH 主机信任 `xran-build-trust`、Registry CA 和镜像拉取 Secret
 是独立于源码的迁移材料；完整 HOME 备份包含 Jenkins 中保存的 Git/Registry Credentials。
 不要先正常启动一个全新 HOME 再把备份混进去；恢复脚本会拒绝非空目标。
-恢复使用内网 site 文件，启动后管理员确认 **Open5gs 离线构建开启、编译环境地址及拉取策略正确**。
+恢复使用内网 site 文件，启动后管理员确认 **xcn 离线构建开启、编译环境地址及拉取策略正确**。
 恢复的网页设置优先于 site 首次默认值，旧实例若保存 offline=false，必须在网页改为开启。
 
 ## 编译环境重建
@@ -146,20 +146,20 @@ python3 scripts/ci.py backup --site config/site.yaml --archive /mnt/backup/jenki
 
 ```bash
 git clone --mirror repos/X-RAN-CLOUD.bundle ../X-RAN-CLOUD.git
-git clone --mirror repos/open5gs.bundle ../open5gs.git
+git clone --mirror repos/xcn.bundle ../xcn.git
 docker load -i .cache/build-base-images.tar
 docker load -i .cache/k8s-images.tar
 make platform-plugin OFFLINE=1
 make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list
 python3 scripts/ci.py images --offline --source ../X-RAN-CLOUD.git \
-  --open5gs-source ../open5gs.git --apt-sources config/sources.intranet.list
+  --xcn-source ../xcn.git --apt-sources config/sources.intranet.list
 ```
 
 SDK 构建始终使用 --network none，离线入口不会更新 APT 或拉取基础镜像。
-包内新增 Helm 二进制及固定 SHA256、PyYAML 的额外 APT 缓存、open5gs Git 镜像/bundle 和 Ubuntu/VPP 基础镜像归档。
-`images --offline` 自动将 `.cache/open5gs-base-images.tar` 加载到构建机 Docker，随后制作基础镜像携带容器；无需预先访问内网镜像仓库。
-运行镜像共九个，包含独立 `open5gs-bases` 镜像；两项目业务源码镜像都从 Git 的已提交文件生成，不复制工作区未跟踪文件。
-open5gs 业务构建的离线模式在“构建平台设置”中由管理员控制，默认开启；`config/site.yaml` 的 `open5gs.offline` 仅首次导入，构建页面不提供 OFFLINE 参数。迁移已有 HOME 会保留网页配置及审计。
+包内新增 Helm 二进制及固定 SHA256、PyYAML 的额外 APT 缓存、xcn Git 镜像/bundle 和 Ubuntu/VPP 基础镜像归档。
+`images --offline` 自动将 `.cache/xcn-base-images.tar` 加载到构建机 Docker，随后制作基础镜像携带容器；无需预先访问内网镜像仓库。
+运行镜像共九个，包含独立 `xcn-bases` 镜像；两项目业务源码镜像都从 Git 的已提交文件生成，不复制工作区未跟踪文件。
+xcn 业务构建的离线模式在“构建平台设置”中由管理员控制，默认开启；`config/site.yaml` 的 `xcn.offline` 仅首次导入，构建页面不提供 OFFLINE 参数。迁移已有 HOME 会保留网页配置及审计。
 离线构建仍需要内网 APT 软件库；不会访问 GitHub/npm/pip 下载 vendor 依赖。
 新增依赖时先在能访问所选源的准备机执行 compile-image 更新缓存；新增 FROM 镜像须下载并补充清单后重新打包。
 镜像发布更新时提升 versions.env 自定义标签，保留旧标签及旧离线目录用于回滚。
@@ -174,8 +174,8 @@ open5gs 业务构建的离线模式在“构建平台设置”中由管理员控
 git clone repos/jenkensTest.bundle ../jenkensTest
 make test
 python3 tests/verify.py --quick --source ../X-RAN-CLOUD.git
-# 内网 APT / Registry 配置完成后验证 open5gs 发布：
-python3 tests/verify-open5gs.py --offline --source ../open5gs.git
+# 内网 APT / Registry 配置完成后验证 xcn 发布：
+python3 tests/verify-xcn.py --offline --source ../xcn.git
 ```
 
 真实站点将源码推至内网 Git 后，配置其地址与凭据。通用离线包不携带任何生产项目密钥。

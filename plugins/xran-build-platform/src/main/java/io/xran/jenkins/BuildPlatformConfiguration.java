@@ -38,6 +38,17 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
         File file = stateFile();
         try {
             state = file.isFile() ? JSONObject.fromObject(Files.readString(file.toPath())) : new JSONObject();
+            if (state.containsKey("settings")) {
+                JSONObject before = copy(state.getJSONObject("settings"));
+                JSONObject upgraded = PlatformSettings.upgradeNames(before);
+                if (!before.equals(upgraded)) {
+                    state.put("settings", PlatformSettings.validate(upgraded));
+                    state.put("version", state.optLong("version") + 1);
+                    state.put("applyError", "等待应用配置");
+                    audit(before, upgraded, "xcn-project-rename");
+                    persist();
+                }
+            }
         } catch (Exception e) {
             // Do not silently replace damaged persisted settings with site defaults.
             throw new IllegalStateException("无法读取构建平台持久化配置：" + file, e);
@@ -92,7 +103,14 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
         JSONArray all = state.optJSONArray("audit");
         if (all == null) return "";
         JSONArray recent = new JSONArray();
-        for (int i = Math.max(0, all.size() - 20); i < all.size(); i++) recent.add(all.get(i));
+        for (int i = Math.max(0, all.size() - 20); i < all.size(); i++) {
+            JSONObject event = copy(all.getJSONObject(i));
+            for (String field : List.of("before", "after")) {
+                JSONObject values = event.optJSONObject(field);
+                if (values != null) event.put(field, PlatformSettings.upgradeNames(values));
+            }
+            recent.add(event);
+        }
         return recent.toString(2);
     }
     public synchronized Map<String, Object> effective(String profile) {
@@ -152,11 +170,11 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
             JSONObject candidate = copy(settings());
             for (Object name : candidate.keySet().toArray()) {
                 String key = name.toString(), value = req.getParameter(key);
-                if (value != null) candidate.put(key, key.equals("open5gsOffline") ? Boolean.valueOf(value) : value);
+                if (value != null) candidate.put(key, key.equals("xcnOffline") ? Boolean.valueOf(value) : value);
             }
             candidate = PlatformSettings.validate(candidate);
             JSONObject result = new JSONObject();
-            for (String p : List.of("service", "image", "open5gs")) result.put(p, PlatformSettings.allocation(candidate, p));
+            for (String p : List.of("service", "image", "xcn")) result.put(p, PlatformSettings.allocation(candidate, p));
             return FormValidation.ok(result.toString(2));
         } catch (RuntimeException e) { return FormValidation.error(e.getMessage()); }
     }
@@ -214,7 +232,7 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
     }
 
     private void updateDefaults() throws IOException {
-        for (String name : List.of("x-ran-cloud", "open5gs")) {
+        for (String name : List.of("x-ran-cloud", "xcn")) {
             WorkflowJob job = Jenkins.get().getItemByFullName(name, WorkflowJob.class);
             if (job == null) continue;
             ParametersDefinitionProperty previous = job.getProperty(ParametersDefinitionProperty.class);

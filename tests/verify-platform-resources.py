@@ -25,18 +25,18 @@ def quantity(value):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--site', required=True)
-    parser.add_argument('--kind', required=True, choices=['service', 'image', 'open5gs'])
+    parser.add_argument('--kind', required=True, choices=['service', 'image', 'xcn'])
     parser.add_argument('--number', type=int)
     parser.add_argument('--capture-only', action='store_true')
     args = parser.parse_args()
     cfg = yaml.safe_load(Path(args.site).read_text())
     directory = ROOT / '.state' / cfg['namespace']
     users = json.loads((directory / 'users.json').read_text())
-    job = 'open5gs' if args.kind == 'open5gs' else 'x-ran-cloud'
+    job = 'xcn' if args.kind == 'xcn' else 'x-ran-cloud'
     api = JenkinsAPI(cfg['jenkinsUrl'], 'builder1', users['BUILDER1_PASSWORD'], job=job)
     admin = JenkinsAPI(cfg['jenkinsUrl'], 'admin', users['ADMIN_PASSWORD'], job=job)
     if not args.number:
-        assert args.kind != 'open5gs', '完整 Open5gs 发布请使用 verify-open5gs.py；本脚本通过 --number 观察该构建'
+        assert args.kind != 'xcn', '完整 xcn 发布请使用 verify-xcn.py；本脚本通过 --number 观察该构建'
     params = dict(BUILD_KIND=args.kind, REF_TYPE='branch', GIT_REF='main', SERVICE_TARGET='serviceA',
                   IMAGE_TARGET='imageA', IMAGE_TAG='platform-' + str(time.time_ns()),
                   COMPILER_IMAGE='192.168.10.35/xnet/xran-compile:latest', COMPILER_IMAGE_PULL_POLICY='Never')
@@ -78,7 +78,7 @@ def main():
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     print('PASS: 实际 Pod 资源与持久化入场快照一致', json.dumps(totals), flush=True)
     if not args.capture_only:
-        result = api.wait(number, timeout=14400 if args.kind == 'open5gs' else 600)
+        result = api.wait(number, timeout=14400 if args.kind == 'xcn' else 600)
         assert result['result'] == 'SUCCESS', api.console(number)
         metadata = api.get(api.job_path + str(number) + '/artifact/publish/metadata.json')
         for key in ['settingsVersion', 'resourceProfile', 'resourceAllocation', 'admittedAt']:
