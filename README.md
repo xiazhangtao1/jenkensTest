@@ -16,6 +16,7 @@
 | 数据 PVC | 独立 local-path，声明 250Gi，Retain，卸载保留 |
 | 历史产物 | 不按天数、次数或固定总容量淘汰 |
 | 清理 | 空间不足时删除最早完成、未标记保留的产物 |
+| 定时磁盘维护 | 每两小时一次；启动时及构建、归档前另检查 |
 | 最低余量 | 50GiB 与实际文件系统总容量 10% 中的较大值 |
 | 提示 | 管理员首页摘要、构建日志、storage-maintenance 和持久清理审计 |
 
@@ -53,7 +54,7 @@ make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.
 镜像及校验清单导出到 `dist/compile/`。详细依赖、离线重建和镜像兼容要求见 [编译镜像说明](docs/compile-image.md)。
 
 默认入口 `http://10.2.0.119:32080/`，可通过 jenkinsUrl 修改。初始账号为 admin、builder1、builder2，
-随机密码保存于 `.state/jenkins/users.json`（0600）。通过管理员的 Users 页面创建正式个人账号；
+随机密码保存于 `.state/jenkins/users.json`（0600）。通过 **Manage Jenkins → Users → Create User** 创建正式个人账号，登录后自动获得普通构建权限；
 验收账号可在交付后停用。普通账号没有任务配置、脚本控制台和流水线重放权限。
 `storage-maintenance` 及首页 CI/清理提示仅管理员可见；普通账号使用 `x-ran-cloud` 和 `open5gs`，自动磁盘维护照常运行。
 
@@ -92,6 +93,8 @@ make bundle
 两项目共享资源的专用验证为 `python3 tests/verify-shared.py --site /路径/验收站点.yaml`，同样只允许独立实例。
 离线目录位于 dist/offline/xran-jenkins-时间，含完整镜像、插件、chart、工具、源码 bundle、apt 缓存和校验清单，
 不含运行密码和 SSH 私钥。
+内网两个 Gerrit 地址已提供在 [站点示例](config/site.intranet.yaml)，`ICT_CN` 的外层仓库名不影响 open5gs 构建路径。
+内网首次部署、可选 SDK 重建及迁移已有历史见 [离线迁移](docs/offline.md)；仅复制 Git 仓库不足以离线启动。
 
 - [离线迁移](docs/offline.md)
 - [运维与备份恢复](docs/operations.md)

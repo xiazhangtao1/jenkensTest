@@ -1,0 +1,169 @@
+{
+  "status": "PASS",
+  "ssh": {
+    "checks": [
+      {
+        "repository": "X-RAN-CLOUD",
+        "refType": "branch",
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+        "port": 29418,
+        "strictHostKeyChecking": true,
+        "entrypoint": "services/build.sh"
+      },
+      {
+        "repository": "X-RAN-CLOUD",
+        "refType": "commit",
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+        "port": 29418,
+        "strictHostKeyChecking": true,
+        "entrypoint": "services/build.sh"
+      },
+      {
+        "repository": "ICT_CN",
+        "refType": "branch",
+        "commit": "49a9671f78814b27c171c681a8acb75ecf255f94",
+        "port": 29418,
+        "strictHostKeyChecking": true,
+        "entrypoint": "helm/build-release.sh"
+      },
+      {
+        "repository": "ICT_CN",
+        "refType": "commit",
+        "commit": "49a9671f78814b27c171c681a8acb75ecf255f94",
+        "port": 29418,
+        "strictHostKeyChecking": true,
+        "entrypoint": "helm/build-release.sh"
+      }
+    ],
+    "realIntranetReached": false,
+    "status": "PASS"
+  },
+  "accountAndRestart": {
+    "status": "PASS",
+    "namespace": "jenkins-intranet-verify",
+    "account": "migration-check",
+    "visibleJobs": [
+      "open5gs",
+      "x-ran-cloud"
+    ],
+    "adminEndpointsDenied": true,
+    "buildNumber": 1,
+    "result": "SUCCESS",
+    "buildUserId": "migration-check",
+    "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+    "artifacts": {
+      "publish/metadata.json": "8430ad0437039b3d0b13d0b8506998276c38432a2b617d780a336139a21f78cf",
+      "publish/serviceA.tar.gz": "3bccfb4cc40c74e785f14323fb2130856108e167aaa93fde0defd7a252cc88e0",
+      "publish/SHA256SUMS": "b4119ba59459d1e12dc404c1fb094aa8fd63a32a101dfd3d335dd7bd2f03a03b"
+    },
+    "pvcUid": "17846f6f-d6ae-4afc-b8e5-6797bce32b7d",
+    "volumeName": "pvc-17846f6f-d6ae-4afc-b8e5-6797bce32b7d",
+    "podUidBefore": "321ec72f-e19f-4d32-9d75-3e6f36c1c25f",
+    "restartVerified": true,
+    "podUidAfter": "72461576-9e97-4b5d-b911-aad26585286c",
+    "accountPasswordPreserved": true,
+    "artifactChecksumsPreserved": true,
+    "platformStatePreserved": true,
+    "PVCReused": true,
+    "maintenanceCron": "H H/2 * * *",
+    "serverRebootPerformed": false
+  },
+  "cron": {
+    "cron": "H H/2 * * *",
+    "dailyTimes": [
+      "00:01",
+      "02:01",
+      "04:01",
+      "06:01",
+      "08:01",
+      "10:01",
+      "12:01",
+      "14:01",
+      "16:01",
+      "18:01",
+      "20:01",
+      "22:01"
+    ],
+    "signup": false
+  },
+  "pythonTests": {
+    "passed": 20
+  },
+  "realIntranetReached": false,
+  "hostRebootPerformed": false,
+  "main": {
+    "status": "PASS",
+    "controllerImage": "docker.io/xran-ci/controller:2.580.2-13",
+    "controllerImageId": "sha256:26dc4e9ff8faedd8aa056b30995c17d7211e2c38b02948e523d6dfeaa77b5562",
+    "maintenanceCronBefore": "H/15 * * * *",
+    "maintenanceCronAfter": "H H/2 * * *",
+    "historicalBuildsPreserved": {
+      "x-ran-cloud": 97,
+      "open5gs": 5
+    },
+    "parametersResultsKeepFlagsMetadataAndArtifactsUnchanged": true,
+    "platformStateUnchanged": true,
+    "initScriptMatchesRepository": true,
+    "acceptingBuilds": true
+  },
+  "permissions": {
+    "namespace": "jenkins",
+    "startedAt": "2026-11-06T15:49:22+0800",
+    "checks": [
+      {
+        "name": "全部插件启用",
+        "status": "PASS",
+        "details": {
+          "count": 74
+        }
+      },
+      {
+        "name": "匿名访问及普通账号管理权限受限",
+        "status": "PASS",
+        "details": null
+      },
+      {
+        "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+        "status": "PASS",
+        "details": {
+          "builder1": {
+            "visibleJobs": [
+              "open5gs",
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "128/consoleText": 404,
+              "build": 404
+            }
+          },
+          "builder2": {
+            "visibleJobs": [
+              "open5gs",
+              "x-ran-cloud"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "128/consoleText": 404,
+              "build": 404
+            }
+          }
+        }
+      }
+    ],
+    "builds": [],
+    "status": "PASS",
+    "finishedAt": "2026-11-06T15:49:27+0800"
+  },
+  "backup": {
+    "archive": "dist/jenkins-home-before-intranet.tar.gz",
+    "bytes": 1288252797,
+    "mode": "0o600",
+    "coreConfigJobsAccountsPlatformAndMasterKeyVerified": true,
+    "credentialsIncludedOnlyInPrivateBackup": true
+  }
+}

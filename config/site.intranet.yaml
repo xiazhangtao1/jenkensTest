@@ -1,0 +1,46 @@
+# 内网站点示例。复制为实际站点文件，先将 JENKINS_NODE_IP 改为 Jenkins 节点 IP。
+# SSH 私钥和 Registry 密码在 Jenkins Credentials 配置，不写入本文件。
+namespace: jenkins
+release: jenkins
+nodePort: 32080
+jenkinsUrl: http://JENKINS_NODE_IP:32080/
+storageClass: jenkins-local-path
+pvcSize: 250Gi
+offline: true
+demo: false
+# 下列默认值仅在首次启动时导入；恢复已有 HOME 后以网页保存的设置为准。
+concurrency: 6
+buildCpuLimit: 4
+buildMemoryGiB: 8
+dindMemoryGiB: 4
+temporaryStorageGiB: 20
+minimumFreeGiB: 50
+minimumFreePercent: 10
+buildTimeoutMinutes: 240
+agentStartupTimeoutMinutes: 15
+compilerImagePullPolicy: Always
+compilerImagePullSecrets: []
+gitUrl: ssh://xiazhangtao@192.168.10.82:29418/X-RAN-CLOUD
+gitCredentialsId: intranet-gerrit-ssh
+registry: 192.168.10.35
+registryCredentialsId: ''
+registryInsecure: true
+# 按实际项目核对服务、镜像名称及镜像脚本使用的仓库路径。
+services: [serviceA, serviceB, serviceC]
+images: [imageA, imageB, imageC]
+imageRepositories: {imageA: xran-demo/imagea, imageB: xran-demo/imageb, imageC: xran-demo/imagec}
+open5gs:
+  # Jenkins 入口仍叫 open5gs；远端仓库改名为 ICT_CN 不影响相对路径。
+  gitUrl: ssh://xiazhangtao@192.168.10.82:29418/ICT_CN
+  gitCredentialsId: intranet-gerrit-ssh
+  offline: true
+  registry: 192.168.10.35
+  registryCredentialsId: ''
+  registryInsecure: true
+  ubuntuImage: 192.168.10.35/xnet/ubuntu:22.04
+  vppImage: 192.168.10.35/xcn/vpp:26.06
+  innerBuildMemoryGiB: 3
+  buildJobs: 2
+proxy: ''
+# 补充目标集群 API 地址、Pod/Service CIDR 及实际节点地址。
+noProxy: localhost,127.0.0.1,.svc,.cluster.local,JENKINS_NODE_IP,192.168.10.35,192.168.10.36,192.168.10.82,192.168.10.0/24

@@ -70,7 +70,8 @@ while (maintenance.getProperty(AuthorizationMatrixProperty) != null) {
     maintenance.removeProperty(AuthorizationMatrixProperty)
 }
 maintenance.addProperty(new AuthorizationMatrixProperty([:], new NonInheritingStrategy()))
-maintenance.addTrigger(new TimerTrigger('H/15 * * * *'))
+// 每两小时一次，使用 Jenkins 哈希错开分钟与小时。
+maintenance.addTrigger(new TimerTrigger('H H/2 * * *'))
 def cleanupNotice = (maintenance.description ?: '').find(/(?s)最近清理：.*/)
 maintenance.description = 'X-RAN-CLOUD CI：历史包持续保存；同时管理 open5gs。磁盘压力时回收最早未保留产物。清理明细见 storage-maintenance。' +
     (cleanupNotice ? '\n' + cleanupNotice : '')
