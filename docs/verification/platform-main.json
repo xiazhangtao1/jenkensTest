@@ -1,0 +1,211 @@
+{
+  "status": "PASS",
+  "url": "http://10.2.0.119:32080/",
+  "controllerImage": "xran-ci/controller:2.580.2-12",
+  "controllerImageId": "sha256:eb08b2cbb30fea35e042faee0a47cc118efd159bd017a21623b3feed5b26cac1",
+  "historicalBuildsUnchanged": 98,
+  "pipelineSha256": "99af400f97f2b9663f4d0973a7971924ad025d54788c761fe59b578e89223fb5",
+  "settings": {
+    "settings": {
+      "concurrency": 6,
+      "serviceCpu": 4,
+      "serviceMemoryGiB": 8,
+      "serviceTemporaryStorageGiB": 20,
+      "imageCpu": 4,
+      "imageMemoryGiB": 8,
+      "imageTemporaryStorageGiB": 20,
+      "open5gsCpu": 4,
+      "open5gsMemoryGiB": 8,
+      "open5gsTemporaryStorageGiB": 20,
+      "imageDindMemoryGiB": 4,
+      "open5gsDindMemoryGiB": 4,
+      "innerBuildMemoryGiB": 3,
+      "buildJobs": 2,
+      "compilerImage": "192.168.10.35/xnet/xran-compile:latest",
+      "compilerImagePullPolicy": "Always",
+      "open5gsOffline": true,
+      "buildTimeoutMinutes": 240,
+      "agentStartupTimeoutMinutes": 15,
+      "minimumFreeGiB": 50,
+      "minimumFreePercent": 10
+    },
+    "version": 1,
+    "audit": [
+      {
+        "at": "2026-11-06T13:58:50.167514330+08:00",
+        "user": "SYSTEM",
+        "version": 1,
+        "reason": "site-migration",
+        "after": {
+          "concurrency": 6,
+          "serviceCpu": 4,
+          "serviceMemoryGiB": 8,
+          "serviceTemporaryStorageGiB": 20,
+          "imageCpu": 4,
+          "imageMemoryGiB": 8,
+          "imageTemporaryStorageGiB": 20,
+          "open5gsCpu": 4,
+          "open5gsMemoryGiB": 8,
+          "open5gsTemporaryStorageGiB": 20,
+          "imageDindMemoryGiB": 4,
+          "open5gsDindMemoryGiB": 4,
+          "innerBuildMemoryGiB": 3,
+          "buildJobs": 2,
+          "compilerImage": "192.168.10.35/xnet/xran-compile:latest",
+          "compilerImagePullPolicy": "Always",
+          "open5gsOffline": true,
+          "buildTimeoutMinutes": 240,
+          "agentStartupTimeoutMinutes": 15,
+          "minimumFreeGiB": 50,
+          "minimumFreePercent": 10
+        }
+      }
+    ],
+    "leases": {},
+    "appliedVersion": 1
+  },
+  "resources": {
+    "service": {
+      "job": "x-ran-cloud",
+      "number": 96,
+      "settingsVersion": 1,
+      "resourceProfile": "service",
+      "admittedAt": "2026-11-06T14:27:39.661985739+08:00",
+      "pod": "x-ran-cloud-96-3r2vn-cbqwf-20s8m",
+      "resources": {
+        "jnlp": {
+          "limits": {
+            "cpu": "250m",
+            "ephemeral-storage": "256Mi",
+            "memory": "512Mi"
+          },
+          "requests": {
+            "cpu": "100m",
+            "ephemeral-storage": "64Mi",
+            "memory": "256Mi"
+          }
+        },
+        "builder": {
+          "limits": {
+            "cpu": "3750m",
+            "ephemeral-storage": "20224Mi",
+            "memory": "7680Mi"
+          },
+          "requests": {
+            "cpu": "500m",
+            "ephemeral-storage": "1Gi",
+            "memory": "1Gi"
+          }
+        }
+      },
+      "totals": {
+        "cpu": 4.0,
+        "memory": 8589934592,
+        "ephemeral-storage": 21474836480
+      },
+      "selected": {
+        "concurrency": 6,
+        "buildTimeoutMinutes": 240,
+        "agentStartupTimeoutMinutes": 15,
+        "minimumFreeGiB": 50,
+        "minimumFreePercent": 10,
+        "compilerImagePullPolicy": "Always",
+        "innerBuildMemoryGiB": 3,
+        "buildJobs": 2,
+        "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+        "buildCpuLimit": 4,
+        "buildMemoryGiB": 8,
+        "temporaryStorageGiB": 20,
+        "dindMemoryGiB": 0,
+        "open5gsOffline": true
+      },
+      "currentSettingsVersion": 1,
+      "status": "PASS",
+      "metadata": {
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+        "settingsVersion": 1,
+        "resourceProfile": "service",
+        "admittedAt": "2026-11-06T14:27:39.661985739+08:00",
+        "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+        "builderImagePullPolicy": "Never"
+      }
+    },
+    "image": {
+      "job": "x-ran-cloud",
+      "number": 97,
+      "settingsVersion": 1,
+      "resourceProfile": "image",
+      "admittedAt": "2026-11-06T14:28:13.191568068+08:00",
+      "pod": "x-ran-cloud-97-j1kp2-pw1sf-4h9hp",
+      "resources": {
+        "jnlp": {
+          "limits": {
+            "cpu": "250m",
+            "ephemeral-storage": "256Mi",
+            "memory": "512Mi"
+          },
+          "requests": {
+            "cpu": "100m",
+            "ephemeral-storage": "64Mi",
+            "memory": "256Mi"
+          }
+        },
+        "builder": {
+          "limits": {
+            "cpu": "2500m",
+            "ephemeral-storage": "10Gi",
+            "memory": "3584Mi"
+          },
+          "requests": {
+            "cpu": "500m",
+            "ephemeral-storage": "1Gi",
+            "memory": "1Gi"
+          }
+        },
+        "dind": {
+          "limits": {
+            "cpu": "1250m",
+            "ephemeral-storage": "9984Mi",
+            "memory": "4Gi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "ephemeral-storage": "1Gi",
+            "memory": "256Mi"
+          }
+        }
+      },
+      "totals": {
+        "cpu": 4.0,
+        "memory": 8589934592,
+        "ephemeral-storage": 21474836480
+      },
+      "selected": {
+        "concurrency": 6,
+        "buildTimeoutMinutes": 240,
+        "agentStartupTimeoutMinutes": 15,
+        "minimumFreeGiB": 50,
+        "minimumFreePercent": 10,
+        "compilerImagePullPolicy": "Always",
+        "innerBuildMemoryGiB": 3,
+        "buildJobs": 2,
+        "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+        "buildCpuLimit": 4,
+        "buildMemoryGiB": 8,
+        "temporaryStorageGiB": 20,
+        "dindMemoryGiB": 4,
+        "open5gsOffline": true
+      },
+      "currentSettingsVersion": 1,
+      "status": "PASS",
+      "metadata": {
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+        "settingsVersion": 1,
+        "resourceProfile": "image",
+        "admittedAt": "2026-11-06T14:28:13.191568068+08:00",
+        "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+        "builderImagePullPolicy": "Never"
+      }
+    }
+  }
+}

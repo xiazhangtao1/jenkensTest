@@ -202,6 +202,8 @@ def images(args):
     build_env['DOCKER_BUILDKIT'] = '0'
     build = ['docker', 'build', '--network', 'none' if args.offline else args.build_network, '--pull=false']
     lock_plugins()
+    run([sys.executable, ROOT / 'scripts/platform-plugin.py',
+         *(['--offline'] if args.offline or args.build_network == 'none' else [])])
     run([*build, '--build-arg', f'JENKINS_BASE={v["JENKINS_BASE"]}',
          '-f', ROOT / 'docker/controller.Dockerfile', '-t', v['CONTROLLER_IMAGE'], ROOT], env=build_env)
     prepare_open5gs_bases(cfg, args.offline)
@@ -511,15 +513,19 @@ def deploy(args):
 def bundle(args):
     cfg = config(args)
     v = versions()
+    local_lock = json.loads((ROOT / 'config/platform-plugin.lock.json').read_text())
+    local_plugin = CACHE / 'local-plugins/xran-build-platform.jpi'
+    if hash_file(local_plugin) != local_lock['sha256']:
+        raise RuntimeError('内部插件与锁文件不符，请执行 make platform-plugin')
     target = ROOT / 'dist/offline' / ('xran-jenkins-' + time.strftime('%Y%m%d-%H%M%S'))
     target.mkdir(parents=True)
-    for name in ['config', 'docker', 'jenkins', 'runtime', 'scripts', 'tests', 'docs', 'vendor']:
+    for name in ['config', 'docker', 'jenkins', 'runtime', 'scripts', 'tests', 'docs', 'vendor', 'plugins']:
         if (ROOT / name).exists():
-            shutil.copytree(ROOT / name, target / name, ignore=shutil.ignore_patterns('__pycache__'))
+            shutil.copytree(ROOT / name, target / name, ignore=shutil.ignore_patterns('__pycache__', 'target'))
     for name in ['README.md', 'Makefile', '.dockerignore', '.gitignore']:
         if (ROOT / name).exists():
             shutil.copy2(ROOT / name, target / name)
-    for name in ['charts', 'plugins', 'tools', 'compile-apt', 'compile-extra-apt', 'compile-tools']:
+    for name in ['charts', 'plugins', 'tools', 'compile-apt', 'compile-extra-apt', 'compile-tools', 'local-plugins', 'platform-m2']:
         shutil.copytree(CACHE / name, target / '.cache' / name)
     shutil.copy2(CACHE / 'base-images.tar', target / '.cache/base-images.tar')
     shutil.copy2(CACHE / 'plugins.complete', target / '.cache/plugins.complete')
@@ -532,6 +538,7 @@ def bundle(args):
     shutil.copytree(CACHE / 'open5gs.git', target / '.cache/open5gs.git')
     shutil.copy2(CACHE / 'open5gs-base-images.tar', target / '.cache/open5gs-base-images.tar')
     bases = [v[key] for key in ['JENKINS_BASE', 'DOCKER_CLI_IMAGE', 'UBUNTU_IMAGE']]
+    bases.append(local_lock['buildImage'])
     bases.extend(line.strip() for line in (ROOT / 'config/base-images.txt').read_text().splitlines()
                  if line.strip() and not line.startswith('#'))
     run(['docker', 'save', '-o', target / '.cache/build-base-images.tar', *dict.fromkeys(bases)])

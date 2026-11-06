@@ -28,7 +28,7 @@ def main():
     original = json.loads(admin.script("println(groovy.json.JsonOutput.toJson(jenkins.model.Jenkins.get().getItem('open5gs').definition.script));return null"))
     expected_source = '\n'.join((ROOT / 'jenkins' / name).read_text() for name in ['storage.groovy', 'compiler.groovy', 'pipeline.groovy'])
     assert original == expected_source, '部署脚本与当前仓库不一致'
-    expected_offline = cfg['open5gs'].get('offline', True)
+    expected_offline = json.loads(admin.script("println(groovy.json.JsonOutput.toJson(io.xran.jenkins.BuildPlatformConfiguration.get().effective('open5gs').open5gsOffline));return null"))
     report = {'namespace': cfg['namespace'], 'offline': expected_offline, 'checks': []}
     numbers = []
 
@@ -50,9 +50,9 @@ def main():
         definitions = admin.get(admin.job_path + 'api/json?tree=property[parameterDefinitions[name]]')
         names = [p['name'] for prop in definitions['property'] for p in prop.get('parameterDefinitions', [])]
         assert 'OFFLINE' not in names and len(names) == 6, names
-        marker = "lock(label: 'xran-build-slot', quantity: 1) {"
+        marker = "def pod = XranCompiler.template("
         assert marker in original
-        admin.set_pipeline(original.replace(marker, marker + "\n echo('parameter-verification-only'); return\n", 1))
+        admin.set_pipeline(original.replace(marker, "echo('parameter-verification-only'); return\n" + marker, 1))
         for values, chart, app in cases:
             # An old client supplying the opposite mode cannot override site configuration.
             number = builder.wait_number(builder.trigger(dict(REF_TYPE='branch', GIT_REF='main',

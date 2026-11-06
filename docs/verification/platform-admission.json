@@ -1,0 +1,120 @@
+{
+  "namespace": "jenkins-open5gs-verify",
+  "checks": [
+    {
+      "name": "管理员资源预览及普通用户接口拒绝",
+      "status": "PASS",
+      "details": {
+        "actions": [
+          "preview",
+          "reapply",
+          "state"
+        ]
+      }
+    },
+    {
+      "name": "并发 6→2→4；旧构建不变、排队构建使用新配置",
+      "status": "PASS",
+      "details": {
+        "oldVersion": 4,
+        "newVersion": 6,
+        "builds": [
+          [
+            "x-ran-cloud",
+            16
+          ],
+          [
+            "open5gs",
+            37
+          ],
+          [
+            "x-ran-cloud",
+            17
+          ],
+          [
+            "open5gs",
+            38
+          ],
+          [
+            "x-ran-cloud",
+            18
+          ],
+          [
+            "open5gs",
+            39
+          ],
+          [
+            "x-ran-cloud",
+            19
+          ],
+          [
+            "open5gs",
+            40
+          ]
+        ]
+      }
+    },
+    {
+      "name": "运行中重启保持快照；取消及完成均释放持久化槽位",
+      "status": "PASS",
+      "details": {
+        "version": 6,
+        "restoredLeases": 3
+      }
+    },
+    {
+      "name": "同标签等待不占全局容量",
+      "status": "PASS",
+      "details": {
+        "first": [
+          "open5gs",
+          41
+        ],
+        "waiter": [
+          "open5gs",
+          42
+        ],
+        "independent": [
+          "x-ran-cloud",
+          20
+        ]
+      }
+    },
+    {
+      "name": "全局槽位等待超过总超时后仍可正常入场",
+      "status": "PASS",
+      "details": {
+        "waiter": [
+          "x-ran-cloud",
+          22
+        ],
+        "waitSeconds": 65,
+        "timeoutMinutes": 1
+      }
+    },
+    {
+      "name": "同标签等待超过总超时后仍可正常入场",
+      "status": "PASS",
+      "details": {
+        "waiter": [
+          "open5gs",
+          44
+        ],
+        "waitSeconds": 65,
+        "timeoutMinutes": 1
+      }
+    },
+    {
+      "name": "总超时从入场开始并释放槽位",
+      "status": "PASS",
+      "details": {
+        "build": [
+          "x-ran-cloud",
+          23
+        ],
+        "result": "ABORTED"
+      }
+    }
+  ],
+  "status": "PASS"
+}

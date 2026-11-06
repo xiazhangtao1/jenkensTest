@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "namespace": "jenkins-platform-restore",
+  "settingsVersion": 21,
+  "auditEntries": 21,
+  "exactStateRestored": true,
+  "cloudCap": 3,
+  "siteDefaultConcurrency": 6,
+  "savedConcurrency": 3,
+  "siteDefaultOffline": true,
+  "savedOffline": false,
+  "savedServiceCpu": 5,
+  "savedServiceTemporaryStorageGiB": 9
+}

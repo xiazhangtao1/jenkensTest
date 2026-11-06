@@ -1,0 +1,84 @@
+{
+  "nativeSave": 302,
+  "staleForm": 400,
+  "staleMessage": true,
+  "preview": 200,
+  "settingsVersion": 3,
+  "activeSnapshotVersion": 1,
+  "activeOffline": false,
+  "currentOffline": true,
+  "ordinaryUser": {
+    "status": "PASS",
+    "user": "builder1",
+    "checks": [
+      {
+        "name": "普通用户无法读取或写入平台配置",
+        "statuses": {
+          "preview": 403,
+          "reapply": 403,
+          "state": 403
+        }
+      },
+      {
+        "name": "已有成功发布版本显示及实际复制粘贴",
+        "build": 1,
+        "versions": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6"
+        },
+        "secureContext": false,
+        "actualPaste": true
+      },
+      {
+        "name": "X-RAN-CLOUD 历史条件显示与 HTTP 复制",
+        "number": 2,
+        "kind": "service",
+        "visible": [
+          "SERVICE_TARGET"
+        ],
+        "actualPaste": true
+      },
+      {
+        "name": "X-RAN-CLOUD 历史条件显示与 HTTP 复制",
+        "number": 3,
+        "kind": "image",
+        "visible": [
+          "IMAGE_TARGET",
+          "IMAGE_TAG"
+        ],
+        "actualPaste": true
+      },
+      {
+        "name": "open5gs 表单六个参数、默认版本及精简说明",
+        "names": [
+          "COMPILER_IMAGE",
+          "COMPILER_IMAGE_PULL_POLICY",
+          "REF_TYPE",
+          "GIT_REF",
+          "CHART_VERSION",
+          "APP_VERSION"
+        ],
+        "defaults": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6"
+        },
+        "descriptions": {
+          "CHART_VERSION": "Chart 版本，默认当天日期",
+          "APP_VERSION": "应用版本，默认当天日期"
+        },
+        "offlineRemoved": true
+      },
+      {
+        "name": "X-RAN-CLOUD 新建表单双向切换及输入保留"
+      },
+      {
+        "name": "普通用户首页权限及维护提示隔离",
+        "jobs": [
+          "open5gs",
+          "x-ran-cloud"
+        ]
+      }
+    ]
+  },
+  "status": "PASS"
+}

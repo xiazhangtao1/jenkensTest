@@ -15,14 +15,9 @@
 
 HTTP 访问时，历史 Parameters 页的复制按钮使用浏览器兼容方式；HTTPS 下保留 Jenkins 原生复制功能。
 
-离线模式由管理员在 `config/site.yaml` 统一配置，默认开启，构建表单不再提供 `OFFLINE`：
+离线模式由管理员在 **Manage Jenkins → 系统配置 → 构建平台设置 → Open5gs 离线构建** 统一配置，默认开启，构建表单不提供 `OFFLINE`。勾选时给业务脚本增加 `--offline`；外网调试时管理员取消勾选。保存后对新入场构建立刻生效。
 
-```yaml
-open5gs:
-  offline: true
-```
-
-`true` 给业务脚本增加 `--offline`；外网调试时管理员可改为 `false`。修改后，在没有运行构建时执行 `make deploy`；站点配置变更会触发 Controller 更新。
+`config/site.yaml` 中的 `open5gs.offline` 只提供首次启动的初始值。
 普通用户和旧 API 客户端传入的 `OFFLINE` 不影响此配置。每次构建的实际模式仍记录在摘要和 `metadata.json` 中；已有历史按原值保留。
 这里控制的是业务脚本的 `--offline`，与部署工具自身的 `--offline`（基础设施拉取策略和网络配置）分别设置。
 
@@ -32,7 +27,7 @@ open5gs:
 
 ```bash
 ./build-release.sh --offline 26.11.6 26.11.6
-# 管理员配置 open5gs.offline: false 时执行：
+# 管理员关闭 Open5gs 离线构建时执行：
 ./build-release.sh 26.11.6 26.11.6
 ```
 
@@ -44,8 +39,8 @@ open5gs:
 编译成功而推送失败时仍可下载四个有效产物，构建摘要、日志和元数据明确提示推送未全部成功。
 同 APP_VERSION 的发布先串行等待，再申请全局槽位，避免两个构建同时覆盖相同镜像标签。
 
-每个 Pod 总上限仍为 4 CPU、8GiB 内存、20GiB 临时存储。DinD 为 **4GiB**，编译容器为 3584MiB，Agent 为 512MiB。
-open5gs 的嵌套 Docker build 额度为 3GiB、并行 2，给 DinD daemon 留出空间；这些是不同层级的限制，不叠加成额外内存。
+Pod 初始默认总上限为 4 CPU、8GiB 内存、20GiB 临时存储。DinD 为 **4GiB**，编译容器为 3584MiB，Agent 为 512MiB。
+默认 open5gs 的嵌套 Docker build 额度为 3GiB、并行 2，给 DinD daemon 留出空间；这些是不同层级的限制，不叠加成额外内存。管理员可在 [构建平台设置](platform-settings.md) 单独修改 Open5gs 资源配置。
 嵌套容器挂在 DinD cgroup 下，共同受 4GiB 上限约束。X-RAN-CLOUD 镜像任务的 DinD 同样为 4GiB。
 
 编译镜像包含 Helm 3.17.3、PyYAML 及原 SDK。Ubuntu/VPP 基础镜像由独立 `open5gs-bases` init 容器复制到共享卷，每次导入自己的 DinD，不共享宿主 Docker socket。

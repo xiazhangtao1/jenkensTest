@@ -117,7 +117,7 @@ def run(args):
             assert expected in v.admin.console(number)
             v.record(name, {'build': number})
 
-        v.set_script(original.replace('def sourceType =', 'cfg.agentStartupTimeoutMinutes = 1\ndef sourceType =', 1))
+        v.set_script(original.replace('cfg.putAll(snapshot.config)', 'cfg.putAll(snapshot.config)\n        cfg.agentStartupTimeoutMinutes = 1', 1))
         for policy, expected in [('Never', 'ErrImageNeverPull'), ('Always', 'pull')]:
             number = v.submit(COMPILER_IMAGE=args.compiler_image.rsplit(':', 1)[0] + ':missing-' + stamp,
                               COMPILER_IMAGE_PULL_POLICY=policy)

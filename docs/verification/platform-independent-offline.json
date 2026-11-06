@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "gitMetadataPresent": false,
+  "officialPluginArchivesPresent": false,
+  "dockerNetwork": "none",
+  "mavenOffline": true,
+  "mavenGoals": "clean verify",
+  "sourceSha256": "75fd2480115fc698729422438571791ffc5c9412e1c8e0a6ebcf8204ef95f515",
+  "rebuiltPluginSha256": "89fc20bfe6bfb4c1aa2ac730fc77f41f7b1c1eb8e64b80d5ca342db769ddc997",
+  "classMajor": 65
+}

@@ -1,0 +1,147 @@
+{
+  "namespace": "jenkins-open5gs-verify",
+  "offline": false,
+  "checks": [
+    {
+      "name": "API 实际参数保存及后台构建模式 #54",
+      "status": "PASS",
+      "details": {
+        "parameters": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main"
+        },
+        "offline": false
+      }
+    },
+    {
+      "name": "API 实际参数保存及后台构建模式 #55",
+      "status": "PASS",
+      "details": {
+        "parameters": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main"
+        },
+        "offline": false
+      }
+    },
+    {
+      "name": "API 实际参数保存及后台构建模式 #56",
+      "status": "PASS",
+      "details": {
+        "parameters": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main"
+        },
+        "offline": false
+      }
+    },
+    {
+      "name": "API 实际参数保存及后台构建模式 #57",
+      "status": "PASS",
+      "details": {
+        "parameters": {
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "CHART_VERSION": "2.3.4-rc.1",
+          "APP_VERSION": "26.11.06-custom"
+        },
+        "offline": false
+      }
+    },
+    {
+      "name": "API 实际参数保存及后台构建模式 #58",
+      "status": "PASS",
+      "details": {
+        "parameters": {
+          "APP_VERSION": "26.11.6",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "CHART_VERSION": "4.5.6"
+        },
+        "offline": false
+      }
+    },
+    {
+      "name": "API 实际参数保存及后台构建模式 #59",
+      "status": "PASS",
+      "details": {
+        "parameters": {
+          "CHART_VERSION": "5.6.7",
+          "APP_VERSION": "release-test",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main"
+        },
+        "offline": false
+      }
+    },
+    {
+      "name": "按历史元数据回填、显式值保护、缺失元数据跳过、幂等及磁盘重载",
+      "status": "PASS",
+      "details": {
+        "numbers": [
+          54,
+          55,
+          56,
+          58
+        ],
+        "versions": [
+          {
+            "CHART_VERSION": "25.1.2",
+            "APP_VERSION": "25.1.2-release",
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main"
+          },
+          {
+            "CHART_VERSION": "",
+            "APP_VERSION": "",
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main"
+          },
+          {
+            "CHART_VERSION": "26.11.6",
+            "APP_VERSION": "26.11.6",
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main"
+          },
+          {
+            "APP_VERSION": "25.3.4",
+            "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+            "COMPILER_IMAGE_PULL_POLICY": "Always",
+            "REF_TYPE": "branch",
+            "GIT_REF": "main",
+            "CHART_VERSION": "4.5.6"
+          }
+        ],
+        "explicitPreserved": true,
+        "missingMetadataSkipped": true,
+        "idempotent": true,
+        "reloadVerified": true
+      }
+    }
+  ],
+  "status": "PASS"
+}

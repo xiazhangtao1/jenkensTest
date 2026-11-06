@@ -1,0 +1,69 @@
+{
+  "job": "open5gs",
+  "number": 2,
+  "settingsVersion": 3,
+  "resourceProfile": "open5gs",
+  "admittedAt": "2026-11-06T13:26:52.478511333+08:00",
+  "pod": "open5gs-2-jc3n7-vclrb-6wl8x",
+  "resources": {
+    "jnlp": {
+      "limits": {
+        "cpu": "250m",
+        "ephemeral-storage": "256Mi",
+        "memory": "512Mi"
+      },
+      "requests": {
+        "cpu": "100m",
+        "ephemeral-storage": "64Mi",
+        "memory": "256Mi"
+      }
+    },
+    "builder": {
+      "limits": {
+        "cpu": "500m",
+        "ephemeral-storage": "4Gi",
+        "memory": "3584Mi"
+      },
+      "requests": {
+        "cpu": "500m",
+        "ephemeral-storage": "1Gi",
+        "memory": "1Gi"
+      }
+    },
+    "dind": {
+      "limits": {
+        "cpu": "3250m",
+        "ephemeral-storage": "16128Mi",
+        "memory": "4Gi"
+      },
+      "requests": {
+        "cpu": "250m",
+        "ephemeral-storage": "1Gi",
+        "memory": "256Mi"
+      }
+    }
+  },
+  "totals": {
+    "cpu": 4.0,
+    "memory": 8589934592,
+    "ephemeral-storage": 21474836480
+  },
+  "selected": {
+    "concurrency": 4,
+    "buildTimeoutMinutes": 240,
+    "agentStartupTimeoutMinutes": 15,
+    "minimumFreeGiB": 50,
+    "minimumFreePercent": 10,
+    "compilerImagePullPolicy": "Never",
+    "innerBuildMemoryGiB": 3,
+    "buildJobs": 2,
+    "builderImage": "192.168.10.35/xnet/xran-compile:26.11.05",
+    "buildCpuLimit": 4,
+    "buildMemoryGiB": 8,
+    "temporaryStorageGiB": 20,
+    "dindMemoryGiB": 4,
+    "open5gsOffline": true
+  },
+  "currentSettingsVersion": 3,
+  "status": "PASS"
+}

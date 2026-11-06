@@ -1,6 +1,20 @@
 /** Controller-side helpers; all returned values are plain serializable data. */
 class XranCompiler {
     @com.cloudbees.groovy.cps.NonCPS
+    static Map defaults(String kind = 'service') {
+        return io.xran.jenkins.BuildPlatformConfiguration.get().effective(kind)
+    }
+
+    @com.cloudbees.groovy.cps.NonCPS
+    static Map admit(hudson.model.Run run, String kind) {
+        return io.xran.jenkins.BuildPlatformConfiguration.get().tryAdmit(run, kind)
+    }
+
+    @com.cloudbees.groovy.cps.NonCPS
+    static void release(String key) {
+        io.xran.jenkins.BuildPlatformConfiguration.get().release(key)
+    }
+    @com.cloudbees.groovy.cps.NonCPS
     static boolean recordVersions(hudson.model.Run run, Map versions, boolean onlyEmpty = false) {
         def action = run.getAction(hudson.model.ParametersAction)
         def updates = versions.findAll { name, value ->
@@ -55,7 +69,7 @@ class XranCompiler {
     }
 
     @com.cloudbees.groovy.cps.NonCPS
-    static Map template(String text, String image, String policy, String number, String job = 'x-ran-cloud') {
+    static Map template(String text, String image, String policy, String number, String job = 'x-ran-cloud', Map snapshot = [:]) {
         validate(image, policy)
         def pod = XranStorage.parseJson(text)
         pod.metadata.labels['xran-build'] = 'b' + number
@@ -64,6 +78,20 @@ class XranCompiler {
         if (builder == null) throw new IllegalArgumentException('Pod 模板缺少 builder 容器')
         builder.image = image
         builder.imagePullPolicy = policy
+        if (snapshot) {
+            pod.spec.containers.each { container ->
+                if (!snapshot.resourceAllocation.containsKey(container.name)) {
+                    throw new IllegalArgumentException('资源配置缺少容器：' + container.name)
+                }
+                container.resources = snapshot.resourceAllocation[container.name]
+            }
+            pod.spec.volumes.findAll { it.name in ['workspace-volume', 'docker-data'] }.each {
+                it.emptyDir.sizeLimit = snapshot.config.temporaryStorageGiB.toString() + 'Gi'
+            }
+            pod.spec.activeDeadlineSeconds = (snapshot.config.buildTimeoutMinutes as int) * 60
+            pod.metadata.annotations = ['xran-ci/settings-version': snapshot.settingsVersion.toString(),
+                'xran-ci/resource-profile': snapshot.resourceProfile]
+        }
         return pod
     }
 

@@ -5,6 +5,7 @@ nodePort: 32080
 jenkinsUrl: http://10.2.0.119:32080/
 storageClass: jenkins-local-path
 pvcSize: 250Gi
+# 下列构建参数只在首次启动时导入；之后在 Manage Jenkins → 系统配置 → 构建平台设置 修改。
 concurrency: 6
 buildCpuLimit: 4
 buildMemoryGiB: 8
@@ -31,7 +32,7 @@ imageRepositories: {imageA: xran-demo/imagea, imageB: xran-demo/imageb, imageC: 
 open5gs:
   gitUrl: http://xran-demo:8000/open5gs.git
   gitCredentialsId: ''
-  # 管理员统一控制是否传 --offline；构建页面不提供此参数。
+  # 初次导入的离线模式；后续在构建平台设置修改，构建页面不提供此参数。
   offline: true
   registry: 192.168.10.35
   registryCredentialsId: ''

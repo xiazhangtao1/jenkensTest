@@ -12,7 +12,35 @@ def protectedBuild=eligible[-3]
 def first=eligible[-2]
 def second=eligible[-1]
 def running=jobs.collectMany { job -> job.builds.findAll { it.isBuilding() } }
+def platform=io.xran.jenkins.BuildPlatformConfiguration.get()
+def originalSettings=platform.form
+def liveThreshold=false
+def snapshotReservation=false
 try {
+    def selected=new HashMap(cfg)
+    selected.temporaryStorageGiB=2
+    def active=running.find()
+    def workspace=[dev:XranStorage.device(j.rootDir),total:j.rootDir.totalSpace,free:j.rootDir.usableSpace]
+    try {
+        def edited=platform.form
+        edited.revision=platform.revision
+        edited.minimumFreeGiB=(originalSettings.minimumFreeGiB as int)+1
+        edited.serviceTemporaryStorageGiB=9
+        platform.configure((org.kohsuke.stapler.StaplerRequest2)null,edited)
+        // Deliberately pass an old threshold: the helper must consult live settings.
+        assert XranStorage.floor([minimumFreeGiB:1,minimumFreePercent:0],1073741824L)==
+            ((originalSettings.minimumFreeGiB as long)+1L)*1073741824L
+        liveThreshold=true
+        if (active) {
+            XranStorage.reserve(selected,active.externalizableId,active.parent.fullName,active.number,workspace)
+            assert XranStorage.readState()[active.externalizableId].temporaryBytes==2L*1073741824L
+            snapshotReservation=true
+        }
+    } finally {
+        if (active) XranStorage.release(active.externalizableId)
+        originalSettings.revision=platform.revision
+        platform.configure((org.kohsuke.stapler.StaplerRequest2)null,originalSettings)
+    }
     finished.each { it.keepLog(true) }
     first.keepLog(false); second.keepLog(false)
     [first,second].each { build ->
@@ -42,7 +70,8 @@ try {
     assert new File(XranStorage.directory(),'cleanup.jsonl').exists()
     println(JsonOutput.toJson([oldestDeleted:first.externalizableId, protectedBuild:protectedBuild.externalizableId,
         secondDeleted:second.externalizableId, runningProtected:running.collect { it.externalizableId },
-        rejectedWhenInsufficient:rejected, audit:true]))
+        rejectedWhenInsufficient:rejected, audit:true, liveDiskThreshold:liveThreshold,
+        reservationUsesBuildSnapshot:snapshotReservation]))
 } finally {
     finished.each { it.keepLog(previous[it.externalizableId]) }
     [first,second].each { new File(it.getArtifactsDir(),'pressure-fixture.bin').delete() }

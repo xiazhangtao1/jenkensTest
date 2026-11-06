@@ -9,7 +9,9 @@ APT_SOURCES ?= config/sources.online.list
 OFFLINE ?= 0
 shell_quote = '$(subst ','"'"',$(1))'
 COMPILE_FLAGS = --image-name $(call shell_quote,$(IMAGE_NAME)) --image-tag $(call shell_quote,$(IMAGE_TAG)) --jobs $(call shell_quote,$(BUILD_JOBS)) --apt-sources $(call shell_quote,$(APT_SOURCES)) $(if $(filter 1,$(OFFLINE)),--offline)
-.PHONY: prepare images render import-images deploy bundle test verify backup compile-image push-compile-image
+.PHONY: prepare images render import-images deploy bundle test verify backup compile-image push-compile-image platform-plugin
+platform-plugin:
+	$(PYTHON) scripts/platform-plugin.py $(if $(filter 1,$(OFFLINE)),--offline)
 compile-image:
 	$(PYTHON) scripts/compile-image.py build $(COMPILE_FLAGS)
 push-compile-image:

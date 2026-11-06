@@ -1,0 +1,77 @@
+{
+  "job": "x-ran-cloud",
+  "number": 3,
+  "settingsVersion": 3,
+  "resourceProfile": "image",
+  "admittedAt": "2026-11-06T13:26:42.576065045+08:00",
+  "pod": "x-ran-cloud-3-jq5b6-8wkz2-52ps0",
+  "resources": {
+    "jnlp": {
+      "limits": {
+        "cpu": "250m",
+        "ephemeral-storage": "256Mi",
+        "memory": "512Mi"
+      },
+      "requests": {
+        "cpu": "100m",
+        "ephemeral-storage": "64Mi",
+        "memory": "256Mi"
+      }
+    },
+    "builder": {
+      "limits": {
+        "cpu": "4500m",
+        "ephemeral-storage": "6Gi",
+        "memory": "5632Mi"
+      },
+      "requests": {
+        "cpu": "500m",
+        "ephemeral-storage": "1Gi",
+        "memory": "1Gi"
+      }
+    },
+    "dind": {
+      "limits": {
+        "cpu": "1250m",
+        "ephemeral-storage": "5888Mi",
+        "memory": "4Gi"
+      },
+      "requests": {
+        "cpu": "250m",
+        "ephemeral-storage": "1Gi",
+        "memory": "256Mi"
+      }
+    }
+  },
+  "totals": {
+    "cpu": 6.0,
+    "memory": 10737418240,
+    "ephemeral-storage": 12884901888
+  },
+  "selected": {
+    "concurrency": 4,
+    "buildTimeoutMinutes": 240,
+    "agentStartupTimeoutMinutes": 15,
+    "minimumFreeGiB": 50,
+    "minimumFreePercent": 10,
+    "compilerImagePullPolicy": "Never",
+    "innerBuildMemoryGiB": 3,
+    "buildJobs": 2,
+    "builderImage": "192.168.10.35/xnet/xran-compile:26.11.05",
+    "buildCpuLimit": 6,
+    "buildMemoryGiB": 10,
+    "temporaryStorageGiB": 12,
+    "dindMemoryGiB": 4,
+    "open5gsOffline": true
+  },
+  "currentSettingsVersion": 3,
+  "status": "PASS",
+  "metadata": {
+    "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+    "settingsVersion": 3,
+    "resourceProfile": "image",
+    "admittedAt": "2026-11-06T13:26:42.576065045+08:00",
+    "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+    "builderImagePullPolicy": "Never"
+  }
+}

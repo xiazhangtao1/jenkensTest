@@ -102,10 +102,10 @@ def main():
 
         # Only the body after the real slot acquisition is short-circuited; the
         # production parameter validation and both lock levels execute unchanged.
-        marker = "lock(label: 'xran-build-slot', quantity: 1) {"
+        marker = "def pod = XranCompiler.template("
         for job, api in clients.items():
             assert marker in originals[job]
-            api.set_pipeline(originals[job].replace(marker, marker + "\n echo('shared-verification-slot-held'); sleep(time: 20, unit: 'SECONDS'); return\n", 1))
+            api.set_pipeline(originals[job].replace(marker, "echo('shared-verification-slot-held'); sleep(time: 20, unit: 'SECONDS'); return\n" + marker, 1))
         stamp = str(int(time.time()))
         batch = submit_many([('x-ran-cloud' if i % 2 == 0 else 'open5gs',
                               dict(COMPILER_IMAGE_PULL_POLICY='Never', CHART_VERSION='1.0.0',
@@ -128,7 +128,9 @@ def main():
         clients['open5gs'].set_pipeline("echo('running storage fixture'); sleep(time: 120, unit: 'SECONDS')")
         active = submit('open5gs')
         admin.script("def r=jenkins.model.Jenkins.get().getItem('open5gs').getBuildByNumber(" + str(active[1]) + ");def f=new File(r.getArtifactsDir(),'running.bin');f.parentFile.mkdirs();f.bytes=new byte[1024];return null")
-        result = json.loads(script((ROOT / 'jenkins/storage.groovy').read_text() + '\n' + (ROOT / 'tests/storage-integration.groovy').read_text()))
+        storage_output = script((ROOT / 'jenkins/storage.groovy').read_text() + '\n' + (ROOT / 'tests/storage-integration.groovy').read_text())
+        (state / 'storage-verification.log').write_text(storage_output)
+        result = json.loads(storage_output)
         assert result['oldestDeleted'].startswith('x-ran-cloud#') and result['secondDeleted'].startswith('open5gs#')
         assert result['runningProtected'] and result['audit'] and result['rejectedWhenInsufficient']
         record('跨项目最早回收、运行/保留保护、提示审计及空间不足拒绝', result)

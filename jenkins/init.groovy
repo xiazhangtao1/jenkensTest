@@ -14,6 +14,9 @@ import org.jenkinsci.plugins.scriptsecurity.scripts.languages.GroovyLanguage
 
 def j = Jenkins.get()
 def cfg = new JsonSlurperClassic().parseText(new File('/var/xran/site.json').text)
+def platform = io.xran.jenkins.BuildPlatformConfiguration.get()
+platform.initialize(cfg)
+cfg.putAll(platform.effective('service'))
 def support = new File('/opt/xran/storage.groovy').text
 def job = j.getItem('x-ran-cloud') ?: j.createProject(WorkflowJob, 'x-ran-cloud')
 def buildScript = support + '\n' + new File('/opt/xran/compiler.groovy').text + '\n' + new File('/opt/xran/pipeline.groovy').text
@@ -74,16 +77,8 @@ maintenance.description = 'X-RAN-CLOUD CI：历史包持续保存；同时管理
 maintenance.save()
 // systemMessage 对所有登录用户公开；管理员提示由受限任务提供。
 j.systemMessage = ''
-def locks = LockableResourcesManager.get()
-(1..(cfg.concurrency as int)).each { i ->
-    String name = "xran-slot-${i}"
-    locks.createResourceWithLabel(name, 'xran-build-slot')
-    locks.fromName(name).labels = 'xran-build-slot'
-}
-// 缩容时去掉多余槽位的标签；已持有的锁仍由原构建正常释放。
-locks.resources.findAll { it.name.startsWith('xran-slot-') &&
-    (it.name.substring('xran-slot-'.length()) as int) > (cfg.concurrency as int) }.each { it.labels = '' }
-locks.save()
+// Reconcile after job creation as well as after JCasC. Existing web settings win.
+platform.initialize(cfg)
 j.updateCenter.sites.clear()
 j.save()
 maintenance.scheduleBuild2(0)

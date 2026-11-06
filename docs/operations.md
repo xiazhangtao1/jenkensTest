@@ -1,5 +1,7 @@
 # 运维与存储
 
+管理员通过 **Manage Jenkins → 系统配置 → 构建平台设置** 修改并发、三类 Pod 资源、默认编译环境、Open5gs 离线模式、超时和磁盘下限，无需重新部署。生效时机、缩容与恢复规则见 [构建平台设置](platform-settings.md)。
+
 ## 历史回收
 
 每 15 分钟及构建、归档前检查实际空间。没有按天数、次数或固定产物总容量淘汰。
@@ -7,7 +9,7 @@
 临时盘与数据盘不同且临时盘不足时，不会通过删除另一块盘的产物误处理。
 
 压力时按完成时间删除最早的未保留归档。使用 Jenkins ArtifactManager API，保留轻量构建信息和清理标记。
-运行中及 Keep forever 构建不参与回收，只处理 x-ran-cloud，不清理宿主机其他目录。
+运行中及 Keep forever 构建不参与回收，只处理 x-ran-cloud 和 open5gs，不清理宿主机其他目录。
 
 清理提示在首页、触发任务日志、storage-maintenance 和数据卷 xran-storage/cleanup.jsonl 中，
 记录构建号、commit 摘要、字节数和前后余量。无法满足安全空间时拒绝继续构建。
@@ -40,7 +42,7 @@ python3 scripts/ci.py backup --archive /mnt/backup/jenkins-home.tar.gz
 ```
 
 备份期间停止 Controller，由临时 Pod 挂同一 PVC 执行，结束后恢复 Controller。
-包含账号、凭据密钥、任务、历史、产物和清理记录，0600 权限，建议保存到另一块物理磁盘。
+包含账号、凭据密钥、任务、历史、产物、清理记录、构建平台设置及修改审计，0600 权限，建议保存到另一块物理磁盘。
 同时保管 users.json 或 xran-users Secret，确保恢复后的 JCasC 初始账号密码一致。
 Registry 数据卷单独备份，不包含在 Jenkins_HOME 归档中。
 

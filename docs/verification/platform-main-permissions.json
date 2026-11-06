@@ -1,0 +1,53 @@
+{
+  "namespace": "jenkins",
+  "startedAt": "2026-11-06T14:04:28+0800",
+  "checks": [
+    {
+      "name": "全部插件启用",
+      "status": "PASS",
+      "details": {
+        "count": 74
+      }
+    },
+    {
+      "name": "匿名访问及普通账号管理权限受限",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+      "status": "PASS",
+      "details": {
+        "builder1": {
+          "visibleJobs": [
+            "open5gs",
+            "x-ran-cloud"
+          ],
+          "deniedEndpoints": {
+            "job": 404,
+            "api/json": 404,
+            "config.xml": 404,
+            "118/consoleText": 404,
+            "build": 404
+          }
+        },
+        "builder2": {
+          "visibleJobs": [
+            "open5gs",
+            "x-ran-cloud"
+          ],
+          "deniedEndpoints": {
+            "job": 404,
+            "api/json": 404,
+            "config.xml": 404,
+            "118/consoleText": 404,
+            "build": 404
+          }
+        }
+      }
+    }
+  ],
+  "builds": [],
+  "status": "PASS",
+  "finishedAt": "2026-11-06T14:04:32+0800"
+}

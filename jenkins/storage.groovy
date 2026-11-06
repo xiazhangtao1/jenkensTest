@@ -60,8 +60,10 @@ class XranStorage {
     @NonCPS static long floor(Map cfg, long total) {
         // minimumFreeBytes 供管理员诊断/隔离验收，普通用户没有配置权限。
         if (cfg.containsKey('minimumFreeBytes')) return cfg.minimumFreeBytes as long
-        return Math.max((cfg.minimumFreeGiB as Number).longValue() * 1073741824L,
-            (long)(total * ((cfg.minimumFreePercent as Number).doubleValue() / 100.0d)))
+        // Thresholds are live; reservations retain each admitted build's snapshot.
+        def current = io.xran.jenkins.BuildPlatformConfiguration.get().effective('service')
+        return Math.max((current.minimumFreeGiB as Number).longValue() * 1073741824L,
+            (long)(total * ((current.minimumFreePercent as Number).doubleValue() / 100.0d)))
     }
 
     @NonCPS static List candidates() {
@@ -85,8 +87,14 @@ class XranStorage {
         long homeDev = device(home)
         Map reserved = [:].withDefault { 0L }
         state.values().each { reservation ->
-            reserved[reservation.workspaceDev.toString()] += reservation.temporaryBytes as long
-            reserved[reservation.dataDev.toString()] += reservation.archiveBytes as long
+            String workspaceDev = reservation.workspaceDev.toString()
+            String dataDev = reservation.dataDev.toString()
+            long workspaceReserved = (reserved[workspaceDev] as Number).longValue()
+            long temporaryBytes = (reservation.temporaryBytes as Number).longValue()
+            reserved[workspaceDev] = workspaceReserved + temporaryBytes
+            long dataReserved = (reserved[dataDev] as Number).longValue()
+            long archiveBytes = (reservation.archiveBytes as Number).longValue()
+            reserved[dataDev] = dataReserved + archiveBytes
         }
         long homeReserved = reserved[homeDev.toString()] as long
         long homeFloor = floor(cfg, home.totalSpace)

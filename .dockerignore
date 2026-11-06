@@ -8,6 +8,7 @@ AGENTS.md
 .cache/reports
 .cache/*
 !.cache/plugins/
+!.cache/local-plugins/
 !.cache/apt-archives/
 !.cache/compile-apt/
 !.cache/compile-sources/

@@ -1,0 +1,2 @@
+<?jelly escape-by-default='true'?>
+<div>提供管理员构建平台设置、Pod 资源分配、配置审计及持久化并发入场控制。</div>

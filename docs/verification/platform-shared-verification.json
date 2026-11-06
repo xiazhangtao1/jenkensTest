@@ -1,0 +1,100 @@
+{
+  "namespace": "jenkins-open5gs-verify",
+  "checks": [
+    {
+      "name": "三类 Pod 模板及镜像参数校验",
+      "status": "PASS",
+      "details": {
+        "status": "PASS",
+        "templateCases": 27,
+        "resourceCases": 3,
+        "invalidReferencesRejected": 5,
+        "invalidPolicyRejected": true
+      }
+    },
+    {
+      "name": "相同构建号按项目分别选择 Pod",
+      "status": "PASS",
+      "details": {
+        "xran": "shared-pod-check-xran",
+        "open5gs": "shared-pod-check-open5gs"
+      }
+    },
+    {
+      "name": "两项目合计六个槽位、其余排队",
+      "status": "PASS",
+      "details": {
+        "builds": [
+          [
+            "x-ran-cloud",
+            36
+          ],
+          [
+            "open5gs",
+            69
+          ],
+          [
+            "x-ran-cloud",
+            37
+          ],
+          [
+            "open5gs",
+            70
+          ],
+          [
+            "x-ran-cloud",
+            38
+          ],
+          [
+            "open5gs",
+            71
+          ],
+          [
+            "x-ran-cloud",
+            39
+          ],
+          [
+            "open5gs",
+            72
+          ]
+        ],
+        "maximumSlots": 6,
+        "queued": true
+      }
+    },
+    {
+      "name": "open5gs 相同 APP_VERSION 等待标签锁且不占额外槽位",
+      "status": "PASS",
+      "details": {
+        "builds": [
+          [
+            "open5gs",
+            73
+          ],
+          [
+            "open5gs",
+            74
+          ]
+        ],
+        "maximumSlots": 1
+      }
+    },
+    {
+      "name": "跨项目最早回收、运行/保留保护、提示审计及空间不足拒绝",
+      "status": "PASS",
+      "details": {
+        "oldestDeleted": "x-ran-cloud#41",
+        "protectedBuild": "open5gs#75",
+        "secondDeleted": "open5gs#76",
+        "runningProtected": [
+          "open5gs#77"
+        ],
+        "rejectedWhenInsufficient": true,
+        "audit": true,
+        "liveDiskThreshold": true,
+        "reservationUsesBuildSnapshot": true
+      }
+    }
+  ],
+  "status": "PASS"
+}

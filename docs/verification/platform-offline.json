@@ -1,0 +1,337 @@
+{
+  "namespace": "jenkins-platform-offline",
+  "startedAt": "2026-11-06T13:46:34+0800",
+  "checks": [
+    {
+      "name": "全部插件启用",
+      "status": "PASS",
+      "details": {
+        "count": 74
+      }
+    },
+    {
+      "name": "匿名访问及普通账号管理权限受限",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+      "status": "PASS",
+      "details": {
+        "builder1": {
+          "visibleJobs": [
+            "open5gs",
+            "x-ran-cloud"
+          ],
+          "deniedEndpoints": {
+            "job": 404,
+            "api/json": 404,
+            "config.xml": 404,
+            "2/consoleText": 404,
+            "build": 404
+          }
+        },
+        "builder2": {
+          "visibleJobs": [
+            "open5gs",
+            "x-ran-cloud"
+          ],
+          "deniedEndpoints": {
+            "job": 404,
+            "api/json": 404,
+            "config.xml": 404,
+            "2/consoleText": 404,
+            "build": 404
+          }
+        }
+      }
+    },
+    {
+      "name": "serviceA 分支",
+      "status": "PASS",
+      "details": {
+        "build": 1,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "serviceB 演示分支",
+      "status": "PASS",
+      "details": {
+        "build": 2,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "serviceC tag",
+      "status": "PASS",
+      "details": {
+        "build": 3,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "带注释 tag",
+      "status": "PASS",
+      "details": {
+        "build": 4,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "all 多包",
+      "status": "PASS",
+      "details": {
+        "build": 5,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "services_all 历史完整 SHA",
+      "status": "PASS",
+      "details": {
+        "build": 6,
+        "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+      }
+    },
+    {
+      "name": "唯一短 SHA",
+      "status": "PASS",
+      "details": {
+        "build": 7,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "imageA build/save/push/load",
+      "status": "PASS",
+      "details": {
+        "build": 8,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "imageB build/save/push/load",
+      "status": "PASS",
+      "details": {
+        "build": 9,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "imageC build/save/push/load",
+      "status": "PASS",
+      "details": {
+        "build": 10,
+        "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+      }
+    },
+    {
+      "name": "不存在的 Git 引用明确失败",
+      "status": "PASS",
+      "details": {
+        "build": 11
+      }
+    },
+    {
+      "name": "非法标签明确失败",
+      "status": "PASS",
+      "details": {
+        "build": 12
+      }
+    },
+    {
+      "name": "push 失败仍能下载并运行有效镜像 tar",
+      "status": "PASS",
+      "details": {
+        "build": 13
+      }
+    }
+  ],
+  "builds": [
+    {
+      "number": 1,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 2,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "demo/feature",
+        "SERVICE_TARGET": "serviceB",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 3,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "tag",
+        "GIT_REF": "demo-v1.0.0",
+        "SERVICE_TARGET": "serviceC",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 4,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "tag",
+        "GIT_REF": "demo-v1.0.0-annotated",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 5,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "all",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 6,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "commit",
+        "GIT_REF": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+        "SERVICE_TARGET": "services_all",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 7,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "commit",
+        "GIT_REF": "db3051980",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 8,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "verify-1793944000",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 9,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageB",
+        "IMAGE_TAG": "verify-1793944000",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 10,
+      "user": "builder2",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageC",
+        "IMAGE_TAG": "verify-1793944000",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 11,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "service",
+        "REF_TYPE": "branch",
+        "GIT_REF": "missing-ci-reference",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "latest",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 12,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "bad;touch /tmp/injected",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    },
+    {
+      "number": 13,
+      "user": "builder1",
+      "parameters": {
+        "BUILD_KIND": "image",
+        "REF_TYPE": "branch",
+        "GIT_REF": "main",
+        "SERVICE_TARGET": "serviceA",
+        "IMAGE_TARGET": "imageA",
+        "IMAGE_TAG": "push-failure-ci",
+        "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+        "COMPILER_IMAGE_PULL_POLICY": "Never"
+      }
+    }
+  ],
+  "status": "PASS",
+  "finishedAt": "2026-11-06T13:55:18+0800"
+}

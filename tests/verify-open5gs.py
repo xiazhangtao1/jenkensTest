@@ -42,9 +42,11 @@ def main():
     parser.add_argument('--values', help='Helm 渲染验收 values；默认使用所选提交的 helm/tests/site-values.yaml')
     args = parser.parse_args()
     cfg = yaml.safe_load(Path(args.site).read_text())
-    expected_offline = cfg['open5gs'].get('offline', True) if args.expected_offline is None else args.expected_offline
     state = ROOT / '.state' / cfg['namespace']
     users = json.loads((state / 'users.json').read_text())
+    admin = JenkinsAPI(cfg['jenkinsUrl'], 'admin', users['ADMIN_PASSWORD'], job='open5gs')
+    expected_offline = (json.loads(admin.script("println(groovy.json.JsonOutput.toJson(io.xran.jenkins.BuildPlatformConfiguration.get().effective('open5gs').open5gsOffline));return null"))
+                        if args.expected_offline is None else args.expected_offline)
     api = JenkinsAPI(cfg['jenkinsUrl'], 'builder1', users['BUILDER1_PASSWORD'], job='open5gs')
     params = dict(COMPILER_IMAGE=args.compiler_image, COMPILER_IMAGE_PULL_POLICY=args.pull_policy,
                   REF_TYPE=args.ref_type, GIT_REF=args.ref,
@@ -77,6 +79,10 @@ def main():
     assert meta['result'] == 'SUCCESS' and meta['durationMillis'] > 0 and meta['finishedAt']
     assert meta['builderImage'] == args.compiler_image and meta['builderImageId']
     assert meta['builderImagePullPolicy'] == args.pull_policy and meta['offline'] is expected_offline
+    if args.number is None:
+        assert isinstance(meta['settingsVersion'], int) and meta['settingsVersion'] > 0
+        assert meta['resourceProfile'] == 'open5gs' and meta['admittedAt']
+        assert set(meta['resourceAllocation']) == {'jnlp', 'builder', 'dind'}
     today = dt.datetime.fromisoformat(meta['startedAt']).astimezone(ZoneInfo('Asia/Shanghai'))
     date_version = f'{today.year % 100:02d}.{today.month}.{today.day}'
     assert meta['chartVersion'] == (args.chart_version or date_version)

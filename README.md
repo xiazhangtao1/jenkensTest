@@ -21,7 +21,7 @@
 
 local-path 的容量声明不是实际配额。20Gi 临时空间不会预先占满；源码、中间文件、Docker 层、
 导出 tar 和日志共同计入 Pod 上限，持久化归档另计。六个构建 Pod 总上限为 24 CPU/48GiB/120GiB，
-实际调度受节点资源约束。配置入口为 [config/site.yaml](config/site.yaml)。
+实际调度受节点资源约束。管理员在 **Manage Jenkins → 系统配置 → 构建平台设置** 调整并发、三类 Pod 资源、默认编译环境、超时和磁盘下限，保存后新入场构建立即生效。详情见 [构建平台设置](docs/platform-settings.md)；[config/site.yaml](config/site.yaml) 负责首次默认值及基础设施配置。
 
 ## 当前环境安装
 

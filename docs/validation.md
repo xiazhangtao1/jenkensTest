@@ -1,3 +1,34 @@
+# 构建平台网页设置验收（2026-11-06）
+
+主实例已部署 Controller `2.580.2-12`、内部插件 `xran-build-platform:1.0.1`。管理员入口为 **Manage Jenkins → System（系统配置）→ 构建平台设置**。
+默认并发 6，三套 Pod 预算各 4 CPU / 8GiB / 20GiB，默认编译环境 latest / Always，Open5gs 离线构建开启。
+
+| 验收 | 结果与证据 |
+| --- | --- |
+| Python 回归 | 20 项通过 |
+| 插件完整断网构建 | 固定 Maven 3.9.9 / JDK 21，Docker network none + Maven -o clean verify；10 项测试中 9 项通过、1 项由框架跳过，SpotBugs 零问题；[构建报告](verification/platform-plugin.json) |
+| 独立源码副本重建 | 没有 Git 元数据、没有官方插件原始归档，仅靠交付的 Maven 缓存与构建镜像，断网 clean verify 成功；[报告](verification/platform-independent-offline.json) |
+| 原生配置与权限 | 浏览器实际保存、资源预览、旧表单返回 400 冲突；普通用户预览/应用/状态接口均 403；[报告](verification/platform-browser.json) |
+| 动态并发与超时 | 6→2→4，统计所有运行中槽位；排队用新版本，运行中保留旧快照；重启、取消、同标签等待与超过 1 分钟的排队测试通过；[报告](verification/platform-admission.json) |
+| 三类实际 Pod | 服务 5 CPU/9GiB/8GiB、镜像 6 CPU/10GiB/12GiB、Open5gs 4 CPU/8GiB/20GiB；容器资源及工作区 sizeLimit 与快照相符；[服务](verification/platform-resources-service.json)、[镜像](verification/platform-resources-image.json)、[Open5gs](verification/platform-resources-open5gs.json) |
+| 实时磁盘阈值与预留 | 管理员修改阈值立即被检查使用；预留按入场预算累计；最早回收、运行中/长期保留保护、提示审计及空间不足拒绝通过；[报告](verification/platform-shared-verification.json) |
+| Open5gs 完整发布 | develop 分支在线构建成功，四个文件可下载且 SHA256 一致，Helm lint/render、三个镜像导入后的断网运行检查通过；[报告](verification/platform-open5gs-release.json) |
+| 参数与页面回归 | 版本保存/历史修复/默认日期、隐藏 OFFLINE、BUILD_KIND 条件显示、HTTP 实际复制粘贴、维护任务隔离通过；[参数报告](verification/platform-parameters-verification.json) |
+| 全新离线 PVC | 74 个插件全部启用，分支/tag/commit、服务、多包、大包、三镜像及失败产物保留等 16 项通过；[报告](verification/platform-offline.json) |
+| 数据恢复 | 配置版本 21、21 条审计和完整配置与备份一致；站点默认并发 6/离线 true 不覆盖保存的并发 3/离线 false；[报告](verification/platform-restore.json) |
+| 恢复后实际构建 | 使用保存的 5 CPU/9GiB 临时空间构建成功，元数据与 Pod 一致；[报告](verification/platform-restored-service.json) |
+| 主实例最终验收 | #96 服务、#97 镜像成功，默认预算与元数据正确；原有 98 次构建参数、结果、保留标记及根元数据 SHA256 全部未变；[报告](verification/platform-main.json) |
+
+实际 Pod 验收发现 Kubernetes 插件会覆盖 YAML 中的工作区卷配置，已显式设置 workspaceVolume.sizeLimit 并复验。
+存储验收发现 GroovyShell 对复合加法中的 long 转换存在类型异常，已改为显式 long 累计，并以运行中的 2GiB 预留验证。
+
+Open5gs 完整发布使用 `open5gs-basev277-develop`，未改动业务 main；内网 Registry 的非致命推送失败如实记入元数据，有效本地包仍可下载。
+主实例保持离线业务默认值；当前外网环境的真实编译显式选择 Never，迁入内网后仍需验证内网 APT/Registry 连通性。
+
+---
+
+以下保留早期版本的验收记录。
+
 # 验证结果
 
 ## open5gs 站点离线模式与参数文案（2026-11-06）

@@ -1,0 +1,65 @@
+{
+  "job": "x-ran-cloud",
+  "number": 42,
+  "settingsVersion": 21,
+  "resourceProfile": "service",
+  "admittedAt": "2026-11-06T14:44:03.162369035+08:00",
+  "pod": "x-ran-cloud-42-jbhzm-gqfl1-l5xf9",
+  "resources": {
+    "jnlp": {
+      "limits": {
+        "cpu": "250m",
+        "ephemeral-storage": "256Mi",
+        "memory": "512Mi"
+      },
+      "requests": {
+        "cpu": "100m",
+        "ephemeral-storage": "64Mi",
+        "memory": "256Mi"
+      }
+    },
+    "builder": {
+      "limits": {
+        "cpu": "4750m",
+        "ephemeral-storage": "8960Mi",
+        "memory": "7680Mi"
+      },
+      "requests": {
+        "cpu": "500m",
+        "ephemeral-storage": "1Gi",
+        "memory": "1Gi"
+      }
+    }
+  },
+  "totals": {
+    "cpu": 5.0,
+    "memory": 8589934592,
+    "ephemeral-storage": 9663676416
+  },
+  "selected": {
+    "concurrency": 3,
+    "buildTimeoutMinutes": 240,
+    "agentStartupTimeoutMinutes": 15,
+    "minimumFreeGiB": 50,
+    "minimumFreePercent": 10,
+    "compilerImagePullPolicy": "Never",
+    "innerBuildMemoryGiB": 3,
+    "buildJobs": 2,
+    "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+    "buildCpuLimit": 5,
+    "buildMemoryGiB": 8,
+    "temporaryStorageGiB": 9,
+    "dindMemoryGiB": 0,
+    "open5gsOffline": false
+  },
+  "currentSettingsVersion": 21,
+  "status": "PASS",
+  "metadata": {
+    "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+    "settingsVersion": 21,
+    "resourceProfile": "service",
+    "admittedAt": "2026-11-06T14:44:03.162369035+08:00",
+    "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+    "builderImagePullPolicy": "Never"
+  }
+}

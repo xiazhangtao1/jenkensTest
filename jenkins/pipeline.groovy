@@ -11,11 +11,11 @@ def target = isOpen5gs ? 'release' : (kind == 'service' ? params.SERVICE_TARGET 
 def today = new Date(currentBuild.startTimeInMillis).format('yy.M.d', TimeZone.getTimeZone('Asia/Shanghai'))
 def chartVersion = isOpen5gs ? ((params.CHART_VERSION as String)?.trim() ?: today) : ''
 def imageTag = isOpen5gs ? ((params.APP_VERSION as String)?.trim() ?: today) : params.IMAGE_TAG as String
-def offline = isOpen5gs && cfg.open5gs.offline == true
+def offline = false // resolved from the settings snapshot at admission
 def needsDocker = kind != 'service'
-def compilerImage = (params.containsKey('COMPILER_IMAGE') ? params.COMPILER_IMAGE : cfg.builderImage) as String
+def compilerImage = (params.containsKey('COMPILER_IMAGE') ? params.COMPILER_IMAGE : XranCompiler.defaults(kind).builderImage) as String
 def compilerPolicy = (params.containsKey('COMPILER_IMAGE_PULL_POLICY') ? params.COMPILER_IMAGE_PULL_POLICY :
-    (cfg.compilerImagePullPolicy ?: 'Always')) as String
+    XranCompiler.defaults(kind).compilerImagePullPolicy) as String
 XranCompiler.validate(compilerImage, compilerPolicy)
 if (!(sourceType in ['branch', 'tag', 'commit']) || !(kind in ['service', 'image', 'open5gs'])) error('非法构建类型或引用类型')
 if (!isOpen5gs && !(target in (kind == 'service' ? cfg.services + ['all', 'services_all'] : cfg.images))) error('非法构建目标')
@@ -30,17 +30,32 @@ def metadata = [buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, job: env
     kind: kind, target: target, imageTag: kind == 'image' ? imageTag : null,
     builderImage: compilerImage, builderImagePullPolicy: compilerPolicy,
     startedAt: new Date(started).format("yyyy-MM-dd'T'HH:mm:ssXXX", TimeZone.getTimeZone('Asia/Shanghai'))]
-if (isOpen5gs) metadata.putAll([chartVersion: chartVersion, appVersion: imageTag, offline: offline])
+if (isOpen5gs) metadata.putAll([chartVersion: chartVersion, appVersion: imageTag])
 trigger = null // Cause 对象不跨 Pipeline 挂起点序列化。
 def reference = isOpen5gs ? "${cfg.registry}/xcn/releases:${imageTag}" : (kind == 'image' ? "${cfg.registry}/${cfg.imageRepositories[target]}:${imageTag}" : '')
 def reservationKey = "${env.JOB_NAME}#${env.BUILD_NUMBER}".toString()
 def execute = {
+  def finished = false
+  while (!finished) {
     lock(label: 'xran-build-slot', quantity: 1) {
+      def snapshot = XranCompiler.admit(currentBuild.rawBuild, kind)
+      if (snapshot != null) {
+        cfg.putAll(snapshot.config)
+        offline = isOpen5gs && cfg.open5gsOffline == true
+        metadata.putAll([settingsVersion: snapshot.settingsVersion, resourceProfile: snapshot.resourceProfile,
+            resourceAllocation: snapshot.resourceAllocation, admittedAt: snapshot.admittedAt])
+        if (isOpen5gs) metadata.offline = offline
+        def deadline = (snapshot.admittedAtMillis as long) + (cfg.buildTimeoutMinutes as long) * 60000L
+        def remainingSeconds = Math.max(1L, (long)Math.ceil((deadline - System.currentTimeMillis()) / 1000.0d))
+        if (deadline <= System.currentTimeMillis()) error('构建入场后总超时已到期')
+        timeout(time: remainingSeconds as int, unit: 'SECONDS') {
         def pod = XranCompiler.template(new File('/var/xran/pod-' + kind + '.json').text,
-            compilerImage, compilerPolicy, env.BUILD_NUMBER, project)
+            compilerImage, compilerPolicy, env.BUILD_NUMBER, project, snapshot)
         def yaml = groovy.json.JsonOutput.toJson(pod)
         pod = null
+        snapshot = null
         podTemplate(yaml: yaml, idleMinutes: 0, podRetention: never(), showRawYaml: false,
+            workspaceVolume: emptyDirWorkspaceVolume(memory: false, sizeLimit: cfg.temporaryStorageGiB.toString() + 'Gi'),
             slaveConnectTimeout: (cfg.agentStartupTimeoutMinutes ?: 15) * 60 as int) {
           try {
             def agentReady = false
@@ -184,10 +199,14 @@ def execute = {
               throw problem
           }
         }
-    }
+        } // admitted timeout
+        finished = true
+      }
+    } // release native slot before waiting after a concurrency reduction
+    if (!finished) sleep(time: 3, unit: 'SECONDS')
+  }
 }
 timestamps {
-    timeout(time: cfg.buildTimeoutMinutes as int, unit: 'MINUTES') {
         try {
             if (needsDocker) {
                 def digest = java.security.MessageDigest.getInstance('SHA-256').digest(reference.getBytes('UTF-8')).encodeHex().toString()
@@ -201,6 +220,7 @@ timestamps {
             throw failed
         } finally {
             XranStorage.release(reservationKey)
+            XranCompiler.release(reservationKey)
             def record = new File(currentBuild.rawBuild.rootDir, 'xran-metadata.json')
             if (!record.exists()) {
                 metadata.result = currentBuild.currentResult
@@ -208,5 +228,4 @@ timestamps {
                 record.text = groovy.json.JsonOutput.toJson(metadata)
             }
         }
-    }
 }

@@ -1,0 +1,178 @@
+{
+  "number": 1,
+  "url": "http://10.2.0.119:32087/job/open5gs/1/",
+  "checks": [
+    {
+      "name": "精确提交、构建人、时间、日期版本及编译镜像",
+      "status": "PASS",
+      "details": {
+        "commit": "49a9671f78814b27c171c681a8acb75ecf255f94",
+        "ref": "open5gs-basev277-develop",
+        "refType": "branch",
+        "repository": "http://xran-demo.jenkins.svc.cluster.local:8000/open5gs.git",
+        "buildNumber": "1",
+        "buildUrl": "http://10.2.0.119:32087/job/open5gs/1/",
+        "job": "open5gs",
+        "project": "open5gs",
+        "userId": "builder1",
+        "userName": "Builder One",
+        "kind": "open5gs",
+        "target": "release",
+        "imageTag": null,
+        "builderImage": "192.168.10.35/xnet/xran-compile:latest",
+        "builderImagePullPolicy": "Never",
+        "startedAt": "2026-11-06T13:05:31+08:00",
+        "chartVersion": "26.11.6",
+        "appVersion": "26.11.6",
+        "settingsVersion": 1,
+        "resourceProfile": "open5gs",
+        "resourceAllocation": {
+          "jnlp": {
+            "requests": {
+              "cpu": "100m",
+              "memory": "256Mi",
+              "ephemeral-storage": "64Mi"
+            },
+            "limits": {
+              "cpu": "250m",
+              "memory": "512Mi",
+              "ephemeral-storage": "256Mi"
+            }
+          },
+          "builder": {
+            "requests": {
+              "cpu": "500m",
+              "memory": "1024Mi",
+              "ephemeral-storage": "1024Mi"
+            },
+            "limits": {
+              "cpu": "500m",
+              "memory": "3584Mi",
+              "ephemeral-storage": "4096Mi"
+            }
+          },
+          "dind": {
+            "requests": {
+              "cpu": "250m",
+              "memory": "256Mi",
+              "ephemeral-storage": "1024Mi"
+            },
+            "limits": {
+              "cpu": "3250m",
+              "memory": "4096Mi",
+              "ephemeral-storage": "16128Mi"
+            }
+          }
+        },
+        "admittedAt": "2026-11-06T13:05:34.490944880+08:00",
+        "offline": false,
+        "builderImageId": "localhost:15050/xnet/xran-compile@sha256:ca4450df16f38d8abbb50f1371252b49c2b83ebc14fe18383cf95aae53d7d019",
+        "builderPod": "open5gs-1-llh47-crg1c-1th4n",
+        "result": "SUCCESS",
+        "durationMillis": 2419416,
+        "files": [
+          {
+            "name": "xcn-runtime.tar",
+            "size": 274081280,
+            "sha256": "dff907c062234f9f8d4d47e1b5c963af4aa9d0ba99a78713fc0c0f51666eef34"
+          },
+          {
+            "name": "xcn-webui.tar",
+            "size": 466788352,
+            "sha256": "98e632e96289d5440fd8d230b3bb2d5b0193b73d4638f936de567a77b583abf4"
+          },
+          {
+            "name": "xcn-monitor.tar",
+            "size": 436587520,
+            "sha256": "1078529e1619d2e809db8cde84458d07b78cb9d5874eaea8e8049cd65a0c88df"
+          },
+          {
+            "name": "xcn-26.11.6.tgz",
+            "size": 25707,
+            "sha256": "5e60cb6c87d6b1bd7f671f388205004a17c197938974c848b2d352ed4bc87a3d"
+          }
+        ],
+        "images": [
+          {
+            "name": "xcn-runtime",
+            "reference": "192.168.10.35/xcn/xcn-runtime:26.11.6",
+            "imageId": "sha256:2beb2129c4b5b563cd18a7628eb1ef78c15df69e690f85b41afa9a17301329ae",
+            "pushStatus": "failed"
+          },
+          {
+            "name": "xcn-webui",
+            "reference": "192.168.10.35/xcn/xcn-webui:26.11.6",
+            "imageId": "sha256:ec73b0e7b9d9f558dd4fb5ed3c9a3ed2822a23128651b7227ce8b333e0d9d4bb",
+            "pushStatus": "failed"
+          },
+          {
+            "name": "xcn-monitor",
+            "reference": "192.168.10.35/xcn/xcn-monitor:26.11.6",
+            "imageId": "sha256:f89d83d7c194100010bc3ccd2a8a01381f885ca869903a3e9c8834829f2f1c47",
+            "pushStatus": "failed"
+          }
+        ],
+        "collectionErrors": [],
+        "warnings": [
+          "镜像推送未全部成功；有效本地包仍可下载"
+        ],
+        "finishedAt": "2026-11-06T05:45:55.139147+00:00"
+      }
+    },
+    {
+      "name": "普通账号下载四个产物及 SHA256 完整性",
+      "status": "PASS",
+      "details": {
+        "files": [
+          "xcn-26.11.6.tgz",
+          "xcn-monitor.tar",
+          "xcn-runtime.tar",
+          "xcn-webui.tar"
+        ]
+      }
+    },
+    {
+      "name": "Helm lint 与模板渲染",
+      "status": "PASS",
+      "details": {
+        "objects": 34,
+        "lint": "==> Linting /home/xiazhangtao/code/jenkensTest/.state/jenkins-platform-release/downloads/open5gs/1/xcn-26.11.6.tgz\n[INFO] Chart.yaml: icon is recommended\n\n1 chart(s) linted, 0 chart(s) failed"
+      }
+    },
+    {
+      "name": "xcn-runtime 导入与断网运行检查",
+      "status": "PASS",
+      "details": {
+        "imageId": "sha256:2beb2129c4b5b563cd18a7628eb1ef78c15df69e690f85b41afa9a17301329ae",
+        "output": "xcn v2.7.7"
+      }
+    },
+    {
+      "name": "xcn-webui 导入与断网运行检查",
+      "status": "PASS",
+      "details": {
+        "imageId": "sha256:ec73b0e7b9d9f558dd4fb5ed3c9a3ed2822a23128651b7227ce8b333e0d9d4bb",
+        "output": "v19.9.0"
+      }
+    },
+    {
+      "name": "xcn-monitor 导入与断网运行检查",
+      "status": "PASS",
+      "details": {
+        "imageId": "sha256:f89d83d7c194100010bc3ccd2a8a01381f885ca869903a3e9c8834829f2f1c47",
+        "output": "TShark (Wireshark) 4.6.9 (Git commit 2d548b197c75).\n\nCopyright 1998-2026 Gerald Combs <gerald@wireshark.org> and contributors.\nLicensed under the terms of the GNU General Public License (version 2 or later).\nThis is free software; see the file named COPYING in the distribution. There is\nNO WARRANTY; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\nCompile-time info:\n Bit width: 64-bit\n  Compiler: GCC 11.4.0\n      GLib: 2.72.4\n With:\n  +Gcrypt 1.9.4            +PCRE2 10.39 2021-10-29\n  +libxml2 2.9.13          +zlib 1.2.11\n Without:\n  -brotli     -libpcap    -LZ4        -nghttp3    -zlib-ng\n  -GnuTLS     -libsmi     -MaxMind    -Snappy     -Zstandard\n  -Kerberos   -Lua        -nghttp2    -xxhash\n\nRuntime info:\n      OS: Linux 5.15.148-rt74-rc202408\n     CPU: INTEL(R) XEON(R) GOLD 6554S (with SSE4.2)\n  Memory: 515474 MB of physical memory\n    GLib: 2.72.4\n  Locale: LC_TYPE=C\n Plugins: disabled at compile time\n With:\n  +c-ares 1.18.1           +PCRE2 10.39 2021-10-29\n  +Gcrypt 1.9.4            +zlib 1.2.11"
+      }
+    },
+    {
+      "name": "推送状态如实记录；非致命 push 失败仍保留有效产物",
+      "status": "PASS",
+      "details": {
+        "192.168.10.35/xcn/xcn-runtime:26.11.6": "failed",
+        "192.168.10.35/xcn/xcn-webui:26.11.6": "failed",
+        "192.168.10.35/xcn/xcn-monitor:26.11.6": "failed"
+      }
+    }
+  ],
+  "status": "PASS",
+  "finishedAt": "2026-11-06T13:50:32+0800"
+}
