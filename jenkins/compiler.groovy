@@ -1,6 +1,45 @@
 /** Controller-side helpers; all returned values are plain serializable data. */
 class XranCompiler {
     @com.cloudbees.groovy.cps.NonCPS
+    static boolean recordVersions(hudson.model.Run run, Map versions, boolean onlyEmpty = false) {
+        def action = run.getAction(hudson.model.ParametersAction)
+        def updates = versions.findAll { name, value ->
+            def previous = action?.getParameter(name)?.value?.toString()
+            value && previous != value && (!onlyEmpty || !previous?.trim())
+        }.collect { name, value -> new hudson.model.StringParameterValue(name as String, value as String) }
+        if (!updates) return false
+        // createUpdated preserves every other parameter and its type/safety settings.
+        run.replaceAction(action ? action.createUpdated(updates) : new hudson.model.ParametersAction(updates))
+        run.save()
+        return true
+    }
+
+    @com.cloudbees.groovy.cps.NonCPS
+    static int restoreVersions(hudson.model.Job job) {
+        int restored = 0
+        job.builds.each { run ->
+            def action = run.getAction(hudson.model.ParametersAction)
+            if (!run.isBuilding() && ['CHART_VERSION', 'APP_VERSION'].any {
+                !action?.getParameter(it)?.value?.toString()?.trim()
+            }) {
+                def file = new File(run.rootDir, 'xran-metadata.json')
+                if (file.isFile()) {
+                    try {
+                        def record = XranStorage.parseJson(file.getText('UTF-8'))
+                        if (record.project == 'open5gs' && record.buildNumber?.toString() == run.number.toString() &&
+                            record.chartVersion instanceof String && record.appVersion instanceof String) {
+                            if (recordVersions(run, [CHART_VERSION: record.chartVersion, APP_VERSION: record.appVersion], true)) restored++
+                        }
+                    } catch (Exception problem) {
+                        System.err.println("Cannot restore versions for ${run.fullDisplayName}: ${problem.message}")
+                    }
+                }
+            }
+        }
+        return restored
+    }
+
+    @com.cloudbees.groovy.cps.NonCPS
     static void validate(String image, String policy) {
         // Repository/tag/digest only: user input is never interpreted as shell or YAML.
         String component = '[a-z0-9]+(?:(?:[._]|__|-+)[a-z0-9]+)*'

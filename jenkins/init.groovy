@@ -55,6 +55,11 @@ open5gs.addProperty(new ParametersDefinitionProperty([
 ]))
 open5gs.description = 'open5gs 发布构建：三个镜像包和一个 Helm Chart。默认 main；当前闭环使用 open5gs-basev277-develop，并取消离线构建。版本留空按上海时区的构建日期生成。'
 open5gs.save()
+// Repair only empty historical versions, using that build's actual metadata.
+// Completed runs without metadata or with explicit values remain untouched.
+def compiler = new GroovyShell(j.pluginManager.uberClassLoader).evaluate(
+    support + '\n' + new File('/opt/xran/compiler.groovy').text + '\nreturn XranCompiler')
+println('open5gs historical versions restored: ' + compiler.restoreVersions(open5gs))
 def maintenance = j.getItem('storage-maintenance') ?: j.createProject(WorkflowJob, 'storage-maintenance')
 def maintenanceScript = support + '\n' + new File('/opt/xran/maintenance.groovy').text
 ScriptApproval.get().preapprove(maintenanceScript, GroovyLanguage.get())

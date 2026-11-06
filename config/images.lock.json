@@ -1,5 +1,5 @@
 {
-  "xran-ci/controller:2.580.2-8": "sha256:38f0626bd432d66f012e03c4e0e9e7af3a9619b7b5503c8e319b2f00fcbb133c",
+  "xran-ci/controller:2.580.2-9": "sha256:aa62a09583560b25fd8f5f9cfb6f4972af862e1a497bc9f1463282c0c5dbddd5",
   "192.168.10.35/xnet/xran-compile:latest": "sha256:c35fc07fbb6ac293b26bf4dbb222dc5e014b07304708e56adf814307520e2b51",
   "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
   "docker:29.9.3-dind": "sha256:51d0681aa1e6756df485af7922fbaf9bd73275db418900c713b564bc94f94175",

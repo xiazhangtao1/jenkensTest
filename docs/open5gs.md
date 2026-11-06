@@ -12,7 +12,9 @@
 | CHART_VERSION | 当天上海日期，如 `26.11.6`；无前导零的 SemVer |
 | APP_VERSION | 同上，可单独填写 Docker tag |
 
-页面打开时填写当天版本；通过 API 省略或传空值时，按构建开始日期计算。显式填写的版本不替换，历史 Parameters 仍显示提交时的原值，实际版本另存 metadata.json。
+页面打开时填写当天版本；通过 API 省略或传空值时，按构建开始日期计算。历史 Parameters 和 metadata.json 均保存实际使用的版本，显式填写的版本保留（去除两端空白）。升级时，已有历史中的空版本只按该次构建元数据回填，不会使用今天的日期替换旧版本。
+
+HTTP 访问时，历史 Parameters 页的复制按钮使用浏览器兼容方式；HTTPS 下保留 Jenkins 原生复制功能。
 
 当前外网闭环选择 `open5gs-basev277-develop`，取消 OFFLINE。该分支已有发布入口；目前 `main` 缺少此入口，选择它会明确失败，不会切换分支，也不修改业务仓库。
 
@@ -53,3 +55,6 @@ python3 tests/verify-open5gs.py --number 1
 脚本实际下载四个文件、校验 SHA256，执行 Helm lint/template，导入并断网检查三个镜像。
 Chart 要求显式站点网络地址，渲染默认读取所选提交的 `helm/tests/site-values.yaml`，也可用 `--values /路径/values.yaml` 指定。
 测试 values 只用于渲染检查，不部署业务。结果位于 `.state/jenkins/open5gs-release.json`。
+
+默认版本保存与历史回填的专项验收使用 `python3 tests/verify-parameters.py --site /路径/验收-site.yaml`。
+该脚本只接受带 `verificationInstance: true` 的独立命名空间，在槽位内跳过业务编译，并在结束时恢复流水线定义。

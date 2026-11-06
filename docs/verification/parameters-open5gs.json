@@ -1,0 +1,293 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-11-06T08:01:50+0800",
+  "controllerImage": "xran-ci/controller:2.580.2-9",
+  "unitTests": {
+    "passed": 19
+  },
+  "isolatedJenkins": {
+    "namespace": "jenkins-open5gs-verify",
+    "checks": [
+      {
+        "name": "API 实际参数保存 #15",
+        "status": "PASS",
+        "details": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "OFFLINE": false
+        }
+      },
+      {
+        "name": "API 实际参数保存 #16",
+        "status": "PASS",
+        "details": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "OFFLINE": false
+        }
+      },
+      {
+        "name": "API 实际参数保存 #17",
+        "status": "PASS",
+        "details": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "OFFLINE": false
+        }
+      },
+      {
+        "name": "API 实际参数保存 #18",
+        "status": "PASS",
+        "details": {
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "OFFLINE": false,
+          "CHART_VERSION": "2.3.4-rc.1",
+          "APP_VERSION": "26.11.06-custom"
+        }
+      },
+      {
+        "name": "API 实际参数保存 #19",
+        "status": "PASS",
+        "details": {
+          "APP_VERSION": "26.11.6",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "OFFLINE": false,
+          "CHART_VERSION": "4.5.6"
+        }
+      },
+      {
+        "name": "API 实际参数保存 #20",
+        "status": "PASS",
+        "details": {
+          "CHART_VERSION": "5.6.7",
+          "APP_VERSION": "release-test",
+          "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+          "COMPILER_IMAGE_PULL_POLICY": "Always",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "OFFLINE": false
+        }
+      },
+      {
+        "name": "按历史元数据回填、显式值保护、缺失元数据跳过、幂等及磁盘重载",
+        "status": "PASS",
+        "details": {
+          "numbers": [
+            15,
+            16,
+            17,
+            19
+          ],
+          "versions": [
+            {
+              "CHART_VERSION": "25.1.2",
+              "APP_VERSION": "25.1.2-release",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+              "COMPILER_IMAGE_PULL_POLICY": "Always",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "OFFLINE": false
+            },
+            {
+              "CHART_VERSION": "",
+              "APP_VERSION": "",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+              "COMPILER_IMAGE_PULL_POLICY": "Always",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "OFFLINE": false
+            },
+            {
+              "CHART_VERSION": "26.11.6",
+              "APP_VERSION": "26.11.6",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+              "COMPILER_IMAGE_PULL_POLICY": "Always",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "OFFLINE": false
+            },
+            {
+              "APP_VERSION": "25.3.4",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+              "COMPILER_IMAGE_PULL_POLICY": "Always",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "OFFLINE": false,
+              "CHART_VERSION": "4.5.6"
+            }
+          ],
+          "explicitPreserved": true,
+          "missingMetadataSkipped": true,
+          "idempotent": true,
+          "reloadVerified": true
+        }
+      }
+    ],
+    "status": "PASS"
+  },
+  "deployment": {
+    "status": "PASS",
+    "checkedAt": "2026-11-06T07:58:46+0800",
+    "controllerImage": "xran-ci/controller:2.580.2-9",
+    "histories": [
+      {
+        "number": 1,
+        "chartVersion": "26.11.6",
+        "appVersion": "26.11.6",
+        "otherParametersPreserved": true,
+        "artifactsPreserved": true,
+        "metadataUnchanged": true
+      },
+      {
+        "number": 2,
+        "chartVersion": "26.11.06",
+        "appVersion": "invalid-ci-check",
+        "otherParametersPreserved": true,
+        "artifactsPreserved": true,
+        "metadataUnchanged": true
+      },
+      {
+        "number": 3,
+        "chartVersion": "26.11.6",
+        "appVersion": "main-entry-check-1793901372",
+        "otherParametersPreserved": true,
+        "artifactsPreserved": true,
+        "metadataUnchanged": true
+      },
+      {
+        "number": 4,
+        "chartVersion": "26.11.6",
+        "appVersion": "policy-always-1793902359",
+        "otherParametersPreserved": true,
+        "artifactsPreserved": true,
+        "metadataUnchanged": true
+      },
+      {
+        "number": 5,
+        "chartVersion": "26.11.6",
+        "appVersion": "policy-ifnotpresent-1793902419",
+        "otherParametersPreserved": true,
+        "artifactsPreserved": true,
+        "metadataUnchanged": true
+      }
+    ],
+    "pipelineSha256": "55c9d9db214d24b6bad1572bf67697c9276d0065ae39f9e16e68f3ffa5ba55bc",
+    "startupMigration": "open5gs historical versions restored: 4",
+    "acceptingBuilds": true
+  },
+  "browser": {
+    "status": "PASS",
+    "user": "builder1",
+    "checks": [
+      {
+        "name": "已有成功发布版本显示及实际复制粘贴",
+        "build": 1,
+        "versions": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6"
+        },
+        "secureContext": false,
+        "actualPaste": true
+      },
+      {
+        "name": "X-RAN-CLOUD 历史条件显示与 HTTP 复制",
+        "number": 43,
+        "kind": "service",
+        "visible": [
+          "SERVICE_TARGET"
+        ],
+        "actualPaste": true
+      },
+      {
+        "name": "X-RAN-CLOUD 历史条件显示与 HTTP 复制",
+        "number": 35,
+        "kind": "image",
+        "visible": [
+          "IMAGE_TARGET",
+          "IMAGE_TAG"
+        ],
+        "actualPaste": true
+      },
+      {
+        "name": "open5gs 新建表单默认版本与顺序",
+        "names": [
+          "COMPILER_IMAGE",
+          "COMPILER_IMAGE_PULL_POLICY",
+          "REF_TYPE",
+          "GIT_REF",
+          "OFFLINE",
+          "CHART_VERSION",
+          "APP_VERSION"
+        ],
+        "defaults": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6"
+        }
+      },
+      {
+        "name": "X-RAN-CLOUD 新建表单双向切换及输入保留"
+      },
+      {
+        "name": "普通用户首页权限及维护提示隔离",
+        "jobs": [
+          "open5gs",
+          "x-ran-cloud"
+        ]
+      }
+    ]
+  },
+  "existingReleaseRecheck": {
+    "number": 1,
+    "url": "http://10.2.0.119:32080/job/open5gs/1/",
+    "status": "PASS",
+    "finishedAt": "2026-11-06T08:01:18+0800",
+    "checks": [
+      {
+        "name": "精确提交、构建人、时间、日期版本及编译镜像",
+        "status": "PASS"
+      },
+      {
+        "name": "普通账号下载四个产物及 SHA256 完整性",
+        "status": "PASS"
+      },
+      {
+        "name": "Helm lint 与模板渲染",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-runtime 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-webui 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-monitor 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "推送状态如实记录；非致命 push 失败仍保留有效产物",
+        "status": "PASS"
+      }
+    ]
+  }
+}

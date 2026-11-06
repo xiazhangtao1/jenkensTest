@@ -23,6 +23,61 @@
   else defaults();
 })();
 
+// Jenkins' native clipboard API requires HTTPS. On HTTP Parameters pages, keep
+// copying available through a synchronous, user-initiated browser copy command.
+(() => {
+  "use strict";
+  if (window.isSecureContext || !/\/job\/(?:open5gs|x-ran-cloud)\/[^/]+\/parameters\/?$/.test(location.pathname)) return;
+
+  function start() {
+    document.querySelectorAll('#main-panel .jenkins-quote .jenkins-copy-button:not([data-xran-http-copy])').forEach(original => {
+      const wrapper = original.parentElement;
+      const button = original.cloneNode(true);
+      // Remove native behaviours/tooltips along with their HTTPS-only message.
+      button.disabled = false;
+      button.removeAttribute('data-tooltip-append-to-parent');
+      button.dataset.xranHttpCopy = 'true';
+      button.setAttribute('aria-label', '复制参数值');
+      button.title = '复制参数值';
+      wrapper._tippy?.destroy();
+      if (wrapper.hasAttribute('data-message-insecure')) wrapper.replaceWith(button);
+      else original.replaceWith(button);
+      button.addEventListener('click', () => {
+        const active = document.activeElement;
+        const selection = window.getSelection();
+        const ranges = Array.from({length: selection.rangeCount}, (_, index) => selection.getRangeAt(index).cloneRange());
+        const input = document.createElement('textarea');
+        input.value = button.getAttribute('text') || '';
+        input.readOnly = true;
+        input.style.cssText = 'position:fixed;left:-9999px;top:0';
+        document.body.append(input);
+        input.select();
+        let copied = false;
+        try { copied = document.execCommand('copy'); }
+        catch (_) { /* Report unsupported clipboard operations below. */ }
+        finally {
+          input.remove();
+          active?.focus({preventScroll: true});
+          selection.removeAllRanges();
+          ranges.forEach(range => selection.addRange(range));
+        }
+        button.title = copied ? '已复制' : '复制失败，请选中文本手动复制';
+        button.setAttribute('aria-label', button.title);
+        button.classList.toggle('jenkins-copy-button--copied', copied);
+        setTimeout(() => {
+          button.classList.remove('jenkins-copy-button--copied');
+          button.title = '复制参数值';
+          button.setAttribute('aria-label', button.title);
+        }, 2000);
+      });
+    });
+  }
+
+  // Run after Jenkins applies its native HTTP-disabled behaviour and tooltips.
+  if (document.readyState !== "complete") window.addEventListener("load", start, {once: true});
+  else start();
+})();
+
 (() => {
   "use strict";
 

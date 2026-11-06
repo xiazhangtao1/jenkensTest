@@ -76,6 +76,9 @@ def main():
     date_version = f'{today.year % 100:02d}.{today.month}.{today.day}'
     assert meta['chartVersion'] == (args.chart_version or date_version)
     assert meta['appVersion'] == (args.app_version or date_version)
+    actual_params = {p['name']: p['value'] for action in build['actions'] for p in action.get('parameters', [])}
+    assert actual_params['CHART_VERSION'] == meta['chartVersion']
+    assert actual_params['APP_VERSION'] == meta['appVersion']
     record('精确提交、构建人、时间、日期版本及编译镜像', meta)
     expected = {'xcn-runtime.tar', 'xcn-webui.tar', 'xcn-monitor.tar', f'xcn-{meta["chartVersion"]}.tgz'}
     assert {item['name'] for item in meta['files']} == expected

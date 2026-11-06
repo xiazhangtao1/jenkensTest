@@ -22,6 +22,7 @@ if (!isOpen5gs && !(target in (kind == 'service' ? cfg.services + ['all', 'servi
 if (!ref || ref.startsWith('-') || ref.contains('\n')) error('非法 Git 引用')
 if (needsDocker && !(imageTag ==~ /[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}/)) error('非法镜像标签')
 if (isOpen5gs && !(chartVersion ==~ /(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?/)) error('非法 Chart 版本，请使用不带前导零的 SemVer')
+if (isOpen5gs) XranCompiler.recordVersions(currentBuild.rawBuild, [CHART_VERSION: chartVersion, APP_VERSION: imageTag])
 def trigger = currentBuild.rawBuild.getCause(hudson.model.Cause.UserIdCause)
 def started = currentBuild.startTimeInMillis
 def metadata = [buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, job: env.JOB_NAME, project: project,
