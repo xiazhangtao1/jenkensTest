@@ -5,7 +5,6 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition
 import hudson.model.ParametersDefinitionProperty
 import hudson.model.ChoiceParameterDefinition
 import hudson.model.StringParameterDefinition
-import hudson.model.BooleanParameterDefinition
 import hudson.triggers.TimerTrigger
 import hudson.security.AuthorizationMatrixProperty
 import org.jenkinsci.plugins.matrixauth.inheritance.NonInheritingStrategy
@@ -49,11 +48,10 @@ open5gs.addProperty(new ParametersDefinitionProperty([
         ([cfg.compilerImagePullPolicy ?: 'Always'] + ['Always', 'IfNotPresent', 'Never']).unique() as String[], '拉取策略'),
     new ChoiceParameterDefinition('REF_TYPE', ['branch', 'tag', 'commit'] as String[], '引用类型'),
     new StringParameterDefinition('GIT_REF', 'main', '分支名、tag 或 commit SHA'),
-    new BooleanParameterDefinition('OFFLINE', cfg.open5gs.offline == true, '离线构建'),
-    new StringParameterDefinition('CHART_VERSION', '', 'Chart 版本，默认当天日期（无前导零）'),
-    new StringParameterDefinition('APP_VERSION', '', '应用版本，默认当天日期（无前导零）')
+    new StringParameterDefinition('CHART_VERSION', '', 'Chart 版本，默认当天日期'),
+    new StringParameterDefinition('APP_VERSION', '', '应用版本，默认当天日期')
 ]))
-open5gs.description = 'open5gs 发布构建：三个镜像包和一个 Helm Chart。默认 main；当前闭环使用 open5gs-basev277-develop，并取消离线构建。版本留空按上海时区的构建日期生成。'
+open5gs.description = 'open5gs 发布构建：三个镜像包和一个 Helm Chart。默认 main；版本留空按上海时区的构建日期生成。'
 open5gs.save()
 // Repair only empty historical versions, using that build's actual metadata.
 // Completed runs without metadata or with explicit values remain untouched.

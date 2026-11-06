@@ -59,7 +59,7 @@ make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.
 
 ## 使用
 
-以下为 X-RAN-CLOUD。open5gs 独立入口、版本日期、OFFLINE、四个产物及资源配置见 [open5gs 发布构建](docs/open5gs.md)。
+以下为 X-RAN-CLOUD。open5gs 独立入口、版本日期、管理员离线模式配置、四个产物及资源配置见 [open5gs 发布构建](docs/open5gs.md)。
 
 1. 填写公共参数 COMPILER_IMAGE，选择 COMPILER_IMAGE_PULL_POLICY；分别默认为上述编译镜像和 Always。
 2. 选择 BUILD_KIND=service 或 image。

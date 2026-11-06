@@ -2,6 +2,10 @@ import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
+import tempfile
+from unittest.mock import patch
+
+import yaml
 
 REPO = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('ci', REPO / 'scripts/ci.py')
@@ -63,6 +67,36 @@ class ConfigurationTests(unittest.TestCase):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False))
         self.assertEqual(cfg['builderImage'], '192.168.10.35/xnet/xran-compile:latest')
         self.assertEqual(cfg['compilerImagePullPolicy'], 'Always')
+        self.assertIs(cfg['open5gs']['offline'], True)
+
+    def test_open5gs_mode_is_a_site_setting(self):
+        source = yaml.safe_load((REPO / 'config/site.yaml').read_text())
+        with tempfile.TemporaryDirectory() as directory:
+            site = Path(directory) / 'site.yaml'
+            args = SimpleNamespace(site=site, namespace=None, offline=False)
+            for value in [None, True, False, 'false', 0]:
+                with self.subTest(value=value):
+                    if value is None:
+                        source['open5gs'].pop('offline', None)
+                    else:
+                        source['open5gs']['offline'] = value
+                    site.write_text(yaml.safe_dump(source))
+                    if isinstance(value, bool) or value is None:
+                        cfg = ci.config(args)
+                        self.assertIs(cfg['open5gs']['offline'], True if value is None else value)
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'open5gs.offline'):
+                            ci.config(args)
+
+            hashes = []
+            for value in [True, False]:
+                source['open5gs']['offline'] = value
+                site.write_text(yaml.safe_dump(source))
+                with patch.object(ci, 'state_dir', return_value=Path(directory)):
+                    ci.render(args)
+                values = yaml.safe_load((Path(directory) / 'values.yaml').read_text())
+                hashes.append(values['controller']['podAnnotations']['xran-ci/site-sha256'])
+            self.assertNotEqual(*hashes)  # A mode change must roll out with the new ConfigMap.
 
     def test_small_temporary_storage_has_valid_requests_and_limits(self):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False))

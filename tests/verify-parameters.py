@@ -28,7 +28,8 @@ def main():
     original = json.loads(admin.script("println(groovy.json.JsonOutput.toJson(jenkins.model.Jenkins.get().getItem('open5gs').definition.script));return null"))
     expected_source = '\n'.join((ROOT / 'jenkins' / name).read_text() for name in ['storage.groovy', 'compiler.groovy', 'pipeline.groovy'])
     assert original == expected_source, '部署脚本与当前仓库不一致'
-    report = {'namespace': cfg['namespace'], 'checks': []}
+    expected_offline = cfg['open5gs'].get('offline', True)
+    report = {'namespace': cfg['namespace'], 'offline': expected_offline, 'checks': []}
     numbers = []
 
     def record(name, details):
@@ -46,11 +47,16 @@ def main():
              ({'CHART_VERSION': '4.5.6', 'APP_VERSION': ''}, '4.5.6', None),
              ({'CHART_VERSION': ' 5.6.7 ', 'APP_VERSION': ' release-test '}, '5.6.7', 'release-test')]
     try:
+        definitions = admin.get(admin.job_path + 'api/json?tree=property[parameterDefinitions[name]]')
+        names = [p['name'] for prop in definitions['property'] for p in prop.get('parameterDefinitions', [])]
+        assert 'OFFLINE' not in names and len(names) == 6, names
         marker = "lock(label: 'xran-build-slot', quantity: 1) {"
         assert marker in original
         admin.set_pipeline(original.replace(marker, marker + "\n echo('parameter-verification-only'); return\n", 1))
         for values, chart, app in cases:
-            number = builder.wait_number(builder.trigger(dict(REF_TYPE='branch', GIT_REF='main', OFFLINE='false', **values)))
+            # An old client supplying the opposite mode cannot override site configuration.
+            number = builder.wait_number(builder.trigger(dict(REF_TYPE='branch', GIT_REF='main',
+                OFFLINE=str(not expected_offline).lower(), **values)))
             numbers.append(number)
             build = builder.wait(number, timeout=120)
             assert build['result'] == 'SUCCESS', builder.console(number)
@@ -59,10 +65,13 @@ def main():
             date_version = f'{started.year % 100:02d}.{started.month}.{started.day}'
             assert submitted['CHART_VERSION'] == (chart or date_version), submitted
             assert submitted['APP_VERSION'] == (app or date_version), submitted
-            assert submitted['OFFLINE'] is False and submitted['GIT_REF'] == 'main'
+            assert 'OFFLINE' not in submitted and submitted['GIT_REF'] == 'main'
+            metadata = json.loads(admin.script("println(new File(jenkins.model.Jenkins.get().getItem('open5gs').getBuildByNumber(" +
+                str(number) + ").rootDir,'xran-metadata.json').text);return null"))
+            assert metadata['offline'] is expected_offline, metadata
             assert submitted['COMPILER_IMAGE_PULL_POLICY'] == 'Always'
             assert any(cause.get('userId') == 'builder1' for action in build['actions'] for cause in action.get('causes', []))
-            record('API 实际参数保存 #' + str(number), submitted)
+            record('API 实际参数保存及后台构建模式 #' + str(number), {'parameters': submitted, 'offline': metadata['offline']})
 
         support = '\n'.join((ROOT / 'jenkins' / name).read_text() for name in ['storage.groovy', 'compiler.groovy'])
         fixtures = ','.join(str(n) for n in numbers[:3] + [numbers[4]])

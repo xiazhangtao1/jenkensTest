@@ -11,7 +11,7 @@ def target = isOpen5gs ? 'release' : (kind == 'service' ? params.SERVICE_TARGET 
 def today = new Date(currentBuild.startTimeInMillis).format('yy.M.d', TimeZone.getTimeZone('Asia/Shanghai'))
 def chartVersion = isOpen5gs ? ((params.CHART_VERSION as String)?.trim() ?: today) : ''
 def imageTag = isOpen5gs ? ((params.APP_VERSION as String)?.trim() ?: today) : params.IMAGE_TAG as String
-def offline = isOpen5gs && params.OFFLINE == true
+def offline = isOpen5gs && cfg.open5gs.offline == true
 def needsDocker = kind != 'service'
 def compilerImage = (params.containsKey('COMPILER_IMAGE') ? params.COMPILER_IMAGE : cfg.builderImage) as String
 def compilerPolicy = (params.containsKey('COMPILER_IMAGE_PULL_POLICY') ? params.COMPILER_IMAGE_PULL_POLICY :

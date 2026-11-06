@@ -1,0 +1,188 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-11-06T10:38:41+0800",
+  "unitTestsPassed": 20,
+  "modeChecks": [
+    {
+      "offline": true,
+      "status": "PASS",
+      "namespace": "jenkins-open5gs-verify",
+      "builds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "oppositeClientParameterIgnored": true,
+      "actualVersionsSaved": true,
+      "historyMigration": {
+        "numbers": [
+          21,
+          22,
+          23,
+          25
+        ],
+        "explicitPreserved": true,
+        "missingMetadataSkipped": true,
+        "idempotent": true,
+        "reloadVerified": true
+      },
+      "pod": {
+        "uid": "4cf95fb7-46ff-4000-a5a3-de45d4b19566",
+        "siteSha256": "bce7a66bf35c99d49f174ab78eb7d404b7d4b98e4da1aadf256f17a269e32e7f"
+      }
+    },
+    {
+      "offline": false,
+      "status": "PASS",
+      "namespace": "jenkins-open5gs-verify",
+      "builds": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "oppositeClientParameterIgnored": true,
+      "actualVersionsSaved": true,
+      "historyMigration": {
+        "numbers": [
+          27,
+          28,
+          29,
+          31
+        ],
+        "explicitPreserved": true,
+        "missingMetadataSkipped": true,
+        "idempotent": true,
+        "reloadVerified": true
+      },
+      "pod": {
+        "uid": "cedde61c-3a31-471d-ae40-e4fe6d7368ab",
+        "siteSha256": "f668a79104f6101df9ffc0994f550bc144a3e9356560e54ce92604cb32f00fce"
+      }
+    }
+  ],
+  "configurationRolloutVerified": true,
+  "deployment": {
+    "status": "PASS",
+    "checkedAt": "2026-11-06T10:35:31+0800",
+    "controllerImage": "xran-ci/controller:2.580.2-10",
+    "offline": true,
+    "parameters": {
+      "COMPILER_IMAGE": "编译环境",
+      "COMPILER_IMAGE_PULL_POLICY": "拉取策略",
+      "REF_TYPE": "引用类型",
+      "GIT_REF": "分支名、tag 或 commit SHA",
+      "CHART_VERSION": "Chart 版本，默认当天日期",
+      "APP_VERSION": "应用版本，默认当天日期"
+    },
+    "historyRecordsUnchanged": 5,
+    "metadataHashesUnchanged": true,
+    "pipelineSha256": "665a65094f2c9fc54c80dea726779254b611dc0a38b6cd55aab2056401e307fe",
+    "acceptingBuilds": true
+  },
+  "browser": {
+    "status": "PASS",
+    "user": "builder1",
+    "checks": [
+      {
+        "name": "已有成功发布版本显示及实际复制粘贴",
+        "build": 1,
+        "versions": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6"
+        },
+        "secureContext": false,
+        "actualPaste": true
+      },
+      {
+        "name": "X-RAN-CLOUD 历史条件显示与 HTTP 复制",
+        "number": 43,
+        "kind": "service",
+        "visible": [
+          "SERVICE_TARGET"
+        ],
+        "actualPaste": true
+      },
+      {
+        "name": "X-RAN-CLOUD 历史条件显示与 HTTP 复制",
+        "number": 35,
+        "kind": "image",
+        "visible": [
+          "IMAGE_TARGET",
+          "IMAGE_TAG"
+        ],
+        "actualPaste": true
+      },
+      {
+        "name": "open5gs 表单六个参数、默认版本及精简说明",
+        "names": [
+          "COMPILER_IMAGE",
+          "COMPILER_IMAGE_PULL_POLICY",
+          "REF_TYPE",
+          "GIT_REF",
+          "CHART_VERSION",
+          "APP_VERSION"
+        ],
+        "defaults": {
+          "CHART_VERSION": "26.11.6",
+          "APP_VERSION": "26.11.6"
+        },
+        "descriptions": {
+          "CHART_VERSION": "Chart 版本，默认当天日期",
+          "APP_VERSION": "应用版本，默认当天日期"
+        },
+        "offlineRemoved": true
+      },
+      {
+        "name": "X-RAN-CLOUD 新建表单双向切换及输入保留"
+      },
+      {
+        "name": "普通用户首页权限及维护提示隔离",
+        "jobs": [
+          "open5gs",
+          "x-ran-cloud"
+        ]
+      }
+    ]
+  },
+  "existingReleaseRecheck": {
+    "number": 1,
+    "status": "PASS",
+    "offline": false,
+    "checks": [
+      {
+        "name": "精确提交、构建人、时间、日期版本及编译镜像",
+        "status": "PASS"
+      },
+      {
+        "name": "普通账号下载四个产物及 SHA256 完整性",
+        "status": "PASS"
+      },
+      {
+        "name": "Helm lint 与模板渲染",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-runtime 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-webui 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-monitor 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "推送状态如实记录；非致命 push 失败仍保留有效产物",
+        "status": "PASS"
+      }
+    ]
+  }
+}

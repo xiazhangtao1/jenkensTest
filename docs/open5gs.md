@@ -8,7 +8,6 @@
 | COMPILER_IMAGE_PULL_POLICY | `Always`，可选 `IfNotPresent`、`Never` |
 | REF_TYPE | `branch`，可选 `tag`、`commit` |
 | GIT_REF | `main`，支持完整或唯一短 commit SHA |
-| OFFLINE | 勾选；给业务脚本增加 `--offline` |
 | CHART_VERSION | 当天上海日期，如 `26.11.6`；无前导零的 SemVer |
 | APP_VERSION | 同上，可单独填写 Docker tag |
 
@@ -16,13 +15,24 @@
 
 HTTP 访问时，历史 Parameters 页的复制按钮使用浏览器兼容方式；HTTPS 下保留 Jenkins 原生复制功能。
 
-当前外网闭环选择 `open5gs-basev277-develop`，取消 OFFLINE。该分支已有发布入口；目前 `main` 缺少此入口，选择它会明确失败，不会切换分支，也不修改业务仓库。
+离线模式由管理员在 `config/site.yaml` 统一配置，默认开启，构建表单不再提供 `OFFLINE`：
+
+```yaml
+open5gs:
+  offline: true
+```
+
+`true` 给业务脚本增加 `--offline`；外网调试时管理员可改为 `false`。修改后，在没有运行构建时执行 `make deploy`；站点配置变更会触发 Controller 更新。
+普通用户和旧 API 客户端传入的 `OFFLINE` 不影响此配置。每次构建的实际模式仍记录在摘要和 `metadata.json` 中；已有历史按原值保留。
+这里控制的是业务脚本的 `--offline`，与部署工具自身的 `--offline`（基础设施拉取策略和网络配置）分别设置。
+
+外网闭环使用 `open5gs-basev277-develop`，由管理员将上述配置设为 `false`。该分支已有发布入口；目前 `main` 缺少此入口，选择它会明确失败，不会切换分支，也不修改业务仓库。
 
 流水线精确检出后，在所选提交的 `helm` 目录执行：
 
 ```bash
 ./build-release.sh --offline 26.11.6 26.11.6
-# 外网验证取消 OFFLINE 后执行：
+# 管理员配置 open5gs.offline: false 时执行：
 ./build-release.sh 26.11.6 26.11.6
 ```
 
@@ -44,17 +54,18 @@ open5gs 的嵌套 Docker build 额度为 3GiB、并行 2，给 DinD daemon 留�
 迁移时配置 `config/site.yaml` 的 `open5gs.gitUrl`、Git/Registry 凭据及基础镜像。
 `ubuntuImage`、`vppImage` 须与该业务提交 Dockerfile/build 脚本使用的镜像引用一致。
 
-真实验证（默认使用 develop 和已导入镜像，不会修改业务源码）：
+真实验证（默认使用 develop 和已导入镜像，构建模式跟随站点配置，不会修改业务源码）：
 
 ```bash
 python3 tests/verify-open5gs.py
 # 接续已有长时间构建并检查下载产物：
-python3 tests/verify-open5gs.py --number 1
+python3 tests/verify-open5gs.py --number 1 --online
 ```
 
 脚本实际下载四个文件、校验 SHA256，执行 Helm lint/template，导入并断网检查三个镜像。
 Chart 要求显式站点网络地址，渲染默认读取所选提交的 `helm/tests/site-values.yaml`，也可用 `--values /路径/values.yaml` 指定。
 测试 values 只用于渲染检查，不部署业务。结果位于 `.state/jenkins/open5gs-release.json`。
+`--offline` / `--online` 仅断言预期模式，不会改变 Jenkins 后台配置。
 
 默认版本保存与历史回填的专项验收使用 `python3 tests/verify-parameters.py --site /路径/验收-site.yaml`。
 该脚本只接受带 `verificationInstance: true` 的独立命名空间，在槽位内跳过业务编译，并在结束时恢复流水线定义。

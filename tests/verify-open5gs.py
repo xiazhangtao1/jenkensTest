@@ -29,7 +29,11 @@ def main():
     parser.add_argument('--number', type=int)
     parser.add_argument('--ref-type', choices=['branch', 'tag', 'commit'], default='branch')
     parser.add_argument('--ref', default='open5gs-basev277-develop')
-    parser.add_argument('--offline', action='store_true')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--offline', dest='expected_offline', action='store_true', default=None,
+                      help='断言构建为离线模式；不覆盖站点配置')
+    mode.add_argument('--online', dest='expected_offline', action='store_false',
+                      help='断言构建为在线模式；不覆盖站点配置，可用于检查旧历史')
     parser.add_argument('--chart-version', default='')
     parser.add_argument('--app-version', default='')
     parser.add_argument('--compiler-image', default='192.168.10.35/xnet/xran-compile:latest')
@@ -38,11 +42,12 @@ def main():
     parser.add_argument('--values', help='Helm 渲染验收 values；默认使用所选提交的 helm/tests/site-values.yaml')
     args = parser.parse_args()
     cfg = yaml.safe_load(Path(args.site).read_text())
+    expected_offline = cfg['open5gs'].get('offline', True) if args.expected_offline is None else args.expected_offline
     state = ROOT / '.state' / cfg['namespace']
     users = json.loads((state / 'users.json').read_text())
     api = JenkinsAPI(cfg['jenkinsUrl'], 'builder1', users['BUILDER1_PASSWORD'], job='open5gs')
     params = dict(COMPILER_IMAGE=args.compiler_image, COMPILER_IMAGE_PULL_POLICY=args.pull_policy,
-                  REF_TYPE=args.ref_type, GIT_REF=args.ref, OFFLINE=str(args.offline).lower(),
+                  REF_TYPE=args.ref_type, GIT_REF=args.ref,
                   CHART_VERSION=args.chart_version, APP_VERSION=args.app_version)
     number = args.number or api.wait_number(api.trigger(params))
     target = state / 'downloads' / 'open5gs' / str(number)
@@ -71,7 +76,7 @@ def main():
     assert meta['userId'] == 'builder1' and meta['project'] == 'open5gs'
     assert meta['result'] == 'SUCCESS' and meta['durationMillis'] > 0 and meta['finishedAt']
     assert meta['builderImage'] == args.compiler_image and meta['builderImageId']
-    assert meta['builderImagePullPolicy'] == args.pull_policy and meta['offline'] == args.offline
+    assert meta['builderImagePullPolicy'] == args.pull_policy and meta['offline'] is expected_offline
     today = dt.datetime.fromisoformat(meta['startedAt']).astimezone(ZoneInfo('Asia/Shanghai'))
     date_version = f'{today.year % 100:02d}.{today.month}.{today.day}'
     assert meta['chartVersion'] == (args.chart_version or date_version)

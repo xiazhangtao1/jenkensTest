@@ -68,6 +68,9 @@ def config(args):
     cfg.setdefault('dindMemoryGiB', 4)
     assert 2 <= int(cfg['dindMemoryGiB']) < int(cfg['buildMemoryGiB']) - 1
     cfg.setdefault('open5gs', {})
+    cfg['open5gs'].setdefault('offline', True)
+    if not isinstance(cfg['open5gs']['offline'], bool):
+        raise ValueError('open5gs.offline 必须为 YAML 布尔值 true 或 false')
     cfg['open5gs'].setdefault('innerBuildMemoryGiB', 3)
     assert 1 <= int(cfg['open5gs']['innerBuildMemoryGiB']) < int(cfg['dindMemoryGiB'])
     cfg['agentStartupTimeoutMinutes'] = int(cfg['agentStartupTimeoutMinutes'])
@@ -346,7 +349,8 @@ def render(args):
         'image': {'registry': 'docker.io', 'repository': cfg['controllerImage'].split(':')[0],
                   'tag': cfg['controllerImage'].rsplit(':', 1)[1], 'pullPolicy': 'Never' if cfg.get('offline') else 'IfNotPresent'},
         'numExecutors': 0, 'installPlugins': False, 'additionalPlugins': [],
-        'podAnnotations': {'xran-ci/image-id': cfg['imageIds'].get(cfg['controllerImage'], 'unlocked')},
+        'podAnnotations': {'xran-ci/image-id': cfg['imageIds'].get(cfg['controllerImage'], 'unlocked'),
+                           'xran-ci/site-sha256': hashlib.sha256(runtime['site.json'].encode()).hexdigest()},
         'sidecars': {'configAutoReload': {'enabled': False}}, 'initializeOnce': False,
         'testEnabled': False, 'agentListenerEnabled': False,
         'serviceType': 'NodePort', 'nodePort': int(cfg['nodePort']), 'jenkinsUrl': cfg['jenkinsUrl'],
