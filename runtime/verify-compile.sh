@@ -2,6 +2,10 @@
 set -euo pipefail
 sdk_check_dir=$(mktemp -d)
 trap 'rm -rf "$sdk_check_dir"' EXIT
+for package in protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1 uuid-dev; do
+    test "$(dpkg-query -W -f='${Status}' "$package")" = 'install ok installed'
+done
+test -z "$(dpkg --verify protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1)"
 cmake -S /opt/xran/compile-check -B "$sdk_check_dir" -G Ninja
 cmake --build "$sdk_check_dir" --parallel 2
 ctest --test-dir "$sdk_check_dir" --output-on-failure
@@ -14,6 +18,15 @@ protoc-c --version
 asn1c -version
 protoc-c --proto_path=/opt/xran/compile-check --c_out="$sdk_check_dir" /opt/xran/compile-check/check.proto
 gcc -c "$sdk_check_dir/check.pb-c.c" $(pkg-config --cflags libprotobuf-c) -o "$sdk_check_dir/check.pb-c.o"
+cat > "$sdk_check_dir/protobuf-c-runtime.c" <<'C'
+#include <protobuf-c/protobuf-c.h>
+int main(void) {
+    return protobuf_c_version_number() == PROTOBUF_C_VERSION_NUMBER ? 0 : 1;
+}
+C
+# Also exercise standard include/library paths used by legacy build scripts.
+gcc "$sdk_check_dir/protobuf-c-runtime.c" -lprotobuf-c -o "$sdk_check_dir/protobuf-c-runtime"
+"$sdk_check_dir/protobuf-c-runtime"
 mkdir "$sdk_check_dir/asn1"
 printf 'Check DEFINITIONS ::= BEGIN Value ::= INTEGER END\n' > "$sdk_check_dir/asn1/check.asn1"
 (cd "$sdk_check_dir/asn1" && asn1c -pdu=all -fcompound-names check.asn1 > generation.log 2>&1)

@@ -55,6 +55,8 @@ COPY runtime/run-build.py /opt/xran/run-build.py
 COPY runtime/demo-server.py /opt/xran/demo-server.py
 COPY runtime/compile-check/ /opt/xran/compile-check/
 COPY runtime/verify-compile.sh /opt/xran/verify-compile.sh
+COPY docker/package-protobuf-c.sh /opt/xran/package-protobuf-c.sh
+RUN bash /opt/xran/package-protobuf-c.sh
 USER 1000:1000
 WORKDIR /home/jenkins/agent
 CMD ["sleep", "infinity"]

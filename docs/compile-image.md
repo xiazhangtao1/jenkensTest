@@ -38,8 +38,14 @@ protobuf、gRPC、Abseil、OpenTelemetry 和 spdlog 同时提供共享库与静�
 APT 包拆为通用工具、编译依赖和额外运行工具清单；后者提供 xcn 发布需要的 PyYAML。
 Helm 3.17.3 二进制及 SHA256 固定于 `config/helm.lock.json`，缓存随离线包交付。
 protobuf、gRPC、Boost 使用上述源码版本，避免再安装 APT 中不同版本的开发库。
+protobuf-c 1.5.2 的现有工具、头文件和运行库由 `docker/package-protobuf-c.sh` 打成真实的
+`protobuf-c-compiler`、`libprotobuf-c-dev`、`libprotobuf-c1` 软件包，再通过 `dpkg --install` 安装。
+这样原业务脚本的 `dpkg -s` 检查可以通过，无需进入 `read` / `sudo apt-get` 交互安装。
+软件包包含实际 SDK 文件、许可证和校验值，保留 `/usr/local/protobuf-c-1.5.2` 路径，
+同时提供标准 `/usr/bin`、`/usr/include` 和多架构库目录入口；版本仍为 1.5.2。
+这些软件包用于完整 SDK 镜像，编译器的 protobuf 3.21.11 依赖由该镜像提供。
 Docker `ENV` 设置 PATH、PKG_CONFIG_PATH、CMAKE_PREFIX_PATH，动态库通过 ldconfig 配置，非交互 Jenkins shell 可以直接使用。
-DPDK 源码和 build 路径保留在 `/opt/dpdk-22.03`。镜像内 `/opt/packages.lock` 记录实际 APT 包版本，
+DPDK 源码和 build 路径保留在 `/opt/dpdk-22.03`。镜像内 `/opt/packages.lock` 记录 APT 及源码生成的软件包版本，
 `/opt/xran/compile-sources.lock.json` 记录源码依赖。
 默认使用已安装 SDK 的 pkg-config 文件，避免 DPDK 的 uninstalled 元数据引用可选构建目录导致 CMake 拒绝配置。
 
@@ -58,7 +64,22 @@ docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/
 已有完整缓存可以用于断网安装。需要新增或调整 APT 依赖时，应在能够访问所选软件源的准备机上重新制作缓存和离线包。
 
 验证脚本以镜像默认 UID/GID 1000 执行 protobuf 代码生成、主要 SDK 的编译/链接/运行、ASN.1 工具和共享库加载检查。
+还会检查上述软件包的安装状态及实际文件校验值，并用标准 include/library 路径验证 protobuf-c 头文件与运行库一致。
 完整 Jenkins 镜像构建、渲染和离线打包支持同样的 `IMAGE_NAME` / `IMAGE_TAG` 参数，定制版本时各命令应使用相同参数。
+
+已部署环境可使用新 tag 验证这次兼容修复：
+旧离线项目副本需先同步本次源码修改；修复镜像交付目录中的 `source.patch` 可在项目根目录通过
+`git apply --check 补丁路径/source.patch` 检查，再用 `git apply 补丁路径/source.patch` 应用。
+
+```bash
+make compile-image OFFLINE=1 IMAGE_TAG=26.11.08-protobufc
+docker run --rm --network none 192.168.10.35/xnet/xran-compile:26.11.08-protobufc bash /opt/xran/verify-compile.sh
+make push-compile-image IMAGE_TAG=26.11.08-protobufc
+```
+
+迁移时拷贝 `dist/compile/192.168.10.35_xnet_xran-compile_26.11.08-protobufc/image.tar`，
+在内网执行 `docker load -i 文件路径` 后推送同名镜像到 Harbor。
+Jenkins 构建参数 `COMPILER_IMAGE` 填该完整新版本地址，拉取策略使用 `Always` 即可，无需重新部署 Jenkins。
 
 ## Jenkins 每次构建选择
 
