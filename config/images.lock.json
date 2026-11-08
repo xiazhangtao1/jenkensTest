@@ -1,6 +1,6 @@
 {
-  "xran-ci/controller:2.580.2-16": "sha256:4dd3746222a33b98428259c4718a67b552ad499c22cc3ba1a5f707d3e185cb04",
-  "192.168.10.35/xnet/xran-compile:latest": "sha256:a059be1d36b0441a417918ae533c0b5ad37ed1680427dd0db1ebd26dd057d5a5",
+  "xran-ci/controller:2.580.2-17": "sha256:7865f1142fcd719bda3a6b937cf9d4a2ef11f5b8d1e615d6b0d229ae1bc29aa5",
+  "192.168.10.35/xnet/xran-compile:latest": "sha256:7fcfcb7cffccfea8c911ac93d3de42f108257a7e3fbbce676291e9240a688ca4",
   "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
   "docker:29.9.3-dind": "sha256:51d0681aa1e6756df485af7922fbaf9bd73275db418900c713b564bc94f94175",
   "xran-ci/xcn-bases:1": "sha256:9b5190e74cf3021633ab3c71ca5b875155459942b2207688fe87f603d1aa4eb0",
@@ -8,6 +8,6 @@
   "registry:2.8.3": "sha256:26b2eb03618e749084668eaff68cff8f81dda12d06ac641be7a6398b82a6f25b",
   "rancher/local-path-provisioner:v0.0.37": "sha256:683316f41426e4fc774e1cd7388e3bcbd5d4d63837753a789d929d64365c399a",
   "busybox:1.37.0": "sha256:30ecbe1509090b38ef3260f3609d64d8261230464eaa4d235901db496e9647fb",
-  "192.168.10.35/xnet/xran-compile:26.11.08-compat": "sha256:a059be1d36b0441a417918ae533c0b5ad37ed1680427dd0db1ebd26dd057d5a5",
-  "192.168.10.35/xnet/xran-compile:26.11.08-sdk": "sha256:e29c000f633b10b76a1571a3b33fe690716f3ee7db85a57e92362d87d33c6e0b"
+  "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2": "sha256:7fcfcb7cffccfea8c911ac93d3de42f108257a7e3fbbce676291e9240a688ca4",
+  "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2": "sha256:452ecad8aea4cbc645599867d64b4e13697a6f38796a31d5162945ee89e226f8"
 }

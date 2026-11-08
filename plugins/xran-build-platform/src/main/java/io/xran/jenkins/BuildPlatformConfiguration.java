@@ -6,6 +6,7 @@ import hudson.model.ParameterDefinition;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Run;
 import hudson.model.StringParameterDefinition;
+import hudson.security.AuthorizationMatrixProperty;
 import hudson.util.AtomicFileWriter;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -26,6 +27,7 @@ import net.sf.json.JSONObject;
 import org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud;
 import org.jenkins.plugins.lockableresources.LockableResourcesManager;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.jenkinsci.plugins.matrixauth.inheritance.NonInheritingStrategy;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
@@ -45,7 +47,7 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
                     state.put("settings", PlatformSettings.validate(upgraded));
                     state.put("version", state.optLong("version") + 1);
                     state.put("applyError", "等待应用配置");
-                    audit(before, upgraded, "build-compatibility-upgrade");
+                    audit(before, upgraded, before.containsKey("xranServiceSerial") ? "job-visibility-upgrade" : "build-compatibility-upgrade");
                     persist();
                 }
             }
@@ -201,6 +203,7 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
 
     private void apply() throws IOException {
         try {
+            updateVisibility(); // Access restrictions must not depend on Kubernetes availability.
             int cap = settings().getInt("concurrency");
             boolean found = false;
             for (var cloud : Jenkins.get().clouds) {
@@ -229,6 +232,57 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
             state.put("applyError", "应用失败：" + e.getClass().getSimpleName() + ": " + e.getMessage());
         }
         persist();
+    }
+
+    private JSONObject authorizationBackups() {
+        if (!state.containsKey("authorizationBackups")) state.put("authorizationBackups", new JSONObject());
+        return state.getJSONObject("authorizationBackups");
+    }
+
+    private boolean adminOnly(String job) {
+        return job.equals("storage-maintenance") || settings().getBoolean(job.equals("xcn") ? "xcnAdminOnly" : "xranAdminOnly");
+    }
+
+    private static boolean restricted(WorkflowJob job) {
+        var property = job.getProperty(AuthorizationMatrixProperty.class);
+        return property != null && property.getInheritanceStrategy() instanceof NonInheritingStrategy
+                && property.getGrantedPermissionEntries().isEmpty();
+    }
+
+    private void updateVisibility() throws IOException {
+        JSONObject backups = authorizationBackups();
+        for (String name : List.of("x-ran-cloud", "xcn", "storage-maintenance")) {
+            WorkflowJob job = Jenkins.get().getItemByFullName(name, WorkflowJob.class);
+            if (job == null) continue;
+            var property = job.getProperty(AuthorizationMatrixProperty.class);
+            if (adminOnly(name)) {
+                if (!name.equals("storage-maintenance") && !backups.containsKey(name)) {
+                    JSONObject backup = new JSONObject();
+                    backup.put("present", property != null);
+                    if (property != null) backup.put("xml", Jenkins.XSTREAM2.toXML(property));
+                    backups.put(name, backup);
+                    persist(); // Save the original ACL before changing the job.
+                }
+                if (!restricted(job)) {
+                    job.removeProperty(AuthorizationMatrixProperty.class);
+                    job.addProperty(new AuthorizationMatrixProperty(Map.of(), new NonInheritingStrategy()));
+                    job.save();
+                }
+            } else if (backups.containsKey(name)) {
+                JSONObject backup = backups.getJSONObject(name);
+                AuthorizationMatrixProperty restored = null;
+                if (backup.getBoolean("present")) {
+                    Object decoded = Jenkins.XSTREAM2.fromXML(backup.getString("xml"));
+                    if (!(decoded instanceof AuthorizationMatrixProperty)) throw new IllegalStateException("项目权限备份类型不正确：" + name);
+                    restored = (AuthorizationMatrixProperty) decoded;
+                }
+                job.removeProperty(AuthorizationMatrixProperty.class);
+                if (restored != null) job.addProperty(restored);
+                job.save();
+                backups.remove(name);
+                persist();
+            }
+        }
     }
 
     private void updateDefaults() throws IOException {
@@ -323,6 +377,12 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
                     drift |= slot.getLabelsAsList().contains("xran-build-slot");
                 }
             }
+        }
+        for (String name : List.of("x-ran-cloud", "xcn", "storage-maintenance")) {
+            WorkflowJob job = Jenkins.get().getItemByFullName(name, WorkflowJob.class);
+            if (job != null) drift |= adminOnly(name) ? !restricted(job) ||
+                    (!name.equals("storage-maintenance") && !authorizationBackups().containsKey(name))
+                    : authorizationBackups().containsKey(name);
         }
         if (!cloudFound || drift) apply();
     }

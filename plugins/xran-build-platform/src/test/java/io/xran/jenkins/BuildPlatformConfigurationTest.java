@@ -162,7 +162,15 @@ public class BuildPlatformConfigurationTest {
         assertTrue(page.asNormalizedText().contains("构建平台设置"));
         assertTrue(page.asNormalizedText().contains("xcn 离线构建"));
         assertTrue(page.asNormalizedText().contains("X-RAN-CLOUD 服务编译串行执行"));
+        assertTrue(page.asNormalizedText().contains("X-RAN-CLOUD 仅管理员可见"));
+        assertTrue(page.asNormalizedText().contains("xcn 仅管理员可见"));
         assertFalse(page.asNormalizedText().contains("open5gs"));
+        for (String field : new String[]{"xranAdminOnly", "xcnAdminOnly"}) {
+            var input = (org.htmlunit.html.HtmlCheckBoxInput)page.getFirstByXPath("//input[@type='checkbox' and contains(@name,'" + field + "')]");
+            assertNotNull(input);
+            input.setChecked(true);
+            expected.put(field, true);
+        }
         try { j.submit(page.getFormByName("config")); }
         catch (org.htmlunit.FailingHttpStatusCodeException error) {
             System.err.println(error.getResponse().getContentAsString());

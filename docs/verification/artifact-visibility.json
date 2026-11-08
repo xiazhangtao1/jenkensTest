@@ -1,0 +1,842 @@
+{
+  "date": "2026-11-08",
+  "status": "PASS",
+  "scope": "独立实例验收；主 Jenkins 不变；X-RAN-CLOUD 使用模拟业务仓库",
+  "controller": {
+    "image": "xran-ci/controller:2.580.2-17",
+    "imageId": "sha256:7865f1142fcd719bda3a6b937cf9d4a2ef11f5b8d1e615d6b0d229ae1bc29aa5"
+  },
+  "python": {
+    "command": "python3 -m unittest discover -s tests",
+    "tests": 36,
+    "status": "PASS"
+  },
+  "plugin": {
+    "id": "xran-build-platform",
+    "version": "1.0.5",
+    "jenkinsVersion": "2.580.2",
+    "buildImage": "maven:3.9.9-eclipse-temurin-21-jammy",
+    "buildImageId": "sha256:68040fabda675295f5fc7be086c1cfb5af560720af6d1794c434496471e0e8c6",
+    "sourceSha256": "8358b179a93251312c303736795b185d5fefb66fd465ca7cbbbce960649a09b3",
+    "sha256": "9df00204cd0c7182efa7e398d75a317de0e4d7bdd01ad3024b6168271ce319ec",
+    "classMajor": 65,
+    "dependencies": "lockable-resources:1582.v54e3b_a_8eda_3a_,kubernetes:4560.vc25b_83890c34,workflow-job:1622.vc41c189cb_e5f,matrix-auth:3.3",
+    "tests": {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "spotbugs": 0,
+    "buildNetwork": "none",
+    "status": "PASS"
+  },
+  "compilerImages": [
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+      "imageId": "sha256:7fcfcb7cffccfea8c911ac93d3de42f108257a7e3fbbce676291e9240a688ca4",
+      "createdAt": "2026-11-08T13:08:40.697985216Z",
+      "dockerfile": "docker/builder-compat.Dockerfile",
+      "dockerfileSha256": "b8af2dd04e4636688743ff1d27f8f5a4fa18d0b22b43372ee1a198ec66a2a406",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.3.3",
+        "pkgconf": "1.8.0"
+      },
+      "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+      "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+      "extraAptManifestSha256": "1f972ef9bf089ed93a5154535f061804289c1503825e8cc8c90a2c4de749bd80",
+      "compatAptManifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1",
+      "bytes": 3441164800,
+      "sha256": "8347a311ec976cce31cbaa783bb6b53764d7f68ef2ad11bc56f69b18e817207f"
+    },
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+      "imageId": "sha256:452ecad8aea4cbc645599867d64b4e13697a6f38796a31d5162945ee89e226f8",
+      "createdAt": "2026-11-08T13:13:04.418682363Z",
+      "dockerfile": "docker/builder.Dockerfile",
+      "dockerfileSha256": "bc18f340e07e53f70a277aa0d8872c41c6550b96590d53bfd3f5a0e022e5bf83",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.5.2",
+        "pkgconf": "1.8.0"
+      },
+      "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+      "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+      "extraAptManifestSha256": "1f972ef9bf089ed93a5154535f061804289c1503825e8cc8c90a2c4de749bd80",
+      "compatAptManifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1",
+      "bytes": 3440252928,
+      "sha256": "864dec574e6fd073dbd2305e462dbee75d75c49a39e921bee9540a0e15b7474d"
+    }
+  ],
+  "compilerImageChecks": {
+    "status": "PASS",
+    "network": "none",
+    "uid": 1000,
+    "ctestPerImage": 2,
+    "additional": [
+      "真实 dpkg 状态、工具版本、生成代码编译/链接/运行",
+      "静态库、ASN.1 及动态库加载",
+      "两版均含 xranImageArchiveFallback:1",
+      "两套导出归档 SHA256"
+    ]
+  },
+  "runtimeImages": {
+    "count": 9,
+    "imageIds": {
+      "xran-ci/controller:2.580.2-17": "sha256:7865f1142fcd719bda3a6b937cf9d4a2ef11f5b8d1e615d6b0d229ae1bc29aa5",
+      "192.168.10.35/xnet/xran-compile:latest": "sha256:7fcfcb7cffccfea8c911ac93d3de42f108257a7e3fbbce676291e9240a688ca4",
+      "docker:29.9.3-dind": "sha256:51d0681aa1e6756df485af7922fbaf9bd73275db418900c713b564bc94f94175",
+      "registry:2.8.3": "sha256:26b2eb03618e749084668eaff68cff8f81dda12d06ac641be7a6398b82a6f25b",
+      "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
+      "xran-ci/xcn-bases:1": "sha256:9b5190e74cf3021633ab3c71ca5b875155459942b2207688fe87f603d1aa4eb0",
+      "xran-ci/demo:4": "sha256:9fb52ca80925cbc117c18fa153260d89b0bba1b01e1faf04d7ad8eadba827f84",
+      "rancher/local-path-provisioner:v0.0.37": "sha256:683316f41426e4fc774e1cd7388e3bcbd5d4d63837753a789d929d64365c399a",
+      "busybox:1.37.0": "sha256:30ecbe1509090b38ef3260f3609d64d8261230464eaa4d235901db496e9647fb"
+    },
+    "lockMatch": true
+  },
+  "imageArtifactExamples": [
+    {
+      "imageArchiveSource": "script",
+      "imageReference": "xran-registry:5000/xran-demo/imagea:verify-1794143943",
+      "imageId": "sha256:0c46481533ceb4514a30877b4ad059ca1b7c8a5f2b157d5f28c4186c19ad1cfd",
+      "result": "SUCCESS",
+      "pushStatus": "success",
+      "build": 32,
+      "files": [
+        {
+          "name": "imageA.tar",
+          "size": 80658944,
+          "sha256": "c37c8df364dd42f41602fb835f2d9a6d2a3448155345de12a84fdc14abd22a92"
+        }
+      ]
+    },
+    {
+      "imageArchiveSource": "script",
+      "imageReference": "xran-registry:5000/xran-demo/imageb:verify-1794143943",
+      "imageId": "sha256:b02ebf2ed7adfa66ea98b12eb6e881aba1085f26f2f6e5f51c2aa64ad05899a7",
+      "result": "SUCCESS",
+      "pushStatus": "success",
+      "build": 33,
+      "files": [
+        {
+          "name": "imageB.tar",
+          "size": 80658944,
+          "sha256": "034d063217b38539603b42465067b3983c8680e7d104be334498348a6e0b959d"
+        }
+      ]
+    },
+    {
+      "imageArchiveSource": "script",
+      "imageReference": "xran-registry:5000/xran-demo/imagec:verify-1794143943",
+      "imageId": "sha256:335c8f344ecc21d2478e48dd190c0c3e11c4109437ad4cb0c734b832d58a90fa",
+      "result": "SUCCESS",
+      "pushStatus": "success",
+      "build": 34,
+      "files": [
+        {
+          "name": "imageC.tar",
+          "size": 80658944,
+          "sha256": "28c2a2168500a75f4a368d92c85b8f5c102dd5ac62a5760409c3caf41600dd0c"
+        }
+      ]
+    },
+    {
+      "imageArchiveSource": "docker-save",
+      "imageReference": "xran-registry:5000/xran-demo/imagea:legacy-compat-1794144441745431108",
+      "imageId": "sha256:0f6d7b22b2aec014aa06121457f6b4c4cc67d2e5c39827b91c2cf2f0c47e7ff7",
+      "result": "SUCCESS",
+      "pushStatus": "success",
+      "build": 38,
+      "files": [
+        {
+          "name": "imageA.tar",
+          "size": 80658944,
+          "sha256": "75c80d9e84d63439c11178a0a8fd440fe340039a6b095934095d6b1d1d522ccb"
+        }
+      ]
+    },
+    {
+      "imageArchiveSource": "docker-save",
+      "imageReference": "xran-registry:5000/xran-demo/imagea:legacy-sdk-1794144503230394224",
+      "imageId": "sha256:a176111fc5a8cf6ab230336b1cf524b0c256681455b2a07f29912a57e83fb914",
+      "result": "SUCCESS",
+      "pushStatus": "success",
+      "build": 39,
+      "files": [
+        {
+          "name": "imageA.tar",
+          "size": 80658944,
+          "sha256": "c9c74b6b9b13812fe81caa7959f620fd1329a60b056933d8eb0aa4a1ecf89dec"
+        }
+      ]
+    },
+    {
+      "imageArchiveSource": "docker-save",
+      "imageReference": "127.0.0.1:1/xran-demo/imagea:legacy-push-1794145409623156896",
+      "imageId": "sha256:8ed30441affc43edc0e6d94c2da28155c46141519b8aa4b02a27416f425eff5e",
+      "result": "FAILURE",
+      "pushStatus": "failed-or-not-reached",
+      "build": 44,
+      "files": [
+        {
+          "name": "imageA.tar",
+          "size": 80658944,
+          "sha256": "d26874f9d77d37f83c4f0485acb907d6bd25c66788ecfdddb312efbd704e9e94"
+        }
+      ]
+    }
+  ],
+  "jenkins": {
+    "namespace": "jenkins-formal-verify",
+    "status": "PASS",
+    "startedAt": "2026-11-08T21:18:55+0800",
+    "finishedAt": "2026-11-08T21:52:58+0800",
+    "rawCheckCount": 40,
+    "uniqueCheckCount": 28,
+    "checks": [
+      {
+        "name": "全部插件启用",
+        "status": "PASS",
+        "details": {
+          "count": 74
+        }
+      },
+      {
+        "name": "匿名访问及普通账号管理权限受限",
+        "status": "PASS",
+        "details": null
+      },
+      {
+        "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+        "status": "PASS",
+        "details": {
+          "builder1": {
+            "visibleJobs": [
+              "x-ran-cloud",
+              "xcn"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "9/consoleText": 404,
+              "build": 404
+            }
+          },
+          "builder2": {
+            "visibleJobs": [
+              "x-ran-cloud",
+              "xcn"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "9/consoleText": 404,
+              "build": 404
+            }
+          }
+        }
+      },
+      {
+        "name": "serviceA 分支",
+        "status": "PASS",
+        "details": {
+          "build": 26,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "serviceB 演示分支",
+        "status": "PASS",
+        "details": {
+          "build": 27,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "serviceC tag",
+        "status": "PASS",
+        "details": {
+          "build": 28,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "带注释 tag",
+        "status": "PASS",
+        "details": {
+          "build": 29,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "services_all 历史完整 SHA",
+        "status": "PASS",
+        "details": {
+          "build": 30,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "唯一短 SHA",
+        "status": "PASS",
+        "details": {
+          "build": 31,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageA build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 32,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageB build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 33,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageC build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 34,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "不存在的 Git 引用明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 35
+        }
+      },
+      {
+        "name": "非法标签明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 36
+        }
+      },
+      {
+        "name": "push 失败仍能下载并运行有效镜像 tar",
+        "status": "PASS",
+        "details": {
+          "build": 37
+        }
+      },
+      {
+        "name": "compat 旧版仅生成镜像时自动导出并下载运行",
+        "status": "PASS",
+        "details": {
+          "build": 38,
+          "imageId": "sha256:0f6d7b22b2aec014aa06121457f6b4c4cc67d2e5c39827b91c2cf2f0c47e7ff7"
+        }
+      },
+      {
+        "name": "sdk 旧版仅生成镜像时自动导出并下载运行",
+        "status": "PASS",
+        "details": {
+          "build": 39,
+          "imageId": "sha256:a176111fc5a8cf6ab230336b1cf524b0c256681455b2a07f29912a57e83fb914"
+        }
+      },
+      {
+        "name": "corrupt 不发布错误镜像包",
+        "status": "PASS",
+        "details": {
+          "build": 41,
+          "errors": [
+            "镜像产物: file could not be opened successfully:\n- method gz: ReadError('not a gzip file')\n- method bz2: ReadError('not a bzip2 file')\n- method xz: ReadError('not an lzma file')\n- method tar: ReadError('truncated header')",
+            "构建没有产生有效产物"
+          ]
+        }
+      },
+      {
+        "name": "missing 不发布错误镜像包",
+        "status": "PASS",
+        "details": {
+          "build": 42,
+          "errors": [
+            "镜像产物: 缺少镜像包，且本次 DinD 中找不到镜像 xran-registry:5000/xran-demo/imagea:missing-1794145332392384552；请核对 registry、imageRepositories 和 tag",
+            "构建没有产生有效产物"
+          ]
+        }
+      },
+      {
+        "name": "unwritable 不发布错误镜像包",
+        "status": "PASS",
+        "details": {
+          "build": 43,
+          "errors": [
+            "镜像产物: [Errno 13] Permission denied: '/home/jenkins/agent/workspace/x-ran-cloud/source/platform/k8s/images-build/.imageA.tar.ggy4r7gi.tmp'"
+          ]
+        }
+      },
+      {
+        "name": "旧版 push 失败仍自动导出有效镜像并保留失败结果",
+        "status": "PASS",
+        "details": {
+          "build": 44
+        }
+      },
+      {
+        "name": "旧编译镜像明确提示缺少自动导出能力",
+        "status": "PASS",
+        "details": {
+          "build": 45
+        }
+      },
+      {
+        "name": "可见性组合 (False, False)",
+        "status": "PASS",
+        "details": {
+          "xran": false,
+          "xcn": false
+        }
+      },
+      {
+        "name": "可见性组合 (True, False)",
+        "status": "PASS",
+        "details": {
+          "xran": true,
+          "xcn": false
+        }
+      },
+      {
+        "name": "可见性组合 (False, True)",
+        "status": "PASS",
+        "details": {
+          "xran": false,
+          "xcn": true
+        }
+      },
+      {
+        "name": "可见性组合 (True, True)",
+        "status": "PASS",
+        "details": {
+          "xran": true,
+          "xcn": true
+        }
+      },
+      {
+        "name": "限制可见性不取消已运行和等待槽位的构建",
+        "status": "PASS",
+        "details": {
+          "builds": [
+            50,
+            51
+          ]
+        }
+      },
+      {
+        "name": "Controller 重启保留限制状态；关闭后精确恢复原用户、组和继承方式",
+        "status": "PASS",
+        "details": {
+          "version": 27,
+          "aclSha256": "cff49dc36b1032689346c167fb4f9267769298ebf2e614fde89a4d82c32efe94"
+        }
+      }
+    ],
+    "builds": [
+      {
+        "number": 26,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 27,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "demo/feature",
+          "SERVICE_TARGET": "serviceB",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 28,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "tag",
+          "GIT_REF": "demo-v1.0.0",
+          "SERVICE_TARGET": "serviceC",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 29,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "tag",
+          "GIT_REF": "demo-v1.0.0-annotated",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 30,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "commit",
+          "GIT_REF": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+          "SERVICE_TARGET": "services_all",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 31,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "commit",
+          "GIT_REF": "db3051980",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 32,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "verify-1794143943",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 33,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageB",
+          "IMAGE_TAG": "verify-1794143943",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 34,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageC",
+          "IMAGE_TAG": "verify-1794143943",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 35,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "missing-ci-reference",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 36,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "bad;touch /tmp/injected",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 37,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "push-failure-ci",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 38,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "legacy-compat-1794144441745431108",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 39,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "legacy-sdk-1794144503230394224",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-sdk-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 40,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "corrupt-1794144574608366540",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 41,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "corrupt-1794145248930068760",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 42,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "missing-1794145332392384552",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 43,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "unwritable-1794145366548066358",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 44,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "legacy-push-1794145409623156896",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 45,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "image",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 46,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 47,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 48,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 49,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 50,
+        "user": "builder1",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      },
+      {
+        "number": 51,
+        "user": "builder2",
+        "parameters": {
+          "BUILD_KIND": "service",
+          "REF_TYPE": "branch",
+          "GIT_REF": "main",
+          "SERVICE_TARGET": "serviceA",
+          "IMAGE_TARGET": "imageA",
+          "IMAGE_TAG": "latest",
+          "COMPILER_IMAGE": "localhost:15050/xnet/xran-compile:26.11.08-compat-r2",
+          "COMPILER_IMAGE_PULL_POLICY": "Always"
+        }
+      }
+    ]
+  },
+  "xcnHistory": {
+    "job": "xcn",
+    "build": 1,
+    "metadataUnchanged": true,
+    "metadataSha256": "647732aa5930584a19067a0e08f3157ea91ea5a145fc0bc5fce5459d235a0ac9",
+    "files": [
+      "xcn-runtime.tar",
+      "xcn-webui.tar",
+      "xcn-monitor.tar",
+      "xcn-26.11.8.tgz"
+    ],
+    "chart": {
+      "name": "xcn-26.11.8.tgz",
+      "size": 25714,
+      "sha256": "67575e69b70ab158e9d1afbad3a886eb9a4a0a3bcc02ec96b7790ef71eec1c92"
+    },
+    "status": "PASS"
+  },
+  "limitations": [
+    "未连接真实内网 Gerrit、APT 或 Harbor",
+    "镜像推送和 Always 拉取使用独立测试 Registry；未向内网 Harbor 推送",
+    "xcn 本轮复验既有历史、Chart 下载及权限；完整业务编译沿用前一轮验收，未重复构建",
+    "全套 protobuf-c 1.5.2 仍需真实内网业务验证"
+  ]
+}

@@ -58,6 +58,7 @@ make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.
 随机密码保存于 `.state/jenkins/users.json`（0600）。通过 **Manage Jenkins → Users → Create User** 创建正式个人账号，登录后自动获得普通构建权限；
 验收账号可在交付后停用。普通账号没有任务配置、脚本控制台和流水线重放权限。
 `storage-maintenance` 及首页 CI/清理提示仅管理员可见；普通账号使用 `x-ran-cloud` 和 `xcn`，自动磁盘维护照常运行。
+管理员可在“构建平台设置”分别限制两个业务项目为仅管理员可见，取消时恢复原项目授权。
 
 ## 使用
 
@@ -71,6 +72,7 @@ make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.
 
 摘要显示构建人、时间、引用、完整 commit 和所选编译镜像；元数据另含实际编译镜像 ID、拉取策略、耗时、产出镜像 ID/推送结果、大小和 SHA256。
 镜像已导出但 push 失败时，构建失败且保留有效 tar。下载按构建号隔离，同名包不互相覆盖。
+旧版脚本仅生成 Docker 镜像而未出 tar 时，流水线会从本次 Pod 的 DinD 自动导出；完整镜像名和 tag 必须与站点配置一致。
 管理员在构建详情点击 **Keep this build forever** 可保护版本。
 
 切换 BUILD_KIND 会立即隐藏无关字段并保留此前输入，Git 和编译镜像参数始终显示。

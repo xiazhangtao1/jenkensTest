@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import tempfile
 import time
 
 ROOT = Path.cwd()
@@ -108,7 +109,7 @@ def release_build():
 
 
 def capabilities():
-    print(json.dumps({'xranServiceCompatibility': 1}))
+    print(json.dumps({'xranServiceCompatibility': 1, 'xranImageArchiveFallback': 1}))
 
 
 def prepare_xran():
@@ -142,6 +143,7 @@ def build():
     elif kind == 'image':
         prepare_xran()
         ensure_docker('/opt/xran/base-images.tar')
+        image_archive_path().unlink(missing_ok=True)
         run(['./images-build.sh', target, os.environ['XRAN_IMAGE_TAG']],
             SOURCE / 'platform/k8s/images-build', input_text='/opt/dpdk-22.03\n')
     elif kind == 'xcn':
@@ -155,6 +157,75 @@ def read_small(archive, name):
     if not item.isfile() or item.size > 8 * 1024 * 1024:
         raise ValueError('非法归档元数据: ' + name)
     return archive.extractfile(item).read()
+
+
+def image_archive_path():
+    target = os.environ['XRAN_TARGET']
+    if not re.fullmatch(r'[A-Za-z0-9_.-]+', target) or target in ('.', '..'):
+        raise ValueError('非法镜像目标')
+    directory = SOURCE / 'platform/k8s/images-build'
+    if not directory.resolve().is_relative_to(SOURCE.resolve()):
+        raise ValueError('镜像产物目录必须位于本次检出的源码内')
+    return directory / (target + '.tar')
+
+
+def validate_image_archive(path, reference, expected_id=None):
+    if path.is_symlink() or not path.is_file():
+        raise ValueError('非法镜像产物路径: ' + path.name)
+    with tarfile.open(path, 'r:*') as archive:
+        for member in archive:
+            if member.isfile():
+                with archive.extractfile(member) as data:
+                    while data.read(1024 * 1024): pass
+        manifest = json.loads(read_small(archive, 'manifest.json'))
+        if not isinstance(manifest, list) or len(manifest) != 1 or not isinstance(manifest[0], dict):
+            raise ValueError('镜像包必须包含唯一 Docker 镜像')
+        image = manifest[0]
+        if reference not in (image.get('RepoTags') or []):
+            raise ValueError('Docker 镜像引用不匹配: ' + reference)
+        layers = image.get('Layers')
+        if not isinstance(layers, list) or not layers or any(not archive.getmember(layer).isfile() for layer in layers):
+            raise ValueError('缺少 Docker 镜像层')
+        config = read_small(archive, image['Config'])
+        if not isinstance(json.loads(config), dict):
+            raise ValueError('非法 Docker 镜像配置')
+        image_id = 'sha256:' + hashlib.sha256(config).hexdigest()
+        if expected_id and image_id != expected_id:
+            raise ValueError('镜像包 ID 与本次 DinD 中的目标镜像不一致')
+        return image_id
+
+
+def collect_image(meta):
+    path = image_archive_path()
+    reference = os.environ['XRAN_IMAGE_REFERENCE']
+    meta['imageReference'] = reference
+    meta['pushStatus'] = 'success' if meta.get('result') == 'SUCCESS' else 'failed-or-not-reached'
+    if not path.exists() and not path.is_symlink() and meta.get('result') == 'ABORTED':
+        return None
+    probe = subprocess.run(['docker', 'image', 'inspect', reference], capture_output=True, text=True)
+    info = json.loads(probe.stdout)[0] if probe.returncode == 0 else None
+    if path.exists() or path.is_symlink():
+        image_id = validate_image_archive(path, reference, info['Id'] if info else None)
+        origin = 'script'
+    else:
+        if not info:
+            raise ValueError('缺少镜像包，且本次 DinD 中找不到镜像 ' + reference +
+                             '；请核对 registry、imageRepositories 和 tag')
+        if not path.parent.is_dir():
+            raise ValueError('缺少镜像产物目录: ' + str(path.parent))
+        print('缺少镜像包，自动从本次 DinD 导出: ' + reference, flush=True)
+        descriptor, name = tempfile.mkstemp(prefix='.' + path.name + '.', suffix='.tmp', dir=path.parent)
+        os.close(descriptor)
+        temporary = Path(name)
+        try:
+            run(['docker', 'save', '--output', str(temporary), reference])
+            image_id = validate_image_archive(temporary, reference, info['Id'])
+            temporary.replace(path)
+        finally:
+            temporary.unlink(missing_ok=True)
+        origin = 'docker-save'
+    meta.update(imageId=image_id, imageArchiveSource=origin, repoDigests=info.get('RepoDigests', []) if info else [])
+    return path
 
 
 def collect_release():
@@ -227,11 +298,16 @@ def collect():
     meta.update(json.loads(os.environ['XRAN_BUILD_METADATA']))
     kind, target = os.environ['XRAN_KIND'], os.environ['XRAN_TARGET']
     directory = SOURCE / ('JDBG/Release/services' if kind == 'service' else 'platform/k8s/images-build')
-    files = []
-    if directory.exists():
-        files = sorted(directory.glob('*.tar.gz')) if kind == 'service' else [directory / (target + '.tar')]
+    files = sorted(directory.glob('*.tar.gz')) if kind == 'service' and directory.exists() else []
     collected = []
     errors = []
+    if kind == 'image':
+        try:
+            candidate = collect_image(meta)
+            if candidate is not None: files = [candidate]
+        except (ValueError, KeyError, TypeError, IndexError, tarfile.TarError, EOFError, OSError,
+                subprocess.CalledProcessError) as error:
+            errors.append('镜像产物: ' + str(error))
     for path in files:
         if not path.is_file():
             continue
@@ -239,13 +315,13 @@ def collect():
             errors.append('非法产物路径: ' + path.name)
             continue
         try:
-            with tarfile.open(path, 'r:*') as archive:
-                # 不提取内容，逐个读取验证压缩流完整性。
-                for entry in archive:
-                    if entry.isfile():
-                        with archive.extractfile(entry) as data:
-                            while data.read(1024 * 1024):
-                                pass
+            if kind == 'service':
+                with tarfile.open(path, 'r:*') as archive:
+                    # 不提取内容，逐个读取验证压缩流完整性。
+                    for entry in archive:
+                        if entry.isfile():
+                            with archive.extractfile(entry) as data:
+                                while data.read(1024 * 1024): pass
         except (tarfile.TarError, EOFError, OSError) as error:
             errors.append(f'{path.name}: {error}')
             continue
@@ -266,16 +342,6 @@ def collect():
         if target == 'services_all' and (len(collected) != 1 or not re.fullmatch(
                 r'L2L3_\d{10}_' + meta['commit'][:9] + r'\.tar\.gz', collected[0]['name'])):
             errors.append('services_all 产物名称或数量不符合约定')
-    if kind == 'image':
-        reference = os.environ['XRAN_IMAGE_REFERENCE']
-        meta['imageReference'] = reference
-        meta['pushStatus'] = 'success' if meta.get('result') == 'SUCCESS' else 'failed-or-not-reached'
-        probe = subprocess.run(['docker', 'image', 'inspect', reference],
-                               capture_output=True, text=True)
-        if probe.returncode == 0:
-            info = json.loads(probe.stdout)[0]
-            meta['imageId'] = info['Id']
-            meta['repoDigests'] = info.get('RepoDigests', [])
     if meta.get('result') == 'SUCCESS' and not collected:
         errors.append('构建没有产生有效产物')
     if errors:

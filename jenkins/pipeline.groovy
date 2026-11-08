@@ -118,6 +118,7 @@ def execute = {
                                     }
                                     python3 -c 'import json,sys; s=json.load(open("compiler-capabilities.json")); sys.exit(0 if s.get("xranServiceCompatibility") == 1 else "编译镜像不支持当前服务适配，请重新制作编译镜像")'
                                 '''
+                                if (kind == 'image') sh '''python3 -c 'import json,sys; s=json.load(open("compiler-capabilities.json")); sys.exit(0 if s.get("xranImageArchiveFallback") == 1 else "编译镜像缺少镜像包自动导出能力，请更新本项目编译镜像")' '''
                                 if (needsDocker) sh 'command -v docker >/dev/null && test -r /opt/xran/base-images.tar'
                                 if (isXcn) sh 'command -v helm >/dev/null && python3 -c "import yaml" && test -r /opt/xran/xcn-bases/images.tar'
                             }

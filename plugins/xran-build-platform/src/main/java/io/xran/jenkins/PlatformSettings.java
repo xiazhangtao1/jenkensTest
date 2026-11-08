@@ -43,6 +43,8 @@ public final class PlatformSettings {
         s.put("compilerImagePullPolicy", "Always");
         s.put("xcnOffline", true);
         s.put("xranServiceSerial", true);
+        s.put("xranAdminOnly", false);
+        s.put("xcnAdminOnly", false);
         s.put("buildTimeoutMinutes", 240);
         s.put("agentStartupTimeoutMinutes", 15);
         s.put("minimumFreeGiB", 50);
@@ -54,13 +56,17 @@ public final class PlatformSettings {
     public static JSONObject upgradeSettings(JSONObject input) {
         JSONObject result = upgradeNames(input);
         if (!result.containsKey("xranServiceSerial")) result.put("xranServiceSerial", true);
+        for (String key : List.of("xranAdminOnly", "xcnAdminOnly")) {
+            if (!result.containsKey(key)) result.put(key, false);
+        }
         return result;
     }
 
     public static JSONObject migrate(JSONObject site) {
         JSONObject s = defaults();
         for (String key : List.of("concurrency", "compilerImagePullPolicy", "buildTimeoutMinutes",
-                "agentStartupTimeoutMinutes", "minimumFreeGiB", "minimumFreePercent", "xranServiceSerial")) {
+                "agentStartupTimeoutMinutes", "minimumFreeGiB", "minimumFreePercent", "xranServiceSerial",
+                "xranAdminOnly", "xcnAdminOnly")) {
             if (site.containsKey(key)) s.put(key, site.get(key));
         }
         if (site.containsKey("builderImage")) s.put("compilerImage", site.get("builderImage"));

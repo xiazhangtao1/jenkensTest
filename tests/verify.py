@@ -156,7 +156,10 @@ class Verification:
                 subprocess.run(['docker', 'load', '-i', path], check=True, stdout=subprocess.DEVNULL)
                 result = subprocess.check_output(['docker', 'run', '--rm', '--network', 'none', meta['imageReference']], text=True)
                 assert sha in result and meta['pushStatus'] == expected_push and meta.get('imageId')
-        subprocess.run(['sha256sum', '-c', 'SHA256SUMS'], cwd=target, check=True, capture_output=True)
+        if meta['files']:
+            subprocess.run(['sha256sum', '-c', 'SHA256SUMS'], cwd=target, check=True, capture_output=True)
+        else:
+            assert (target / 'SHA256SUMS').read_text() == ''
         return meta
 
     def functional(self):

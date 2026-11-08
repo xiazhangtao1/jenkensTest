@@ -2,8 +2,16 @@
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
   <j:if test="${instance.admin}">
     <f:section title="构建平台设置">
-      <f:entry><div class="jenkins-help">${instance.status}</div><p>设置保存后对新入场构建立刻生效；排队等待不计入总超时。运行中的构建保留入场时的配置。CPU、内存和临时存储为整个 Pod 的预算，内部容器自动分配。</p></f:entry>
+      <f:entry><div class="jenkins-help">${instance.status}</div><p>资源设置对新入场构建立刻生效；排队等待不计入总超时。运行中的构建保留入场时的配置。项目访问权限保存后立即生效。CPU、内存和临时存储为整个 Pod 的预算，内部容器自动分配。</p></f:entry>
       <f:invisibleEntry><input type="hidden" name="revision" value="${instance.revision}" /></f:invisibleEntry>
+      <f:entry title="X-RAN-CLOUD 仅管理员可见" field="xranAdminOnly">
+        <f:checkbox checked="${instance.form.xranAdminOnly}" />
+        <div class="jenkins-help">立即限制项目及其历史、日志和产物访问；取消后恢复开启前权限，不取消已有构建。</div>
+      </f:entry>
+      <f:entry title="xcn 仅管理员可见" field="xcnAdminOnly">
+        <f:checkbox checked="${instance.form.xcnAdminOnly}" />
+        <div class="jenkins-help">未开启时沿用原项目权限。storage-maintenance 始终仅管理员可见。</div>
+      </f:entry>
       <f:entry title="全局并发上限" field="concurrency">
         <f:number value="${instance.form.concurrency}" min="1" max="32" step="1" />
       </f:entry>

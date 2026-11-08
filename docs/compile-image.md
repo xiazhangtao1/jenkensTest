@@ -4,8 +4,8 @@
 
 ```bash
 make compile-image
-make compile-image DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat
-make compile-image DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.08-sdk
+make compile-image DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat-r2
+make compile-image DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.08-sdk-r2
 make compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.11.05 BUILD_JOBS=4
 make compile-image APT_SOURCES=config/sources.intranet.list
 make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.11.05
@@ -76,7 +76,7 @@ DPDK 源码和 build 路径保留在 `/opt/dpdk-22.03`。镜像内 `/opt/package
 docker load -i .cache/build-base-images.tar
 docker load -i .cache/k8s-images.tar
 make compile-image OFFLINE=1
-make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.08-sdk
+make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.08-sdk-r2
 docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/xran/verify-compile.sh
 ```
 
@@ -91,13 +91,36 @@ docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/
 先同步源码和新增 APT 缓存，再重建所选镜像：
 
 ```bash
-make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat
-make push-compile-image IMAGE_TAG=26.11.08-compat
+make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat-r2
+make push-compile-image IMAGE_TAG=26.11.08-compat-r2
 ```
 
-迁移时拷贝 `dist/compile/192.168.10.35_xnet_xran-compile_26.11.08-compat/image.tar`，
+迁移时拷贝 `dist/compile/192.168.10.35_xnet_xran-compile_26.11.08-compat-r2/image.tar`，
 在内网执行 `docker load -i 文件路径` 后推送同名镜像到 Harbor。
 Jenkins 构建参数 `COMPILER_IMAGE` 填该完整新版本地址，拉取策略使用 `Always` 即可，无需重新部署 Jenkins。
+
+## 新旧镜像构建脚本的产物兼容
+
+新版在 `platform/k8s/images-build/目标.tar` 出包时直接使用。
+旧版只在本次 Pod 的 DinD 留下镜像时，收集阶段会自动 `docker save` 为同名包，校验后归档。
+构建前仅清理本次目标的旧同名文件；导出先写临时文件，失败时清理临时文件，不发布残缺包。
+已有包损坏、Docker manifest 的引用不符或镜像 ID 与本次 DinD 不符时明确失败，不用自动导出掩盖问题。
+
+期望镜像地址为 `registry/imageRepositories[IMAGE_TARGET]:IMAGE_TAG`，按业务脚本配置，例如：
+
+```yaml
+registry: 192.168.10.35
+imageRepositories: {imageA: xnet/imagea, imageB: xnet/imageb, imageC: xnet/imagec}
+```
+
+只匹配该完整地址和 tag，不扫描宿主机 Docker、不猜测其他标签，也不会执行 `docker pull`。
+找不到镜像时检查站点映射是否与该业务版本一致。
+元数据 `imageArchiveSource` 为 `script` 或 `docker-save`；镜像包包含名称、大小、SHA256 和镜像 ID。
+脚本返回失败时，自动导出的有效包仍可下载，任务保持失败；取消构建时不会启动新的缺包导出。
+
+该能力由新版编译镜像内的适配器提供，镜像任务检查 `xranImageArchiveFallback: 1`。
+需要更新两版 Dockerfile 制作的镜像；只升级 Controller 而继续选择旧适配器时会明确提示更新。
+服务和 xcn 的适配器兼容规则保持原有行为。
 
 ## Jenkins 每次构建选择
 
