@@ -122,7 +122,7 @@ class Verification:
             raise AssertionError(f'#{number}: {build["result"]}, expected {expected}\n{console[-7000:]}')
         return build
 
-    def artifacts(self, number, sha, user, expected_push='success', expected_result='SUCCESS'):
+    def artifacts(self, number, sha, user, expected_push='success', expected_result='SUCCESS', compiler_image=None):
         target = self.downloads / str(number)
         target.mkdir(exist_ok=True)
         prefix = f'job/x-ran-cloud/{number}/artifact/publish/'
@@ -135,8 +135,8 @@ class Verification:
         assert meta['startedAt'] and meta['finishedAt'] and meta['durationMillis'] >= 0
         assert meta.get('builderImage') and meta.get('builderImageId')
         assert meta.get('builderImagePullPolicy') in ('Always', 'IfNotPresent', 'Never')
-        if self.args.compiler_image:
-            assert meta['builderImage'] == self.args.compiler_image
+        if compiler_image or self.args.compiler_image:
+            assert meta['builderImage'] == (compiler_image or self.args.compiler_image)
         if self.args.compiler_image_pull_policy:
             assert meta['builderImagePullPolicy'] == self.args.compiler_image_pull_policy
         for item in meta['files']:
@@ -164,7 +164,6 @@ class Verification:
             ('serviceB 演示分支', {'SERVICE_TARGET': 'serviceB', 'GIT_REF': 'demo/feature'}, self.old),
             ('serviceC tag', {'SERVICE_TARGET': 'serviceC', 'REF_TYPE': 'tag', 'GIT_REF': 'demo-v1.0.0'}, self.old),
             ('带注释 tag', {'REF_TYPE': 'tag', 'GIT_REF': 'demo-v1.0.0-annotated'}, self.old),
-            ('all 多包', {'SERVICE_TARGET': 'all'}, self.head),
             ('services_all 历史完整 SHA', {'SERVICE_TARGET': 'services_all', 'REF_TYPE': 'commit', 'GIT_REF': self.old}, self.old),
             ('唯一短 SHA', {'REF_TYPE': 'commit', 'GIT_REF': self.head[:9]}, self.head)]
         if not self.args.services_only:
@@ -175,7 +174,7 @@ class Verification:
             number = self.submit(user, **changes)
             self.completed(number)
             meta = self.artifacts(number, sha, user)
-            assert len(meta['files']) == (3 if changes.get('SERVICE_TARGET') == 'all' else 1)
+            assert len(meta['files']) == 1
             self.record(name, {'build': number, 'commit': sha})
         for name, changes in [('不存在的 Git 引用明确失败', {'GIT_REF': 'missing-ci-reference'}),
                               ('非法标签明确失败', {'BUILD_KIND': 'image', 'IMAGE_TAG': 'bad;touch /tmp/injected'})]:

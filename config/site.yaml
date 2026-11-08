@@ -7,6 +7,7 @@ storageClass: jenkins-local-path
 pvcSize: 250Gi
 # 下列构建参数只在首次启动时导入；之后在 Manage Jenkins → 系统配置 → 构建平台设置 修改。
 concurrency: 6
+xranServiceSerial: true
 buildCpuLimit: 4
 buildMemoryGiB: 8
 dindMemoryGiB: 4

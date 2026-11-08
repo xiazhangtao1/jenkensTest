@@ -16,6 +16,10 @@
       <f:entry title="xcn 离线构建" field="xcnOffline">
         <f:checkbox checked="${instance.form.xcnOffline}" />
       </f:entry>
+      <f:entry title="X-RAN-CLOUD 服务编译串行执行" field="xranServiceSerial">
+        <f:checkbox checked="${instance.form.xranServiceSerial}" />
+        <div class="jenkins-help">适用于服务包及镜像任务中的服务编译。关闭后遵循业务脚本原有并行设置；不影响 Jenkins 全局并发。</div>
+      </f:entry>
       <f:entry title="服务包 Pod CPU 总上限（核）" field="serviceCpu">
         <f:number value="${instance.form.serviceCpu}" min="2" max="128" step="1" />
       </f:entry>
@@ -68,7 +72,7 @@
         <f:number value="${instance.form.minimumFreePercent}" min="0" max="79" step="1" />
       </f:entry>
       <f:entry>
-        <f:validateButton title="预览内部资源分配" progress="计算中…" method="preview" with="concurrency,compilerImage,compilerImagePullPolicy,xcnOffline,serviceCpu,serviceMemoryGiB,serviceTemporaryStorageGiB,imageCpu,imageMemoryGiB,imageTemporaryStorageGiB,imageDindMemoryGiB,xcnCpu,xcnMemoryGiB,xcnTemporaryStorageGiB,xcnDindMemoryGiB,innerBuildMemoryGiB,buildJobs,buildTimeoutMinutes,agentStartupTimeoutMinutes,minimumFreeGiB,minimumFreePercent" />
+        <f:validateButton title="预览内部资源分配" progress="计算中…" method="preview" with="concurrency,compilerImage,compilerImagePullPolicy,xcnOffline,xranServiceSerial,serviceCpu,serviceMemoryGiB,serviceTemporaryStorageGiB,imageCpu,imageMemoryGiB,imageTemporaryStorageGiB,imageDindMemoryGiB,xcnCpu,xcnMemoryGiB,xcnTemporaryStorageGiB,xcnDindMemoryGiB,innerBuildMemoryGiB,buildJobs,buildTimeoutMinutes,agentStartupTimeoutMinutes,minimumFreeGiB,minimumFreePercent" />
         <f:validateButton title="重新应用配置" progress="应用中…" method="reapply" />
       </f:entry>
       <f:advanced title="最近修改审计（完整记录保存在 Jenkins 数据目录）">

@@ -14,6 +14,7 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / '.cache'
 DEFAULT_NAME = '192.168.10.35/xnet/xran-compile'
+DEFAULT_DOCKERFILE = 'docker/builder-compat.Dockerfile'
 TAG = re.compile(r'[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}')
 HOST = r'[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*'
 NAME = re.compile(r'(?:' + HOST + r'(?::[0-9]+)?/)?[a-z0-9]+(?:(?:[._]|__|-+)[a-z0-9]+)*(?:/[a-z0-9]+(?:(?:[._]|__|-+)[a-z0-9]+)*)*')
@@ -23,6 +24,16 @@ def image_reference(name, tag):
     if not NAME.fullmatch(name) or not TAG.fullmatch(tag):
         raise ValueError('非法镜像名称或 tag；名称不含 tag，仓库地址可以带端口')
     return name + ':' + tag
+
+
+def resolve_dockerfile(value):
+    path = Path(value)
+    if not path.is_absolute():
+        path = ROOT / path
+    path = path.resolve()
+    if not path.is_file():
+        raise ValueError('Dockerfile 不存在或不是普通文件：' + str(path))
+    return path
 
 
 def sha256(path):
@@ -105,7 +116,8 @@ def prepare_apt(args, base, cache_name='compile-apt', package_files=None):
                                                    for name, digest in lock.get('debs', {}).items()) and lock.get('debs'):
             return
     if args.offline:
-        raise RuntimeError('完整 APT 缓存缺失或与基础镜像/源/软件清单不符；请在联网环境先执行同配置的 compile-image')
+        raise RuntimeError('完整 APT 缓存缺失或与基础镜像/源/软件清单不符：' + cache_name +
+                           '；请在联网环境先执行同配置的 compile-image')
     # Download the complete dependency closure from a fresh instance of the pinned base.
     # A temporary directory avoids mixing multiple revisions of a deb on subsequent preparations.
     staging = CACHE / (cache_name + '-staging')
@@ -117,8 +129,10 @@ def prepare_apt(args, base, cache_name='compile-apt', package_files=None):
     run(['docker', 'run', '--rm', '--network', args.prepare_network, *proxy,
          '-v', f'{source}:/etc/apt/sources.list:ro', '-v', f'{staging}:/var/cache/apt/archives',
          '-e', 'DEBIAN_FRONTEND=noninteractive', base, 'bash', '-euc',
-         'rm -f /etc/apt/apt.conf.d/docker-clean; apt-get -o Acquire::Retries=3 update; '
-         'apt-get -o Acquire::Retries=3 --download-only -y --no-install-recommends install "$@"', 'apt-cache', *packages])
+         'rm -f /etc/apt/apt.conf.d/docker-clean; '
+         'apt-get -o Acquire::Retries=3 -o Acquire::http::Pipeline-Depth=0 update; '
+         'apt-get -o Acquire::Retries=3 -o Acquire::http::Pipeline-Depth=0 '
+         '--download-only -y --no-install-recommends install "$@"', 'apt-cache', *packages])
     # Old cache revisions are replaced only after successful preparation.
     for path in cache.glob('*.deb'):
         path.unlink()
@@ -153,6 +167,7 @@ def prepare_helm(offline):
 
 def build(args):
     ref = image_reference(args.image_name, args.image_tag)
+    dockerfile = resolve_dockerfile(getattr(args, 'dockerfile', DEFAULT_DOCKERFILE))
     if not 1 <= args.jobs <= 64:
         raise ValueError('BUILD_JOBS 必须为 1..64')
     v = versions()
@@ -168,6 +183,8 @@ def build(args):
         run(['docker', 'save', '-o', CACHE / 'base-images.tar', *bases])
     prepare_apt(args, v['UBUNTU_IMAGE'])
     prepare_apt(args, v['UBUNTU_IMAGE'], 'compile-extra-apt', ['config/compiler-extra-apt-packages.txt'])
+    # Prepare both recipes' small extra caches so the same offline kit can build either.
+    prepare_apt(args, v['UBUNTU_IMAGE'], 'compile-compat-apt', ['config/compiler-compat-apt-packages.txt'])
     prepare_helm(args.offline)
     env = os.environ.copy()
     env['DOCKER_BUILDKIT'] = '0'
@@ -175,21 +192,35 @@ def build(args):
     run(['docker', 'build', '--network', 'none', '--pull=false',
          '--build-arg', f'APT_SOURCES={args.apt_sources}', '--build-arg', f'BUILD_JOBS={args.jobs}',
          '--build-arg', f'DOCKER_CLI_IMAGE={v["DOCKER_CLI_IMAGE"]}',
-         '-f', ROOT / 'docker/builder.Dockerfile', '-t', ref, ROOT], env=env)
+         '-f', dockerfile, '-t', ref, ROOT], env=env)
+    run(['docker', 'run', '--rm', '--network', 'none', ref, 'bash', '/opt/xran/verify-compile.sh'])
     if not args.no_export:
-        export(ref)
+        export(ref, dockerfile)
     return ref
 
 
-def export(ref):
+def export(ref, dockerfile):
     directory = ROOT / 'dist/compile' / re.sub(r'[^A-Za-z0-9_.-]', '_', ref)
     directory.mkdir(parents=True, exist_ok=True)
     archive = directory / 'image.tar'
     run(['docker', 'save', '-o', archive, ref])
     details = inspect(ref)
+    probe = '''import json, subprocess
+commands = {'protoc': ['protoc', '--version'], 'protocC': ['protoc-c', '--version'],
+            'protobufCLibrary': ['pkg-config', '--modversion', 'libprotobuf-c'],
+            'pkgconf': ['pkgconf', '--version']}
+print(json.dumps({name: subprocess.check_output(command, text=True).strip()
+                  for name, command in commands.items()}))'''
+    dependency_versions = json.loads(subprocess.check_output(
+        ['docker', 'run', '--rm', '--network', 'none', '--entrypoint', 'python3', ref, '-c', probe], text=True))
+    dockerfile = Path(dockerfile)
     metadata = {'image': ref, 'imageId': details['Id'], 'createdAt': details['Created'],
+                'dockerfile': str(dockerfile.relative_to(ROOT)) if dockerfile.is_relative_to(ROOT) else str(dockerfile),
+                'dockerfileSha256': sha256(dockerfile), 'dependencyVersions': dependency_versions,
                 'sourceManifestSha256': sha256(ROOT / 'vendor/compile/manifest.json'),
                 'aptManifestSha256': sha256(CACHE / 'compile-apt/manifest.json'),
+                'extraAptManifestSha256': sha256(CACHE / 'compile-extra-apt/manifest.json'),
+                'compatAptManifestSha256': sha256(CACHE / 'compile-compat-apt/manifest.json'),
                 'bytes': archive.stat().st_size, 'sha256': sha256(archive)}
     (directory / 'manifest.json').write_text(json.dumps(metadata, indent=2) + '\n')
     (directory / 'SHA256SUMS').write_text(f"{metadata['sha256']}  image.tar\n{sha256(directory / 'manifest.json')}  manifest.json\n")
@@ -201,6 +232,8 @@ def parser():
     cli.add_argument('command', choices=['build', 'push', 'assemble'], nargs='?', default='build')
     cli.add_argument('--image-name', default=DEFAULT_NAME)
     cli.add_argument('--image-tag', default='latest')
+    cli.add_argument('--dockerfile', default=DEFAULT_DOCKERFILE,
+                     help='编译镜像 Dockerfile 路径，构建上下文固定为项目根目录')
     cli.add_argument('--jobs', type=int, default=4)
     cli.add_argument('--apt-sources', default='config/sources.online.list')
     cli.add_argument('--offline', action='store_true')

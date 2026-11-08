@@ -150,7 +150,8 @@ git clone --mirror repos/xcn.bundle ../xcn.git
 docker load -i .cache/build-base-images.tar
 docker load -i .cache/k8s-images.tar
 make platform-plugin OFFLINE=1
-make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list
+make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list \
+  DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat
 python3 scripts/ci.py images --offline --source ../X-RAN-CLOUD.git \
   --xcn-source ../xcn.git --apt-sources config/sources.intranet.list
 ```
@@ -165,6 +166,9 @@ xcn 业务构建的离线模式在“构建平台设置”中由管理员控制�
 镜像发布更新时提升 versions.env 自定义标签，保留旧标签及旧离线目录用于回滚。
 
 编译镜像制作、按构建选版本/策略及节点拉取凭据配置见 [编译镜像说明](compile-image.md)。
+切换全套 protobuf-c 1.5.2 时，改用 `DOCKERFILE=docker/builder.Dockerfile` 并指定另一个 tag。
+离线包同时携带两套 Dockerfile 的 APT 缓存，运行镜像按所选版本交付；另一版可在内网自行制作。
+从旧临时验证目录升级见 [正式构建修复升级](formal-build-upgrade.md)。
 
 内部构建平台插件的源码、JPI、Maven 完整缓存和固定构建镜像也随包提供；`make platform-plugin OFFLINE=1` 实际使用 Maven `-o` 与 Docker `--network none`。
 

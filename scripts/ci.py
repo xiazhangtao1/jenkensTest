@@ -209,7 +209,7 @@ def images(args):
     compiler.build(argparse.Namespace(image_name=cfg['builderImage'].rsplit(':', 1)[0],
         image_tag=cfg['builderImage'].rsplit(':', 1)[1], jobs=args.jobs,
         apt_sources=args.apt_sources, offline=args.offline or args.build_network == 'none',
-        prepare_network='host', no_export=True))
+        prepare_network='host', no_export=True, dockerfile=args.dockerfile))
     build_env = os.environ.copy()
     build_env['DOCKER_BUILDKIT'] = '0'
     build = ['docker', 'build', '--network', 'none' if args.offline else args.build_network, '--pull=false']
@@ -539,7 +539,7 @@ def bundle(args):
     for name in ['README.md', 'Makefile', '.dockerignore', '.gitignore']:
         if (ROOT / name).exists():
             shutil.copy2(ROOT / name, target / name)
-    for name in ['charts', 'plugins', 'tools', 'compile-apt', 'compile-extra-apt', 'compile-tools', 'local-plugins', 'platform-m2']:
+    for name in ['charts', 'plugins', 'tools', 'compile-apt', 'compile-extra-apt', 'compile-compat-apt', 'compile-tools', 'local-plugins', 'platform-m2']:
         shutil.copytree(CACHE / name, target / '.cache' / name)
     shutil.copy2(CACHE / 'base-images.tar', target / '.cache/base-images.tar')
     shutil.copy2(CACHE / 'plugins.complete', target / '.cache/plugins.complete')
@@ -671,6 +671,7 @@ if __name__ == '__main__':
     parser.add_argument('--importer-image')
     parser.add_argument('--image-name')
     parser.add_argument('--image-tag')
+    parser.add_argument('--dockerfile', default='docker/builder-compat.Dockerfile')
     parser.add_argument('--jobs', type=int, default=4)
     parser.add_argument('--xcn-source', default=default_xcn_source())
     parser.add_argument('--open5gs-source', dest='xcn_source', default=argparse.SUPPRESS, help=argparse.SUPPRESS)

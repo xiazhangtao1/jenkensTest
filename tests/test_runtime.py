@@ -81,8 +81,8 @@ class RuntimeTests(unittest.TestCase):
                 runner.checkout()
             self.assertFalse(marker.exists())
 
-    def test_compile_all_and_big_package(self):
-        for target, count in [('serviceA', 1), ('all', 3), ('services_all', 1)]:
+    def test_compile_service_and_big_package(self):
+        for target, count in [('serviceA', 1), ('services_all', 1)]:
             with self.subTest(target=target):
                 runner.checkout()
                 os.environ['XRAN_TARGET'] = target
@@ -114,6 +114,101 @@ class RuntimeTests(unittest.TestCase):
         (directory / 'serviceA.tar.gz').symlink_to(secret)
         self.assertEqual(runner.collect(), 1)
         self.assertFalse((runner.PUBLISH / 'serviceA.tar.gz').exists())
+
+
+class ServiceCompatibilityTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        for name, value in [('ROOT', self.root), ('SOURCE', self.root / 'source')]:
+            context = patch.object(runner, name, value)
+            context.start()
+            self.addCleanup(context.stop)
+        self.services = runner.SOURCE / 'services'
+        self.services.mkdir(parents=True)
+        self.env = patch.dict(os.environ, XRAN_KIND='service', XRAN_TARGET='serviceA', XRAN_SERVICE_SERIAL='true')
+        self.env.start()
+        self.addCleanup(self.env.stop)
+
+    def fixture(self):
+        # Directory creation and dependency generation lack an ordering dependency.
+        content = '''ifeq ($(CUR_PROJECT),test)
+all: output dep-a dep-b
+output:
+\t@sleep 0.4
+\t@mkdir -p objRelease
+dep-a:
+\t@printf 'a\\n' > objRelease/a.dep
+dep-b:
+\t@printf 'b\\n' > objRelease/b.dep
+else
+all:
+\t+$(MAKE) -j32 CUR_PROJECT=test
+endif
+'''
+        (self.services / 'makefile').write_text(content)
+        script = self.services / 'build.sh'
+        script.write_text('#!/bin/bash\nset -eu\nread -r dpdk\nprintf "%s" "$dpdk" > dpdk-input\nmake -j32\n')
+        script.chmod(0o755)
+        return content.encode()
+
+    def test_serial_fixes_recursive_make_race_and_answers_dpdk_prompt(self):
+        self.fixture()
+        original = (self.services / 'makefile').read_bytes()
+        baseline = subprocess.run(['make', '-j32'], cwd=self.services, capture_output=True, text=True)
+        self.assertNotEqual(baseline.returncode, 0)
+        self.assertIn('cannot create', baseline.stderr)
+        shutil.rmtree(self.services / 'objRelease', ignore_errors=True)
+        runner.build()
+        self.assertEqual((self.services / 'dpdk-input').read_text(), '/opt/dpdk-22.03')
+        self.assertEqual((self.services / 'objRelease/a.dep').read_text(), 'a\n')
+        modified = (self.services / 'makefile').read_bytes()
+        self.assertTrue(modified.endswith(original))
+        runner.prepare_xran()
+        self.assertEqual((self.services / 'makefile').read_bytes(), modified)
+
+    def test_disabled_and_invalid_setting(self):
+        original = self.fixture()
+        os.environ['XRAN_SERVICE_SERIAL'] = 'false'
+        runner.prepare_xran()
+        self.assertEqual((self.services / 'makefile').read_bytes(), original)
+        os.environ['XRAN_SERVICE_SERIAL'] = 'invalid'
+        with self.assertRaisesRegex(ValueError, '必须为 true 或 false'):
+            runner.prepare_xran()
+
+    def test_image_build_uses_the_same_preparation(self):
+        self.fixture()
+        directory = runner.SOURCE / 'platform/k8s/images-build'
+        directory.mkdir(parents=True)
+        script = directory / 'images-build.sh'
+        script.write_text('#!/bin/bash\nset -eu\ncd ../../../services\n./build.sh -c -m serviceA\n')
+        script.chmod(0o755)
+        os.environ.update(XRAN_KIND='image', XRAN_TARGET='imageA', XRAN_IMAGE_TAG='test')
+        with patch.object(runner, 'ensure_docker'):
+            runner.build()
+        self.assertTrue((self.services / 'objRelease/b.dep').is_file())
+        self.assertEqual((self.services / 'dpdk-input').read_text(), '/opt/dpdk-22.03')
+
+    def test_removed_target_and_script_failure_are_reported(self):
+        os.environ['XRAN_TARGET'] = 'all'
+        with self.assertRaisesRegex(ValueError, 'all 已取消'):
+            runner.build()
+        os.environ['XRAN_TARGET'] = 'serviceA'
+        script = self.services / 'build.sh'
+        script.write_text('#!/bin/sh\nexit 17\n')
+        script.chmod(0o755)
+        with self.assertRaises(subprocess.CalledProcessError) as failed:
+            runner.build()
+        self.assertEqual(failed.exception.returncode, 17)
+
+    def test_makefile_symlink_is_not_modified(self):
+        outside = self.root / 'outside'
+        outside.write_bytes(b'original')
+        (self.services / 'makefile').symlink_to(outside)
+        with self.assertRaisesRegex(ValueError, '必须位于本次检出'):
+            runner.prepare_xran()
+        self.assertEqual(outside.read_bytes(), b'original')
 
 
 if __name__ == '__main__':

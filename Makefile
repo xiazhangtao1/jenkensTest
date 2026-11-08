@@ -4,11 +4,12 @@ XCN_SOURCE ?= $(or $(OPEN5GS_SOURCE),$(wildcard $(CURDIR)/../xcn),$(wildcard $(C
 SITE ?= config/site.yaml
 IMAGE_NAME ?= 192.168.10.35/xnet/xran-compile
 IMAGE_TAG ?= latest
+DOCKERFILE ?= docker/builder-compat.Dockerfile
 BUILD_JOBS ?= 4
 APT_SOURCES ?= config/sources.online.list
 OFFLINE ?= 0
 shell_quote = '$(subst ','"'"',$(1))'
-COMPILE_FLAGS = --image-name $(call shell_quote,$(IMAGE_NAME)) --image-tag $(call shell_quote,$(IMAGE_TAG)) --jobs $(call shell_quote,$(BUILD_JOBS)) --apt-sources $(call shell_quote,$(APT_SOURCES)) $(if $(filter 1,$(OFFLINE)),--offline)
+COMPILE_FLAGS = --image-name $(call shell_quote,$(IMAGE_NAME)) --image-tag $(call shell_quote,$(IMAGE_TAG)) --dockerfile $(call shell_quote,$(DOCKERFILE)) --jobs $(call shell_quote,$(BUILD_JOBS)) --apt-sources $(call shell_quote,$(APT_SOURCES)) $(if $(filter 1,$(OFFLINE)),--offline)
 .PHONY: prepare images render import-images deploy bundle test verify backup compile-image push-compile-image platform-plugin
 platform-plugin:
 	$(PYTHON) scripts/platform-plugin.py $(if $(filter 1,$(OFFLINE)),--offline)

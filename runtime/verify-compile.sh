@@ -2,8 +2,19 @@
 set -euo pipefail
 sdk_check_dir=$(mktemp -d)
 trap 'rm -rf "$sdk_check_dir"' EXIT
+command -v pkgconf
+pkgconf --version
+test -d /opt/dpdk-22.03/build
+test "$(pkg-config --modversion libprotobuf-c)" = "$XRAN_PROTOBUF_C_VERSION"
+protoc-c --version | grep -qx 'protobuf-c 1.5.2'
+python3 /opt/xran/run-build.py capabilities | python3 -c \
+    'import json,sys; assert json.load(sys.stdin)["xranServiceCompatibility"] == 1'
 for package in protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1 uuid-dev; do
     test "$(dpkg-query -W -f='${Status}' "$package")" = 'install ok installed'
+done
+for package in protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1; do
+    test "$(dpkg-query -W -f='${Version}' "$package")" = \
+        "$(case "$XRAN_PROTOBUF_C_VERSION" in 1.3.3) echo 1.3.3-1ubuntu2.1;; 1.5.2) echo 1.5.2-1xran1;; *) exit 1;; esac)"
 done
 test -z "$(dpkg --verify protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1)"
 cmake -S /opt/xran/compile-check -B "$sdk_check_dir" -G Ninja

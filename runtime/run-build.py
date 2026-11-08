@@ -17,8 +17,9 @@ SOURCE = ROOT / 'source'
 PUBLISH = ROOT / 'publish'
 
 
-def run(args, cwd=None, capture=False):
+def run(args, cwd=None, capture=False, input_text=None):
     return subprocess.run(args, cwd=cwd, check=True, text=True,
+                          input=input_text,
                           stdout=subprocess.PIPE if capture else None).stdout
 
 
@@ -106,17 +107,43 @@ def release_build():
         raise subprocess.CalledProcessError(status, command)
 
 
+def capabilities():
+    print(json.dumps({'xranServiceCompatibility': 1}))
+
+
+def prepare_xran():
+    value = os.environ.get('XRAN_SERVICE_SERIAL', 'true')
+    if value not in ('true', 'false'):
+        raise ValueError('XRAN_SERVICE_SERIAL 必须为 true 或 false')
+    makefile = SOURCE / 'services/makefile'
+    if value == 'true' and makefile.exists():
+        if makefile.is_symlink() or not makefile.resolve().is_relative_to(SOURCE.resolve()):
+            raise ValueError('服务 Makefile 必须位于本次检出的源码目录内')
+        header = b'# X-RAN-CLOUD CI: serialize service compilation\n.NOTPARALLEL:\n'
+        content = makefile.read_bytes()
+        if not content.startswith(header):
+            makefile.write_bytes(header + content)
+        print('服务编译：串行；已适配 services/makefile', flush=True)
+    else:
+        print('服务编译：' + ('遵循原脚本并行设置' if value == 'false' else
+              '未发现 services/makefile，执行原构建入口'), flush=True)
+
+
 def build():
     target = os.environ['XRAN_TARGET']
     kind = os.environ['XRAN_KIND']
     if kind == 'open5gs':  # previous compiler adapter protocol
         kind = 'xcn'
     if kind == 'service':
-        run(['./build.sh', '-c', '-m', target], SOURCE / 'services')
+        if target == 'all':
+            raise ValueError('服务目标 all 已取消，请选择单个服务或 services_all')
+        prepare_xran()
+        run(['./build.sh', '-c', '-m', target], SOURCE / 'services', input_text='/opt/dpdk-22.03\n')
     elif kind == 'image':
+        prepare_xran()
         ensure_docker('/opt/xran/base-images.tar')
         run(['./images-build.sh', target, os.environ['XRAN_IMAGE_TAG']],
-            SOURCE / 'platform/k8s/images-build')
+            SOURCE / 'platform/k8s/images-build', input_text='/opt/dpdk-22.03\n')
     elif kind == 'xcn':
         release_build()
     else:
@@ -230,8 +257,9 @@ def collect():
                 sha.update(chunk)
         collected.append({'name': out.name, 'size': out.stat().st_size, 'sha256': sha.hexdigest()})
     if kind == 'service' and meta.get('result') == 'SUCCESS':
-        expected = (set(json.loads(os.environ['XRAN_SERVICES'])) if target == 'all'
-                    else {target} if target != 'services_all' else None)
+        if target == 'all':
+            errors.append('服务目标 all 已取消，请选择单个服务或 services_all')
+        expected = {target} if target != 'services_all' else None
         actual = {x['name'].removesuffix('.tar.gz') for x in collected}
         if expected is not None and expected != actual:
             errors.append('服务产物集合不符合目标')
@@ -266,7 +294,7 @@ def collect():
 
 
 if __name__ == '__main__':
-    commands = {'checkout': checkout, 'build': build, 'collect': collect}
+    commands = {'checkout': checkout, 'build': build, 'collect': collect, 'capabilities': capabilities}
     if len(sys.argv) != 2 or sys.argv[1] not in commands:
-        raise SystemExit('usage: run-build.py checkout|build|collect')
+        raise SystemExit('usage: run-build.py checkout|build|collect|capabilities')
     raise SystemExit(commands[sys.argv[1]]() or 0)

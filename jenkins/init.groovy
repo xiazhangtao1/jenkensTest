@@ -43,7 +43,7 @@ job.addProperty(new ParametersDefinitionProperty([
     new ChoiceParameterDefinition('BUILD_KIND', ['service', 'image'] as String[], 'service=服务包；image=镜像'),
     new ChoiceParameterDefinition('REF_TYPE', ['branch', 'tag', 'commit'] as String[], '引用类型'),
     new StringParameterDefinition('GIT_REF', 'main', '分支名、tag 或 commit SHA'),
-    new ChoiceParameterDefinition('SERVICE_TARGET', (cfg.services + ['all', 'services_all']) as String[], '服务构建目标'),
+    new ChoiceParameterDefinition('SERVICE_TARGET', ((cfg.services - ['all']) + ['services_all']).unique() as String[], '服务构建目标'),
     new ChoiceParameterDefinition('IMAGE_TARGET', cfg.images as String[], '镜像构建目标'),
     new StringParameterDefinition('IMAGE_TAG', 'latest', '镜像标签；同镜像同标签将串行执行')
 ]))

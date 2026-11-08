@@ -57,6 +57,7 @@ COPY runtime/compile-check/ /opt/xran/compile-check/
 COPY runtime/verify-compile.sh /opt/xran/verify-compile.sh
 COPY docker/package-protobuf-c.sh /opt/xran/package-protobuf-c.sh
 RUN bash /opt/xran/package-protobuf-c.sh
+ENV XRAN_PROTOBUF_C_VERSION=1.5.2
 USER 1000:1000
 WORKDIR /home/jenkins/agent
 CMD ["sleep", "infinity"]

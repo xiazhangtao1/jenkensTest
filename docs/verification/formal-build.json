@@ -1,0 +1,492 @@
+{
+  "date": "2026-11-08",
+  "scope": "独立实例验收；现有主 Jenkins 不变；X-RAN-CLOUD 使用模拟业务仓库",
+  "controller": {
+    "image": "xran-ci/controller:2.580.2-16",
+    "imageId": "sha256:4dd3746222a33b98428259c4718a67b552ad499c22cc3ba1a5f707d3e185cb04"
+  },
+  "python": {
+    "command": "python3 -m unittest discover -s tests",
+    "tests": 28,
+    "status": "PASS"
+  },
+  "plugin": {
+    "id": "xran-build-platform",
+    "version": "1.0.4",
+    "jenkinsVersion": "2.580.2",
+    "buildImage": "maven:3.9.9-eclipse-temurin-21-jammy",
+    "buildImageId": "sha256:68040fabda675295f5fc7be086c1cfb5af560720af6d1794c434496471e0e8c6",
+    "sourceSha256": "0f218cb495a2a65f6dc740e1fcba3bb6e041bcd27b832695eebb981c998303f9",
+    "sha256": "e8a8878723f3d309f4e6ff1d1922c7e7c835605747e7a2a211b58462f0767a1a",
+    "classMajor": 65,
+    "dependencies": "lockable-resources:1582.v54e3b_a_8eda_3a_,kubernetes:4560.vc25b_83890c34,workflow-job:1622.vc41c189cb_e5f",
+    "tests": {
+      "main": 7,
+      "injected": 5,
+      "skipped": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    "spotbugs": 0,
+    "buildNetwork": "none",
+    "status": "PASS"
+  },
+  "compilerImages": [
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat",
+      "imageId": "sha256:a059be1d36b0441a417918ae533c0b5ad37ed1680427dd0db1ebd26dd057d5a5",
+      "createdAt": "2026-11-08T08:44:13.517349918Z",
+      "dockerfile": "docker/builder-compat.Dockerfile",
+      "dockerfileSha256": "b8af2dd04e4636688743ff1d27f8f5a4fa18d0b22b43372ee1a198ec66a2a406",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.3.3",
+        "pkgconf": "1.8.0"
+      },
+      "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+      "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+      "extraAptManifestSha256": "1f972ef9bf089ed93a5154535f061804289c1503825e8cc8c90a2c4de749bd80",
+      "compatAptManifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1",
+      "bytes": 3441161216,
+      "sha256": "dcef73b4aadb4efe776e2d6ba7ee6f650a4200149c38106b0deb07176749896f"
+    },
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.08-sdk",
+      "imageId": "sha256:e29c000f633b10b76a1571a3b33fe690716f3ee7db85a57e92362d87d33c6e0b",
+      "createdAt": "2026-11-08T08:45:11.04533021Z",
+      "dockerfile": "docker/builder.Dockerfile",
+      "dockerfileSha256": "bc18f340e07e53f70a277aa0d8872c41c6550b96590d53bfd3f5a0e022e5bf83",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.5.2",
+        "pkgconf": "1.8.0"
+      },
+      "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+      "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+      "extraAptManifestSha256": "1f972ef9bf089ed93a5154535f061804289c1503825e8cc8c90a2c4de749bd80",
+      "compatAptManifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1",
+      "bytes": 3440249344,
+      "sha256": "fa46001cf660056c3f01a690252716d7c2d0f2b5009d7bf854e642aebfdd5740"
+    }
+  ],
+  "compilerImageChecks": {
+    "status": "PASS",
+    "network": "none",
+    "uid": 1000,
+    "ctestPerImage": 2,
+    "additional": [
+      "真实 dpkg 软件包状态、版本和文件校验",
+      "生成代码编译、标准头文件与运行库版本一致",
+      "ASN.1 代码生成、静态库及动态库加载",
+      "绝对路径且含空格的 Dockerfile 实际构建",
+      "两套导出包 SHA256 校验"
+    ]
+  },
+  "aptCaches": [
+    {
+      "path": ".cache/compile-apt",
+      "files": 228,
+      "manifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+      "status": "PASS"
+    },
+    {
+      "path": ".cache/compile-extra-apt",
+      "files": 37,
+      "manifestSha256": "1f972ef9bf089ed93a5154535f061804289c1503825e8cc8c90a2c4de749bd80",
+      "status": "PASS"
+    },
+    {
+      "path": ".cache/compile-compat-apt",
+      "files": 5,
+      "manifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1",
+      "status": "PASS"
+    }
+  ],
+  "jenkins": {
+    "namespace": "jenkins-formal-verify",
+    "status": "PASS",
+    "startedAt": "2026-11-08T16:56:19+0800",
+    "finishedAt": "2026-11-08T17:21:26+0800",
+    "rawCheckCount": 39,
+    "uniqueCheckCount": 24,
+    "checks": [
+      {
+        "name": "全部插件启用",
+        "status": "PASS",
+        "details": {
+          "count": 74
+        }
+      },
+      {
+        "name": "匿名访问及普通账号管理权限受限",
+        "status": "PASS",
+        "details": null
+      },
+      {
+        "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+        "status": "PASS",
+        "details": {
+          "builder1": {
+            "visibleJobs": [
+              "x-ran-cloud",
+              "xcn"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "2/consoleText": 404,
+              "build": 404
+            }
+          },
+          "builder2": {
+            "visibleJobs": [
+              "x-ran-cloud",
+              "xcn"
+            ],
+            "deniedEndpoints": {
+              "job": 404,
+              "api/json": 404,
+              "config.xml": 404,
+              "2/consoleText": 404,
+              "build": 404
+            }
+          }
+        }
+      },
+      {
+        "name": "管理员开关及默认资源；页面仅提供单服务和 services_all",
+        "status": "PASS",
+        "details": {
+          "_class": "hudson.model.ChoiceParameterDefinition",
+          "name": "SERVICE_TARGET",
+          "choices": [
+            "serviceA",
+            "serviceB",
+            "serviceC",
+            "services_all"
+          ]
+        }
+      },
+      {
+        "name": "serviceA 分支",
+        "status": "PASS",
+        "details": {
+          "build": 1,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "serviceB 演示分支",
+        "status": "PASS",
+        "details": {
+          "build": 2,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "serviceC tag",
+        "status": "PASS",
+        "details": {
+          "build": 3,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "带注释 tag",
+        "status": "PASS",
+        "details": {
+          "build": 4,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "services_all 历史完整 SHA",
+        "status": "PASS",
+        "details": {
+          "build": 5,
+          "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+        }
+      },
+      {
+        "name": "唯一短 SHA",
+        "status": "PASS",
+        "details": {
+          "build": 6,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageA build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 7,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageB build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 8,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "imageC build/save/push/load",
+        "status": "PASS",
+        "details": {
+          "build": 9,
+          "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+        }
+      },
+      {
+        "name": "不存在的 Git 引用明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 10
+        }
+      },
+      {
+        "name": "非法标签明确失败",
+        "status": "PASS",
+        "details": {
+          "build": 11
+        }
+      },
+      {
+        "name": "push 失败仍能下载并运行有效镜像 tar",
+        "status": "PASS",
+        "details": {
+          "build": 12
+        }
+      },
+      {
+        "name": "SDK 镜像构建 service/serviceA",
+        "status": "PASS",
+        "details": {
+          "build": 14,
+          "imageId": "localhost:15050/xnet/xran-compile@sha256:c8ad49eb021a05799b5324885c5cf40bb1d6ca5277e4b5c8275a6701b153f605"
+        }
+      },
+      {
+        "name": "SDK 镜像构建 service/services_all",
+        "status": "PASS",
+        "details": {
+          "build": 15,
+          "imageId": "localhost:15050/xnet/xran-compile@sha256:c8ad49eb021a05799b5324885c5cf40bb1d6ca5277e4b5c8275a6701b153f605"
+        }
+      },
+      {
+        "name": "SDK 镜像构建 image/imageA",
+        "status": "PASS",
+        "details": {
+          "build": 16,
+          "imageId": "localhost:15050/xnet/xran-compile@sha256:c8ad49eb021a05799b5324885c5cf40bb1d6ca5277e4b5c8275a6701b153f605"
+        }
+      },
+      {
+        "name": "绕过页面提交 all 仍明确拒绝",
+        "status": "PASS",
+        "details": {
+          "build": 21
+        }
+      },
+      {
+        "name": "关闭开关真实传入 false 并记录到构建快照",
+        "status": "PASS",
+        "details": {
+          "build": 22
+        }
+      },
+      {
+        "name": "两种编译环境同时构建；单任务串行不影响任务并发",
+        "status": "PASS",
+        "details": {
+          "builds": [
+            23,
+            24
+          ],
+          "maximumPods": 2,
+          "imageIds": [
+            "localhost:15050/xnet/xran-compile@sha256:f3e5e8ead3e809856ea502acb0cdaed938bea4997c4596ea4cb1fa58b693e061",
+            "localhost:15050/xnet/xran-compile@sha256:c8ad49eb021a05799b5324885c5cf40bb1d6ca5277e4b5c8275a6701b153f605"
+          ]
+        }
+      },
+      {
+        "name": "Controller 重启保留关闭状态、配置版本与构建历史",
+        "status": "PASS",
+        "details": {
+          "version": 8
+        }
+      },
+      {
+        "name": "旧适配器即使具备 pkgconf 也明确提示升级",
+        "status": "PASS",
+        "details": {
+          "build": 25
+        }
+      }
+    ],
+    "reportPath": ".state/jenkins-formal-verify/build-compatibility.json"
+  },
+  "limits": [
+    "未连接实际内网 Gerrit、APT 或 Harbor",
+    "全套 protobuf-c 1.5.2 仍需真实内网业务测试；可切回兼容版",
+    "xcn 为发布开发分支的在线完整编译；内网 --offline、Gerrit、APT 和 Harbor 仍需迁入后验证；本次三镜像推送失败已如实记录"
+  ],
+  "offlineRuntimeArchive": {
+    "path": ".cache/k8s-images.tar",
+    "imageCount": 9,
+    "status": "PASS",
+    "check": "归档内所有镜像配置 ID 均与 config/images.lock.json 一致，包含 Controller 16 和兼容版 latest"
+  },
+  "incrementalSourceUpgrade": {
+    "base": "23777c1",
+    "files": 34,
+    "status": "PASS",
+    "check": "旧基线所有改动文件通过 git apply --check，应用后逐字节匹配正式源码"
+  },
+  "xcn": {
+    "status": "PASS",
+    "number": 1,
+    "url": "http://10.2.0.119:32198/job/xcn/1/",
+    "finishedAt": "2026-11-08T18:15:45+0800",
+    "metadata": {
+      "commit": "5975f8653bb5f9282d1d0c14609e432d954cd26b",
+      "userId": "builder1",
+      "startedAt": "2026-11-08T17:34:49+08:00",
+      "finishedAt": "2026-11-08T10:09:24.894719+00:00",
+      "durationMillis": 2072127,
+      "chartVersion": "26.11.8",
+      "appVersion": "26.11.8-formal",
+      "offline": false,
+      "builderImage": "localhost:15050/xnet/xran-compile:26.11.08-compat",
+      "builderImageId": "localhost:15050/xnet/xran-compile@sha256:f3e5e8ead3e809856ea502acb0cdaed938bea4997c4596ea4cb1fa58b693e061",
+      "builderImagePullPolicy": "Always",
+      "settingsVersion": 9,
+      "resourceProfile": "xcn",
+      "admittedAt": "2026-11-08T17:34:49.936281074+08:00",
+      "resourceAllocation": {
+        "jnlp": {
+          "requests": {
+            "memory": "256Mi",
+            "ephemeral-storage": "64Mi",
+            "cpu": "100m"
+          },
+          "limits": {
+            "memory": "512Mi",
+            "ephemeral-storage": "256Mi",
+            "cpu": "250m"
+          }
+        },
+        "builder": {
+          "requests": {
+            "memory": "1024Mi",
+            "ephemeral-storage": "1024Mi",
+            "cpu": "500m"
+          },
+          "limits": {
+            "memory": "3584Mi",
+            "ephemeral-storage": "4096Mi",
+            "cpu": "500m"
+          }
+        },
+        "dind": {
+          "requests": {
+            "memory": "256Mi",
+            "ephemeral-storage": "1024Mi",
+            "cpu": "250m"
+          },
+          "limits": {
+            "memory": "4096Mi",
+            "ephemeral-storage": "16128Mi",
+            "cpu": "3250m"
+          }
+        }
+      },
+      "files": [
+        {
+          "name": "xcn-runtime.tar",
+          "size": 274081280,
+          "sha256": "4163df4bc2e28636db9c74819158c699d034e433f9c36ddb7cad1fc7ff1002dc"
+        },
+        {
+          "name": "xcn-webui.tar",
+          "size": 466788352,
+          "sha256": "5132a93dff3399307ef512adbc00ae81549aaa300892567d38edd5066ad02664"
+        },
+        {
+          "name": "xcn-monitor.tar",
+          "size": 436569088,
+          "sha256": "3f9b47241f67e1d24585ce292b96b4af4135e23ba74404a976ebbb60a86213d1"
+        },
+        {
+          "name": "xcn-26.11.8.tgz",
+          "size": 25714,
+          "sha256": "67575e69b70ab158e9d1afbad3a886eb9a4a0a3bcc02ec96b7790ef71eec1c92"
+        }
+      ],
+      "images": [
+        {
+          "name": "xcn-runtime",
+          "reference": "192.168.10.35/xcn/xcn-runtime:26.11.8-formal",
+          "imageId": "sha256:d54c235fa48a9c8de89d7507e344abc96de8d4e0ec0a01db3fadaf08cb1636ee",
+          "pushStatus": "failed"
+        },
+        {
+          "name": "xcn-webui",
+          "reference": "192.168.10.35/xcn/xcn-webui:26.11.8-formal",
+          "imageId": "sha256:eac58d6c53541202939028467add23b794f16f5274559c2119470bf89279287e",
+          "pushStatus": "failed"
+        },
+        {
+          "name": "xcn-monitor",
+          "reference": "192.168.10.35/xcn/xcn-monitor:26.11.8-formal",
+          "imageId": "sha256:e9bd0ec2ecdab349d050d2023f2fd419f9179a580fb202bf4e97807efecedcdd",
+          "pushStatus": "failed"
+        }
+      ],
+      "warnings": [
+        "镜像推送未全部成功；有效本地包仍可下载"
+      ]
+    },
+    "checks": [
+      {
+        "name": "精确提交、构建人、时间、日期版本及编译镜像",
+        "status": "PASS"
+      },
+      {
+        "name": "普通账号下载四个产物及 SHA256 完整性",
+        "status": "PASS"
+      },
+      {
+        "name": "Helm lint 与模板渲染",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-runtime 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-webui 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "xcn-monitor 导入与断网运行检查",
+        "status": "PASS"
+      },
+      {
+        "name": "推送状态如实记录；非致命 push 失败仍保留有效产物",
+        "status": "PASS"
+      }
+    ],
+    "sourceVerification": "实际 Git 服务与 .cache/xcn.git 的开发分支固定为 5975f865；本地业务目录分支已前进到 7019cb034，接续验收时使用实际镜像仓库核对。没有修改业务 main 或开发分支。",
+    "networkPolicy": "用户授权的独立命名空间 xcn Pod TCP 80/443 例外已在构建结束后删除",
+    "reportPath": ".state/jenkins-formal-verify/xcn-release.json"
+  },
+  "status": "PASS"
+}

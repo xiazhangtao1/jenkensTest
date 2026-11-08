@@ -42,6 +42,7 @@ public final class PlatformSettings {
         s.put("compilerImage", "192.168.10.35/xnet/xran-compile:latest");
         s.put("compilerImagePullPolicy", "Always");
         s.put("xcnOffline", true);
+        s.put("xranServiceSerial", true);
         s.put("buildTimeoutMinutes", 240);
         s.put("agentStartupTimeoutMinutes", 15);
         s.put("minimumFreeGiB", 50);
@@ -49,10 +50,17 @@ public final class PlatformSettings {
         return s;
     }
 
+    /** Fill only newly introduced settings; keep administrator values and old audit records. */
+    public static JSONObject upgradeSettings(JSONObject input) {
+        JSONObject result = upgradeNames(input);
+        if (!result.containsKey("xranServiceSerial")) result.put("xranServiceSerial", true);
+        return result;
+    }
+
     public static JSONObject migrate(JSONObject site) {
         JSONObject s = defaults();
         for (String key : List.of("concurrency", "compilerImagePullPolicy", "buildTimeoutMinutes",
-                "agentStartupTimeoutMinutes", "minimumFreeGiB", "minimumFreePercent")) {
+                "agentStartupTimeoutMinutes", "minimumFreeGiB", "minimumFreePercent", "xranServiceSerial")) {
             if (site.containsKey(key)) s.put(key, site.get(key));
         }
         if (site.containsKey("builderImage")) s.put("compilerImage", site.get("builderImage"));
@@ -147,7 +155,7 @@ public final class PlatformSettings {
     public static Map<String, Object> runtime(JSONObject s, String p) {
         Map<String, Object> result = new LinkedHashMap<>();
         for (String key : List.of("concurrency", "buildTimeoutMinutes", "agentStartupTimeoutMinutes",
-                "minimumFreeGiB", "minimumFreePercent", "compilerImagePullPolicy", "innerBuildMemoryGiB", "buildJobs")) {
+                "minimumFreeGiB", "minimumFreePercent", "compilerImagePullPolicy", "innerBuildMemoryGiB", "buildJobs", "xranServiceSerial")) {
             result.put(key, s.get(key));
         }
         result.put("builderImage", s.getString("compilerImage"));

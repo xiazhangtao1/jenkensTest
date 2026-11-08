@@ -10,6 +10,7 @@ offline: true
 demo: false
 # 下列默认值仅在首次启动时导入；恢复已有 HOME 后以网页保存的设置为准。
 concurrency: 6
+xranServiceSerial: true
 buildCpuLimit: 4
 buildMemoryGiB: 8
 dindMemoryGiB: 4

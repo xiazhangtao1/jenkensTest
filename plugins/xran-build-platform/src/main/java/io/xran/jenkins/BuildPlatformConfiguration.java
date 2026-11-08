@@ -40,12 +40,12 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
             state = file.isFile() ? JSONObject.fromObject(Files.readString(file.toPath())) : new JSONObject();
             if (state.containsKey("settings")) {
                 JSONObject before = copy(state.getJSONObject("settings"));
-                JSONObject upgraded = PlatformSettings.upgradeNames(before);
+                JSONObject upgraded = PlatformSettings.upgradeSettings(before);
                 if (!before.equals(upgraded)) {
                     state.put("settings", PlatformSettings.validate(upgraded));
                     state.put("version", state.optLong("version") + 1);
                     state.put("applyError", "等待应用配置");
-                    audit(before, upgraded, "xcn-project-rename");
+                    audit(before, upgraded, "build-compatibility-upgrade");
                     persist();
                 }
             }
@@ -170,7 +170,7 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
             JSONObject candidate = copy(settings());
             for (Object name : candidate.keySet().toArray()) {
                 String key = name.toString(), value = req.getParameter(key);
-                if (value != null) candidate.put(key, key.equals("xcnOffline") ? Boolean.valueOf(value) : value);
+                if (value != null) candidate.put(key, candidate.get(key) instanceof Boolean ? Boolean.valueOf(value) : value);
             }
             candidate = PlatformSettings.validate(candidate);
             JSONObject result = new JSONObject();

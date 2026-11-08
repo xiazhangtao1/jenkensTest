@@ -13,6 +13,7 @@ AGENTS.md
 !.cache/compile-apt/
 !.cache/compile-sources/
 !.cache/compile-extra-apt/
+!.cache/compile-compat-apt/
 !.cache/compile-tools/
 !.cache/xcn-base-images.tar
 !.cache/xcn.git/

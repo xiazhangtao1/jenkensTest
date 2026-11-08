@@ -70,6 +70,32 @@ public class BuildPlatformConfigurationTest {
         }
     }
 
+    @Test public void serialSettingMigratesOnceAndKeepsAdministratorValues() throws Exception {
+        BuildPlatformConfiguration c = seed();
+        var file = j.jenkins.getRootDir().toPath().resolve("xran-platform/state.json");
+        JSONObject stored = JSONObject.fromObject(Files.readString(file));
+        stored.getJSONObject("settings").remove("xranServiceSerial");
+        stored.getJSONObject("settings").put("serviceMemoryGiB", 16);
+        stored.getJSONObject("settings").put("concurrency", 3);
+        String leases = stored.getJSONObject("leases").toString();
+        Files.writeString(file, stored.toString());
+        BuildPlatformConfiguration migrated = new BuildPlatformConfiguration();
+        assertTrue(migrated.getForm().getBoolean("xranServiceSerial"));
+        assertEquals(16, migrated.getForm().getInt("serviceMemoryGiB"));
+        assertEquals(3, migrated.getForm().getInt("concurrency"));
+        assertEquals(2, migrated.getRevision());
+        JSONObject saved = JSONObject.fromObject(Files.readString(file));
+        assertEquals(leases, saved.getJSONObject("leases").toString());
+        assertTrue(Files.readString(file).contains("build-compatibility-upgrade"));
+        assertEquals(2, new BuildPlatformConfiguration().getRevision());
+        JSONObject edit = migrated.getForm();
+        edit.put("revision", migrated.getRevision());
+        edit.put("xranServiceSerial", false);
+        migrated.configure((org.kohsuke.stapler.StaplerRequest2) null, edit);
+        assertFalse(new BuildPlatformConfiguration().getForm().getBoolean("xranServiceSerial"));
+        assertEquals(false, migrated.effective("service").get("xranServiceSerial"));
+    }
+
     @Test public void savedProjectSettingsKeepValuesAcrossRename() {
         JSONObject expected = PlatformSettings.defaults();
         expected.put("concurrency", 3);
@@ -123,6 +149,7 @@ public class BuildPlatformConfigurationTest {
         expected.put("minimumFreePercent", 0);
         expected.put("xcnOffline", false);
         expected.put("compilerImagePullPolicy", "Never");
+        expected.put("xranServiceSerial", false);
         JSONObject submitted = JSONObject.fromObject(expected.toString());
         submitted.put("revision", c.getRevision());
         c.configure((org.kohsuke.stapler.StaplerRequest2) null, submitted);
@@ -134,6 +161,7 @@ public class BuildPlatformConfigurationTest {
         var page = admin.goTo("configure");
         assertTrue(page.asNormalizedText().contains("构建平台设置"));
         assertTrue(page.asNormalizedText().contains("xcn 离线构建"));
+        assertTrue(page.asNormalizedText().contains("X-RAN-CLOUD 服务编译串行执行"));
         assertFalse(page.asNormalizedText().contains("open5gs"));
         try { j.submit(page.getFormByName("config")); }
         catch (org.htmlunit.FailingHttpStatusCodeException error) {

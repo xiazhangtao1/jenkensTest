@@ -18,7 +18,8 @@ def compilerPolicy = (params.containsKey('COMPILER_IMAGE_PULL_POLICY') ? params.
     XranCompiler.defaults(kind).compilerImagePullPolicy) as String
 XranCompiler.validate(compilerImage, compilerPolicy)
 if (!(sourceType in ['branch', 'tag', 'commit']) || !(kind in ['service', 'image', 'xcn'])) error('非法构建类型或引用类型')
-if (!isXcn && !(target in (kind == 'service' ? cfg.services + ['all', 'services_all'] : cfg.images))) error('非法构建目标')
+if (kind == 'service' && target == 'all') error('服务目标 all 已取消，请选择单个服务或 services_all')
+if (!isXcn && !(target in (kind == 'service' ? cfg.services + ['services_all'] : cfg.images))) error('非法构建目标')
 if (!ref || ref.startsWith('-') || ref.contains('\n')) error('非法 Git 引用')
 if (needsDocker && !(imageTag ==~ /[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}/)) error('非法镜像标签')
 if (isXcn && !(chartVersion ==~ /(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?/)) error('非法 Chart 版本，请使用不带前导零的 SemVer')
@@ -45,6 +46,7 @@ def execute = {
         metadata.putAll([settingsVersion: snapshot.settingsVersion, resourceProfile: snapshot.resourceProfile,
             resourceAllocation: snapshot.resourceAllocation, admittedAt: snapshot.admittedAt])
         if (isXcn) metadata.offline = offline
+        else metadata.xranServiceSerial = cfg.containsKey('xranServiceSerial') ? cfg.xranServiceSerial : true
         def deadline = (snapshot.admittedAtMillis as long) + (cfg.buildTimeoutMinutes as long) * 60000L
         def remainingSeconds = Math.max(1L, (long)Math.ceil((deadline - System.currentTimeMillis()) / 1000.0d))
         if (deadline <= System.currentTimeMillis()) error('构建入场后总超时已到期')
@@ -90,6 +92,7 @@ def execute = {
                     "XRAN_REGISTRY=${cfg.registry}", "IMAGE_REGISTRY=${cfg.registry}",
                     "XRAN_IMAGE_REFERENCE=${reference}", "XRAN_SERVICES=${groovy.json.JsonOutput.toJson(cfg.services)}",
                     "XRAN_CHART_VERSION=${chartVersion}", "XRAN_OFFLINE=${offline}",
+                    "XRAN_SERVICE_SERIAL=${cfg.containsKey('xranServiceSerial') ? cfg.xranServiceSerial : true}",
                     "BUILD_MEMORY=${cfg.innerBuildMemoryGiB ?: 3}g", "BUILD_JOBS=${cfg.buildJobs ?: 2}",
                     "XRAN_BUILD_DELAY_SECONDS=${cfg.demoBuildDelaySeconds ?: 0}",
                     'TZ=Asia/Shanghai', 'MAKEFLAGS=-j4', 'CMAKE_BUILD_PARALLEL_LEVEL=4',
@@ -107,6 +110,13 @@ def execute = {
                                         command -v "$tool" >/dev/null || { echo "编译镜像缺少工具：$tool" >&2; exit 1; }
                                     done
                                     test -r /opt/xran/run-build.py || { echo '编译镜像缺少 /opt/xran/run-build.py，请使用本项目制作的兼容镜像' >&2; exit 1; }
+                                '''
+                                if (!isXcn) sh '''set -eu
+                                    command -v pkgconf >/dev/null || { echo '编译镜像缺少工具：pkgconf' >&2; exit 1; }
+                                    python3 /opt/xran/run-build.py capabilities > compiler-capabilities.json || {
+                                        echo '编译镜像适配器版本过旧，请使用本项目 Dockerfile 重新制作编译镜像' >&2; exit 1;
+                                    }
+                                    python3 -c 'import json,sys; s=json.load(open("compiler-capabilities.json")); sys.exit(0 if s.get("xranServiceCompatibility") == 1 else "编译镜像不支持当前服务适配，请重新制作编译镜像")'
                                 '''
                                 if (needsDocker) sh 'command -v docker >/dev/null && test -r /opt/xran/base-images.tar'
                                 if (isXcn) sh 'command -v helm >/dev/null && python3 -c "import yaml" && test -r /opt/xran/xcn-bases/images.tar'

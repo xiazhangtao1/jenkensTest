@@ -18,6 +18,7 @@ class CompilerTests(unittest.TestCase):
         args = compiler.parser().parse_args([])
         self.assertEqual(compiler.image_reference(args.image_name, args.image_tag),
                          '192.168.10.35/xnet/xran-compile:latest')
+        self.assertEqual(args.dockerfile, 'docker/builder-compat.Dockerfile')
         self.assertEqual(compiler.image_reference('registry.local:5000/team/sdk', '26.11.05'),
                          'registry.local:5000/team/sdk:26.11.05')
         self.assertEqual(compiler.image_reference('example/sdk', 'feature_A-2'), 'example/sdk:feature_A-2')
@@ -25,6 +26,44 @@ class CompilerTests(unittest.TestCase):
                           ('sdk\nFROM evil', 'tag'), ('-sdk', 'tag'), ('-repo/sdk', 'tag'), ('UPPER/sdk', 'latest')]:
             with self.subTest(name=name, tag=tag), self.assertRaises(ValueError):
                 compiler.image_reference(name, tag)
+
+    def test_dockerfile_paths_and_build_arguments(self):
+        with tempfile.TemporaryDirectory(prefix='compiler path ') as folder:
+            root = Path(folder)
+            recipe = root / "Dockerfile custom ' name"
+            recipe.write_text('FROM ubuntu:22.04\n')
+            cache = root / '.cache'
+            cache.mkdir()
+            (cache / 'base-images.tar').touch()
+            with patch.object(compiler, 'ROOT', root), patch.object(compiler, 'CACHE', cache):
+                self.assertEqual(compiler.resolve_dockerfile(recipe.name), recipe)
+                self.assertEqual(compiler.resolve_dockerfile(str(recipe)), recipe)
+                for invalid in ('missing.Dockerfile', str(root)):
+                    with self.assertRaisesRegex(ValueError, 'Dockerfile 不存在'):
+                        compiler.resolve_dockerfile(invalid)
+                args = SimpleNamespace(image_name='example/sdk', image_tag='test', jobs=4,
+                    dockerfile=recipe.name, offline=True, apt_sources='config/sources.intranet.list', no_export=True)
+                with patch.object(compiler, 'versions', return_value={'UBUNTU_IMAGE': 'ubuntu:22.04',
+                        'DOCKER_CLI_IMAGE': 'docker:test'}), \
+                     patch.object(compiler, 'assemble_sources'), patch.object(compiler, 'ensure_image'), \
+                     patch.object(compiler, 'prepare_apt'), patch.object(compiler, 'prepare_helm'), \
+                     patch.object(compiler, 'run') as execute:
+                    (root / 'config').mkdir()
+                    (root / 'config/base-images.txt').write_text('')
+                    compiler.build(args)
+                command = execute.call_args_list[0].args[0]
+                self.assertEqual(command[command.index('-f') + 1], recipe)
+                self.assertEqual(command[-1], root)
+                self.assertEqual(command[command.index('--network') + 1], 'none')
+
+    def test_make_dockerfile_path_is_not_executed_by_shell(self):
+        with tempfile.TemporaryDirectory() as folder:
+            sentinel = Path(folder) / 'unexpected'
+            result = subprocess.run(['make', 'compile-image',
+                'DOCKERFILE=missing file;touch ' + str(sentinel)], cwd=ROOT, capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('Dockerfile 不存在', result.stdout + result.stderr)
+            self.assertFalse(sentinel.exists())
 
     def test_split_sources_restore_and_detect_corruption(self):
         original_root, original_cache = compiler.ROOT, compiler.CACHE
