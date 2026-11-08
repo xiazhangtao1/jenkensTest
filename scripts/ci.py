@@ -221,18 +221,19 @@ def images(args):
     prepare_xcn_bases(cfg, args.offline)
     run([*build, '--build-arg', f'STORAGE_HELPER_IMAGE={v["STORAGE_HELPER_IMAGE"]}',
          '-f', ROOT / 'docker/xcn-bases.Dockerfile', '-t', v['XCN_BASES_IMAGE'], ROOT], env=build_env)
-    mirror = CACHE / 'demo.git'
-    if mirror.exists():
-        shutil.rmtree(mirror)
-    run(['git', 'clone', '--mirror', '--no-hardlinks', args.source, mirror])
-    run(['git', '-C', mirror, 'update-server-info'])
-    xcn_mirror = CACHE / 'xcn.git'
-    if xcn_mirror.exists():
-        shutil.rmtree(xcn_mirror)
-    run(['git', 'clone', '--mirror', '--no-hardlinks', args.xcn_source, xcn_mirror])
-    run(['git', '-C', xcn_mirror, 'update-server-info'])
-    run([*build, '--build-arg', f'BUILDER_IMAGE={cfg["builderImage"]}',
-         '-f', ROOT / 'docker/demo.Dockerfile', '-t', v['DEMO_IMAGE'], ROOT], env=build_env)
+    if cfg.get('demo'):
+        mirror = CACHE / 'demo.git'
+        if mirror.exists():
+            shutil.rmtree(mirror)
+        run(['git', 'clone', '--mirror', '--no-hardlinks', args.source, mirror])
+        run(['git', '-C', mirror, 'update-server-info'])
+        xcn_mirror = CACHE / 'xcn.git'
+        if xcn_mirror.exists():
+            shutil.rmtree(xcn_mirror)
+        run(['git', 'clone', '--mirror', '--no-hardlinks', args.xcn_source, xcn_mirror])
+        run(['git', '-C', xcn_mirror, 'update-server-info'])
+        run([*build, '--build-arg', f'BUILDER_IMAGE={cfg["builderImage"]}',
+             '-f', ROOT / 'docker/demo.Dockerfile', '-t', v['DEMO_IMAGE'], ROOT], env=build_env)
     refs = runtime_images(config(args))
     records = {ref: json.loads(output(['docker', 'image', 'inspect', ref]))[0]['Id'] for ref in refs}
     (ROOT / 'config/images.lock.json').write_text(json.dumps(records, indent=2) + '\n')

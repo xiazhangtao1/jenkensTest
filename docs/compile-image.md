@@ -27,7 +27,7 @@ Python 入口为 `python3 scripts/compile-image.py build --dockerfile Dockerfile
 
 首次命令自动校验、还原源码，准备 Docker 基础镜像和完整 APT 依赖缓存，再执行断网 Docker 构建。
 制作 SDK 时默认并行数为 4，可通过 `BUILD_JOBS` 修改；它与 Jenkins 的服务串行开关、xcn 内层并行数分别配置。
-Docker 构建完成后自动执行镜像验证。导出目录为 `dist/compile/镜像引用转换后的目录名/`，
+Docker 构建完成后自动执行镜像验证。导出目录为 `dist/transfer/03-generated-images/compiler/镜像引用转换后的目录名/`，
 包含 `image.tar`、`manifest.json`、`SHA256SUMS`，记录 Dockerfile 路径及校验值、实际工具版本、镜像 ID、依赖清单校验值和导出包校验值。
 
 推送命令单独执行。私有仓库需要登录时，先执行 `docker login 192.168.10.35`；凭据只保存在操作者自己的 Docker 配置中。
@@ -70,11 +70,10 @@ DPDK 源码和 build 路径保留在 `/opt/dpdk-22.03`。镜像内 `/opt/package
 
 ## 离线重建与验证
 
-准备机制作的离线目录已包含所有源码分片、APT 缓存、基础镜像和运行镜像。迁入后：
+先按 [分类搬运](transfer.md) 还原编译依赖和基础镜像；无需携带编译镜像成品。迁入后：
 
 ```bash
 docker load -i .cache/build-base-images.tar
-docker load -i .cache/k8s-images.tar
 make compile-image OFFLINE=1
 make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.08-sdk-r2
 docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/xran/verify-compile.sh
@@ -95,7 +94,7 @@ make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_T
 make push-compile-image IMAGE_TAG=26.11.08-compat-r2
 ```
 
-迁移时拷贝 `dist/compile/192.168.10.35_xnet_xran-compile_26.11.08-compat-r2/image.tar`，
+选择直接搬运成品时，拷贝 `dist/transfer/03-generated-images/compiler/192.168.10.35_xnet_xran-compile_26.11.08-compat-r2/image.tar`，
 在内网执行 `docker load -i 文件路径` 后推送同名镜像到 Harbor。
 Jenkins 构建参数 `COMPILER_IMAGE` 填该完整新版本地址，拉取策略使用 `Always` 即可，无需重新部署 Jenkins。
 

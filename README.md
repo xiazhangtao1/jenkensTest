@@ -52,7 +52,7 @@ make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.
 
 默认镜像为 `192.168.10.35/xnet/xran-compile:latest`。支持 `BUILD_JOBS=4`、
 `APT_SOURCES=config/sources.intranet.list` 和 `OFFLINE=1`；推送前按实际仓库执行 `docker login`。
-镜像及校验清单导出到 `dist/compile/`。详细依赖、离线重建和镜像兼容要求见 [编译镜像说明](docs/compile-image.md)。
+镜像及校验清单导出到 `dist/transfer/03-generated-images/compiler/`。详细依赖、离线重建和镜像兼容要求见 [编译镜像说明](docs/compile-image.md)。
 
 默认入口 `http://10.2.0.119:32080/`，可通过 jenkinsUrl 修改。初始账号为 admin、builder1、builder2，
 随机密码保存于 `.state/jenkins/users.json`（0600）。通过 **Manage Jenkins → Users → Create User** 创建正式个人账号，登录后自动获得普通构建权限；
@@ -88,18 +88,26 @@ make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.
 
 ```bash
 make test
-make bundle
+make transfer-deps
+make transfer-code
+# 已有内网代码时，仅生成该基线以来的代码补丁：
+make transfer-code BASE_COMMIT=内网当前提交
 ```
+
+搬运统一使用 `dist/transfer/`：`01-dependencies` 是首次或依赖变化时才需要的外部输入，
+`02-code` 是日常代码更新，`03-generated-images` 是可选的自建镜像成品。
+准备在内网自行制作编译镜像时，无需拷贝成品。先带入依赖清单，用 `make transfer-check TRANSFER_MANIFEST=/路径/MANIFEST.json`
+检查已有文件，只拷缺少或变化的包。具体目录、清单和内网重建命令见 [分类搬运](docs/transfer.md)。
 
 `make verify SITE=/路径/验收站点.yaml` 会提交真实构建并测试并发和清理。
 磁盘压力测试要求独立验收实例的配置包含 `verificationInstance: true`；日常仅验证功能可执行 `python3 tests/verify.py --quick`。
 两项目共享资源的专用验证为 `python3 tests/verify-shared.py --site /路径/验收站点.yaml`，同样只允许独立实例。
-离线目录位于 dist/offline/xran-jenkins-时间，含完整镜像、插件、chart、工具、源码 bundle、apt 缓存和校验清单，
-不含运行密码和 SSH 私钥。
+`make bundle` 保留为完整快照的兼容命令，包含预编译镜像；日常更新使用分类包，不包含运行密码和 SSH 私钥。
 内网两个 Gerrit 地址已提供在 [站点示例](config/site.intranet.yaml)，`ICT_CN` 的外层仓库名不影响 xcn 构建路径。
 内网首次部署、可选 SDK 重建及迁移已有历史见 [离线迁移](docs/offline.md)；仅复制 Git 仓库不足以离线启动。
 
 - [离线迁移](docs/offline.md)
+- [分类搬运和避免重复拷贝](docs/transfer.md)
 - [运维与备份恢复](docs/operations.md)
 - [验证结果](docs/validation.md)
 

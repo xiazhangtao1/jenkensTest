@@ -5,23 +5,26 @@
 
 ## 同步源码和缓存
 
-联网环境正常更新 Git。已更新到 `b9773ef` 的目录使用 `source.patch`；仍为 `23777c1` 的旧离线目录使用 `source-from-23777.patch`，后者包含前一轮构建修复。先按实际基线选择补丁：
+联网环境正常更新 Git。离线更新按 [分类搬运](transfer.md) 交付，外部依赖与代码分开。
+先在内网确认实际代码基线；外网执行 `make transfer-code BASE_COMMIT=该基线` 生成 `02-code/code.patch`，
+例如 `23777c1` 或 `b9773ef`。历史临时改动需与正式修改合并。
 
 ```bash
-cd /交付路径
+cd /交付路径/02-code
 sha256sum -c SHA256SUMS
 cd /实际路径/jenkensTestOffline
 git diff > /tmp/jenkins-local-before-formal.patch
 git rev-parse --short HEAD
-# 以下以 b9773ef 为例；23777c1 改用 source-from-23777.patch。
-git apply --check /交付路径/source.patch
-git apply /交付路径/source.patch
+git apply --check /交付路径/02-code/code.patch
+git apply /交付路径/02-code/code.patch
+cp /交付路径/02-code/CODE.json TRANSFER_SOURCE.json
 ```
 
 如果检查提示冲突，先保留临时文件副本，再合并正式修改；不要直接覆盖本地 `config/site.local.yaml`。
-补丁不携带 Jenkins HOME、私钥或密码。将交付的 `.cache/compile-extra-apt/`、`.cache/compile-compat-apt/`
-按目录分别替换为同一批已校验文件，不能只追加 deb 而保留旧 manifest。
-交付目录的 `SHA256SUMS` 应先通过校验。已有基础镜像和公共源码可继续使用；把交付的 `.cache/platform-m2/org/jenkins-ci/plugins/matrix-auth/3.3/` 合并到同路径，以便断网重建新插件。
+补丁不携带 Jenkins HOME、私钥或密码，也不重复携带 SDK 源码大文件。
+先将新的 `01-dependencies/MANIFEST.json` 带入内网，用 `scripts/transfer.py check` 检查，再只拷缺少或变化的依赖包。
+解开相应依赖包到项目根目录；同一类缓存以校验清单为准，不混用旧 manifest 和新 deb。
+已有相同基础镜像和依赖可以继续使用，完整分类和命令见分类搬运文档。
 
 ## 制作和测试两版编译镜像
 
@@ -36,7 +39,7 @@ sudo make push-compile-image IMAGE_TAG=26.11.08-sdk-r2
 Harbor 需要登录时，使用与推送相同的用户登录；上述 sudo 示例对应 `sudo docker login 192.168.10.35`。
 
 默认镜像名称为 `192.168.10.35/xnet/xran-compile`；名称和 tag 都可另行指定。
-构建命令会自动断网验证镜像。每个 tag 的导出包位于 `dist/compile/镜像引用转换后的目录名/image.tar`，
+构建命令会自动断网验证镜像。每个 tag 的导出包位于 `dist/transfer/03-generated-images/compiler/镜像引用转换后的目录名/image.tar`，
 已有成品也可直接 `docker load` 后推送到 Harbor。两版是完整编译环境，切换只需在构建参数填写对应 `COMPILER_IMAGE`。
 
 完成兼容版验收后，如果要继续使用默认的 `latest` 地址：
@@ -51,7 +54,7 @@ sudo make push-compile-image IMAGE_TAG=latest
 直接使用交付的新 Controller 镜像时：
 
 ```bash
-sudo ctr -n k8s.io images import /交付路径/controller-image.tar
+sudo ctr -n k8s.io images import /交付路径/03-generated-images/controller/controller-image.tar.gz
 sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml OFFLINE=1
 ```
 

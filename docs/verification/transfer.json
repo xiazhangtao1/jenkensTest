@@ -1,0 +1,97 @@
+{
+  "date": "2026-11-08T23:25:01.699754+08:00",
+  "status": "PASS",
+  "python": {
+    "tests": 41,
+    "status": "PASS"
+  },
+  "independentOfflineBuild": {
+    "status": "PASS",
+    "codeRequiresBusinessRepositories": false,
+    "network": "none",
+    "compilerCTest": 2,
+    "pluginTests": {
+      "tests": 16,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 1
+    },
+    "spotbugs": 0,
+    "runtimeImages": {
+      "xran-ci/transfer-compile-verify:1": "sha256:7fcfcb7cffccfea8c911ac93d3de42f108257a7e3fbbce676291e9240a688ca4",
+      "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
+      "docker:29.9.3-dind": "sha256:51d0681aa1e6756df485af7922fbaf9bd73275db418900c713b564bc94f94175",
+      "xran-ci/transfer-bases-verify:1": "sha256:efad7c29ea5b925e20db49e8c62c3116a079f87e260726f6a4a66577026be75a",
+      "rancher/local-path-provisioner:v0.0.37": "sha256:683316f41426e4fc774e1cd7388e3bcbd5d4d63837753a789d929d64365c399a",
+      "busybox:1.37.0": "sha256:30ecbe1509090b38ef3260f3609d64d8261230464eaa4d235901db496e9647fb",
+      "xran-ci/transfer-controller-verify:1": "sha256:b10dcaafe73c732ace2323456349e21ef5a59aa2bcf8930ebf673b89c5c8bba3"
+    },
+    "source": "仅由分类依赖包和项目源文件还原的独立目录"
+  },
+  "dependencies": {
+    "componentCount": 5,
+    "totalPackageBytes": 3832196356,
+    "components": [
+      {
+        "name": "compiler",
+        "package": "compiler-deps.tar.gz",
+        "id": "1deb24adef11abf8c1621abc112e5c5f3e54372270b489fbfcb2ac7f958eb3e1",
+        "sha256": "969a0bcd3e52ac9fafa5edc61200b35faf702898fcddbed06d677cace5dbdcc8",
+        "bytes": 547341141,
+        "files": 307
+      },
+      {
+        "name": "jenkins",
+        "package": "jenkins-deps.tar.gz",
+        "id": "55cb7b95bc781762775638145c956898c1edc7fd114e1d99c54e34a804e981b0",
+        "sha256": "40ece3908fbc95dbac02c6fd5b030b34439bb0a71657b97375edf7638ae07977",
+        "bytes": 591353263,
+        "files": 5842
+      },
+      {
+        "name": "build-images",
+        "package": "build-base-images.tar",
+        "id": "6f7c39669e5d575337b136398dc71901d04fe09ed9fcf956a198af4558559fea",
+        "sha256": "068b264d1588fba06c0f825300c9756974ccb3d09fd774a388970f321178811c",
+        "bytes": 1440836608,
+        "files": 1
+      },
+      {
+        "name": "runtime-images",
+        "package": "runtime-base-images.tar",
+        "id": "173a7798e9d43d4dcfe2a5872015cae9c6b0b489a5a0acaeff1681a1f3ead64e",
+        "sha256": "c6849fa3969ed1c8b991bb08ca2e2567b7c513fd810c0b97d63f5d5f96a495c6",
+        "bytes": 944803840,
+        "files": 1
+      },
+      {
+        "name": "xcn-images",
+        "package": "xcn-base-images.tar",
+        "id": "d8f5f36a57d9e116274a91655de99fb52bf6b84ad3b3b692bc67a5c5572eae8a",
+        "sha256": "c6e7dd5ded58f199719a678bf06b9833889794b86c7d2b79b9af855e46f6263d",
+        "bytes": 307861504,
+        "files": 1
+      }
+    ],
+    "repeatPackaging": "全部五包均未变化并复用",
+    "workspaceCheck": "全部已有，无需重复拷贝",
+    "integrity": "归档 SHA256、解包逐文件和最终镜像包校验通过",
+    "retainedDependencyFilesVerified": 6232,
+    "runtimeArchiveDockerLoad": "PASS",
+    "controllerCompressedArchiveDockerLoad": "PASS",
+    "upstreamOnlyExportWithoutCustomImages": "PASS"
+  },
+  "codeChecks": [
+    "完整代码包和增量补丁均排除 SDK 归档及本地站点配置",
+    "确定性归档保留可执行权限",
+    "清单识别内容变化并拒绝越界路径"
+  ],
+  "cleanup": {
+    "beforeBytes": 48905191424,
+    "afterBytes": 13558194176,
+    "freedBytes": 35346997248,
+    "gitHistoryPreserved": true,
+    "liveJenkinsDataUnchanged": true
+  },
+  "scope": "仅调整交付和构建工具；主 Jenkins、业务源码分支和运行中的历史产物均未改动"
+}

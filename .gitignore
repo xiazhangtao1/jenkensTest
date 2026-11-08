@@ -6,3 +6,5 @@ __pycache__/
 output/
 .playwright-cli/
 plugins/*/target/
+TRANSFER_SOURCE.json
+config/site.local.yaml

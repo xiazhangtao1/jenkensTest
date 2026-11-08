@@ -1,14 +1,15 @@
 # 内网离线迁移
 
 目标已有 Kubernetes/containerd 和 Ubuntu 22.04 amd64，不包含集群安装。
-所有运行镜像、完整插件依赖和可选 local-path 镜像均在包内；启动时不安装插件，临时 DinD 加载预置基础镜像。
+外部依赖、代码和可选的自建镜像分别交付；启动时不安装插件，临时 DinD 加载预置基础镜像。
 
 ## 搬运哪些内容
 
-在当前准备机执行 `make bundle`，搬运生成的整个 `dist/offline/xran-jenkins-时间/` 目录，包含隐藏的 `.cache/`。
-仅复制 Git 仓库不包含运行镜像、插件二进制、Helm chart 和 APT/Maven 缓存，不能直接完成全离线部署。
-首次部署可直接使用包内镜像，无需在目标机重新编译 SDK；Kubernetes 按任务自动创建临时编译 Pod。
-要在内网重新制作编译镜像，使用后面的“编译环境重建”命令，需要目标机另安装 Docker。
+推荐先阅读 [分类搬运](transfer.md)：`make transfer-deps` 准备固定外部输入，`make transfer-code` 准备小型代码包，
+在 `dist/transfer/01-dependencies` 和 `02-code` 分别生成。先携带依赖清单检查内网已有内容，只拷缺少或变化的包。
+准备在内网自行构建时不拷贝 `03-generated-images`，依赖还原后按分类文档运行 `make images SITE=config/site.local.yaml OFFLINE=1`。
+生产站点关闭 demo，不需要本地模拟业务库。仅复制 Git 仓库仍不足以离线部署，需准备上游镜像、插件、chart 和构建缓存。
+`make bundle` 仍可生成含成品的完整快照，适用于明确需要一起搬运的场景。
 
 如果还要保留外网 Jenkins 的账号、历史包和网页设置，另做 Jenkins HOME 备份，并单独搬运
 `.state/jenkins/users.json`（0600）及所需 Kubernetes Secret。运行数据和私钥不放入通用离线包。
@@ -16,8 +17,8 @@
 ## 校验和导入
 
 ```bash
-cd /data/xran-jenkins-实际时间
-sha256sum -c SHA256SUMS
+cd /data/jenkensTest
+# 先按分类文档还原并校验依赖，再在内网完成自建镜像。
 sudo apt-get install -y python3 python3-yaml make
 export PATH="$PWD/.cache/tools:$PATH"
 sudo ctr -n k8s.io images import .cache/k8s-images.tar
@@ -145,25 +146,21 @@ python3 scripts/ci.py backup --site config/site.yaml --archive /mnt/backup/jenki
 原始基础镜像、完整 deb 缓存及插件文件已准备：
 
 ```bash
-git clone --mirror repos/X-RAN-CLOUD.bundle ../X-RAN-CLOUD.git
-git clone --mirror repos/xcn.bundle ../xcn.git
 docker load -i .cache/build-base-images.tar
-docker load -i .cache/k8s-images.tar
-make platform-plugin OFFLINE=1
-make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list \
-  DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat
-python3 scripts/ci.py images --offline --source ../X-RAN-CLOUD.git \
-  --xcn-source ../xcn.git --apt-sources config/sources.intranet.list
+docker load -i .cache/runtime-base-images.tar
+docker load -i .cache/xcn-base-images.tar
+make images SITE=config/site.local.yaml OFFLINE=1 APT_SOURCES=config/sources.intranet.list
 ```
 
 SDK 构建始终使用 --network none，离线入口不会更新 APT 或拉取基础镜像。
-包内新增 Helm 二进制及固定 SHA256、PyYAML 的额外 APT 缓存、xcn Git 镜像/bundle 和 Ubuntu/VPP 基础镜像归档。
+依赖包含 Helm 二进制及固定 SHA256、PyYAML 的额外 APT 缓存和 Ubuntu/VPP 基础镜像归档。
 `images --offline` 自动将 `.cache/xcn-base-images.tar` 加载到构建机 Docker，随后制作基础镜像携带容器；无需预先访问内网镜像仓库。
-运行镜像共九个，包含独立 `xcn-bases` 镜像；两项目业务源码镜像都从 Git 的已提交文件生成，不复制工作区未跟踪文件。
+生产配置生成七个运行镜像，包含编译环境和独立 `xcn-bases`；演示模式另外生成 Git 服务和 Registry 两个镜像。
+演示业务源码镜像仅从 Git 的已提交文件生成，不复制工作区未跟踪文件。
 xcn 业务构建的离线模式在“构建平台设置”中由管理员控制，默认开启；`config/site.yaml` 的 `xcn.offline` 仅首次导入，构建页面不提供 OFFLINE 参数。迁移已有 HOME 会保留网页配置及审计。
 离线构建仍需要内网 APT 软件库；不会访问 GitHub/npm/pip 下载 vendor 依赖。
 新增依赖时先在能访问所选源的准备机执行 compile-image 更新缓存；新增 FROM 镜像须下载并补充清单后重新打包。
-镜像发布更新时提升 versions.env 自定义标签，保留旧标签及旧离线目录用于回滚。
+镜像发布更新时提升 versions.env 自定义标签；依赖未变化时只搬运代码，不累计旧交付目录。
 
 编译镜像制作、按构建选版本/策略及节点拉取凭据配置见 [编译镜像说明](compile-image.md)。
 切换全套 protobuf-c 1.5.2 时，改用 `DOCKERFILE=docker/builder.Dockerfile` 并指定另一个 tag。
@@ -175,11 +172,8 @@ xcn 业务构建的离线模式在“构建平台设置”中由管理员控制�
 版本与内容见 config/versions.env、plugins.lock、platform-plugin.lock.json、images.lock.json、编译镜像 /opt/packages.lock 及 SHA256SUMS。
 
 ```bash
-git clone repos/jenkensTest.bundle ../jenkensTest
 make test
-python3 tests/verify.py --quick --source ../X-RAN-CLOUD.git
-# 内网 APT / Registry 配置完成后验证 xcn 发布：
-python3 tests/verify-xcn.py --offline --source ../xcn.git
 ```
 
+完整 Git 历史按需执行 `make transfer-git` 单独交付；不与日常代码包混在一起。
 真实站点将源码推至内网 Git 后，配置其地址与凭据。通用离线包不携带任何生产项目密钥。

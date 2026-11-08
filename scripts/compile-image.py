@@ -200,7 +200,7 @@ def build(args):
 
 
 def export(ref, dockerfile):
-    directory = ROOT / 'dist/compile' / re.sub(r'[^A-Za-z0-9_.-]', '_', ref)
+    directory = ROOT / 'dist/transfer/03-generated-images/compiler' / re.sub(r'[^A-Za-z0-9_.-]', '_', ref)
     directory.mkdir(parents=True, exist_ok=True)
     archive = directory / 'image.tar'
     run(['docker', 'save', '-o', archive, ref])

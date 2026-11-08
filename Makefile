@@ -8,9 +8,20 @@ DOCKERFILE ?= docker/builder-compat.Dockerfile
 BUILD_JOBS ?= 4
 APT_SOURCES ?= config/sources.online.list
 OFFLINE ?= 0
+BASE_COMMIT ?=
+TRANSFER_MANIFEST ?= dist/transfer/01-dependencies/MANIFEST.json
 shell_quote = '$(subst ','"'"',$(1))'
 COMPILE_FLAGS = --image-name $(call shell_quote,$(IMAGE_NAME)) --image-tag $(call shell_quote,$(IMAGE_TAG)) --dockerfile $(call shell_quote,$(DOCKERFILE)) --jobs $(call shell_quote,$(BUILD_JOBS)) --apt-sources $(call shell_quote,$(APT_SOURCES)) $(if $(filter 1,$(OFFLINE)),--offline)
-.PHONY: prepare images render import-images deploy bundle test verify backup compile-image push-compile-image platform-plugin
+.PHONY: prepare images render import-images deploy bundle test verify backup compile-image push-compile-image platform-plugin transfer transfer-deps transfer-code transfer-check transfer-git
+transfer: transfer-deps transfer-code
+transfer-deps:
+	$(PYTHON) scripts/transfer.py deps
+transfer-code:
+	$(PYTHON) scripts/transfer.py code --base-commit $(call shell_quote,$(BASE_COMMIT))
+transfer-check:
+	$(PYTHON) scripts/transfer.py check --manifest $(call shell_quote,$(TRANSFER_MANIFEST))
+transfer-git:
+	$(PYTHON) scripts/transfer.py git
 platform-plugin:
 	$(PYTHON) scripts/platform-plugin.py $(if $(filter 1,$(OFFLINE)),--offline)
 compile-image:
