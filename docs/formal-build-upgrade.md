@@ -1,8 +1,9 @@
 # 将临时验证环境升级为正式构建环境
 
-本次版本为构建平台插件 1.0.5、Controller `xran-ci/controller:2.580.2-18`。
+当前版本为构建平台插件 1.0.5、Controller `xran-ci/controller:2.580.2-19`。
+Controller 19 仅统一 xcn 与 X-RAN-CLOUD 的任务描述；已有部署须按 [升级 Jenkins](#升级-jenkins) 更新 Controller，编译镜像不变。
 支持两个编译 Dockerfile，保留 `pkgconf`、DPDK 非交互输入、服务串行及取消 `all` 的修复；新增旧版业务镜像缺包自动导出和项目可见性开关。
-本轮关闭离线页面的 Jenkins 使用统计请求，固定 local-path helper 镜像 tag，并将 xcn 基础镜像复制初始化容器从 128MiB 调整为 1GiB，避免文件缓存触发 OOM；新增 [完整回归与持续构建验收](reliability.md)。
+此前 Controller 18 关闭离线页面的 Jenkins 使用统计请求，固定 local-path helper 镜像 tag，并将 xcn 基础镜像复制初始化容器从 128MiB 调整为 1GiB，避免文件缓存触发 OOM；新增 [完整回归与持续构建验收](reliability.md)。
 已有 `26.11.08-compat-r2` / `26.11.08-sdk-r2` 编译镜像无需因本轮平台测试重新构建。
 初始化预算由部署脚本生成，更新代码后须执行 `make deploy` 更新模板；仅导入 Controller 或重启旧部署不会生成新模板。
 
@@ -15,8 +16,9 @@
 单服务仍校验 `<服务名>.tar.gz`；总包仍校验唯一的 `L2L3_时间_commit前9位.tar.gz`。
 外网 `config/site.yaml` 的演示目标不变。
 
-已经完成此前 Controller 18 和 r2 镜像升级的站点，本次只需搬运新的 **02-code**。
-Controller 源码、插件和外部依赖未变，无需重建 Controller 或重复搬运依赖、镜像。
+仅更新 DPDK 参数和目标列表时无需更换此前 Controller 18；当前代码另外包含 Controller 19 的 xcn 文案更新，
+已有站点搬运新的 **02-code** 后，按本文升级 Controller 即可，或另带 Controller 成品。
+插件、编译镜像和外部依赖未变，无需重复搬运依赖、编译镜像。
 在已有内网目录更新代码后，只把这三个目标配置合入本地站点文件，保留节点地址、Git、凭据 ID 及其他配置值：
 
 ```bash
@@ -122,9 +124,9 @@ sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml 
 ```bash
 sudo make platform-plugin OFFLINE=1
 sudo env DOCKER_BUILDKIT=0 docker build --network none --pull=false \
-  -f docker/controller.Dockerfile -t xran-ci/controller:2.580.2-18 .
-sudo docker save -o /tmp/xran-controller-2.580.2-18.tar xran-ci/controller:2.580.2-18
-sudo ctr -n k8s.io images import /tmp/xran-controller-2.580.2-18.tar
+  -f docker/controller.Dockerfile -t xran-ci/controller:2.580.2-19 .
+sudo docker save -o /tmp/xran-controller-2.580.2-19.tar xran-ci/controller:2.580.2-19
+sudo ctr -n k8s.io images import /tmp/xran-controller-2.580.2-19.tar
 sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml OFFLINE=1
 ```
 

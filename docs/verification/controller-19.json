@@ -1,0 +1,105 @@
+{
+  "status": "PASS",
+  "namespace": "jenkins-reliability-verify",
+  "controllerImage": "xran-ci/controller:2.580.2-19",
+  "controllerImageId": "sha256:c59902fc221bf1cc1fb52867c220bc1d00e7b168c885103fb67eb8f1f8c1ec37",
+  "testedAt": 1794221128.3561494,
+  "protectedBefore": {
+    "namespace": "jenkins",
+    "objects": [
+      {
+        "kind": "PersistentVolumeClaim",
+        "name": "jenkins",
+        "uid": "2157aac0-ca51-4eeb-a271-d1805ba7afcf"
+      },
+      {
+        "kind": "Pod",
+        "name": "jenkins-0",
+        "uid": "25924c57-32f4-498e-abd3-418a3ef83595"
+      }
+    ],
+    "historyAndSettingsSha256": "74902b156f2517b336ef9d99d5db7e6d585758d4172a61a482f397a277087074",
+    "businessHistories": {
+      "x-ran-cloud": 99,
+      "xcn": 5
+    }
+  },
+  "checks": [
+    {
+      "name": "普通个人账号通过原生 Security 网页修改密码并验证新旧登录",
+      "status": "PASS"
+    },
+    {
+      "name": "初始账号通过同一网页修改密码并验证新旧登录",
+      "status": "PASS"
+    },
+    {
+      "name": "Controller 19 重启后新描述通过 API 和普通用户网页验证",
+      "status": "PASS"
+    },
+    {
+      "name": "新建个人账号的新密码重启后保留，旧密码仍被拒绝",
+      "status": "PASS"
+    },
+    {
+      "name": "初始账号重启后按 JCasC 重新应用 Secret 密码",
+      "status": "PASS"
+    }
+  ],
+  "liveControllerImageId": "sha256:c59902fc221bf1cc1fb52867c220bc1d00e7b168c885103fb67eb8f1f8c1ec37",
+  "protectedAfter": {
+    "namespace": "jenkins",
+    "objects": [
+      {
+        "kind": "PersistentVolumeClaim",
+        "name": "jenkins",
+        "uid": "2157aac0-ca51-4eeb-a271-d1805ba7afcf"
+      },
+      {
+        "kind": "Pod",
+        "name": "jenkins-0",
+        "uid": "25924c57-32f4-498e-abd3-418a3ef83595"
+      }
+    ],
+    "historyAndSettingsSha256": "74902b156f2517b336ef9d99d5db7e6d585758d4172a61a482f397a277087074",
+    "businessHistories": {
+      "x-ran-cloud": 99,
+      "xcn": 5
+    }
+  },
+  "historyAccountsAndSettingsUnchanged": true,
+  "sourceFingerprint": "44286e68e1442d2592692effad6a8df718b92eefe122647962136b6922d11e60",
+  "baselineCommit": "c77dd012334a6d29de967a5ebc36096aa18f96f7",
+  "pythonRegression": {
+    "status": "PASS",
+    "testsPassed": 54,
+    "logSha256": "43d994a099f2600528dd0b0faa2cc288fe3c69ec3f6b2f890c64351461badecb"
+  },
+  "build": {
+    "status": "PASS",
+    "network": "none",
+    "logSha256": "006d97ac48621087ed160e45995f8f35fd2d025abe3cb9fc958f7e47d08dc21f"
+  },
+  "limitations": [
+    "仅在独立实例验证；未修改主 Jenkins",
+    "未改变密码策略：初始账号仍由 Secret/JCasC 管理",
+    "未重启宿主机、未重复长期负载或私有业务构建"
+  ],
+  "archive": {
+    "image": "xran-ci/controller:2.580.2-19",
+    "imageId": "sha256:c59902fc221bf1cc1fb52867c220bc1d00e7b168c885103fb67eb8f1f8c1ec37",
+    "sha256": "da6ad0779a0cb85b026f9535ea0cdf25637884070675ca79e8b6b542b737ff89",
+    "bytes": 401642580
+  },
+  "dependencyCheck": {
+    "status": "PASS",
+    "requiredAdditionalPackages": [],
+    "logSha256": "5462cd7190604bed24e52f1dbe3b7cc64d738c5db24e899b76e36e06d6a5e03f"
+  },
+  "sourceSha256": {
+    "jenkins/init.groovy": "72c11d905b34d500cc933b137eb28d14743e636570ed2005d77ca6c1d3b34191",
+    "docker/controller.Dockerfile": "6ee679150123bcc8caa1f428490d4d6fd748420fa8e71552512ccc11e6b22f2d",
+    "config/versions.env": "29a0dfbf3296005be9e904c16a993cca51cfae35c890417d27e9f89c70b4b9c7",
+    "config/images.lock.json": "586934396364a6d697c4d193c4d94b277bf1425adaa82365de3a12eba3fc31c8"
+  }
+}

@@ -64,6 +64,33 @@ admin、builder1、builder2 的密码，不是后续全部账号的名单。初�
 修改这些初始账号密码时应同步 Secret；新增普通个人账号无需修改 Secret。
 如需额外管理员，必须将该账号明确加入部署配置的 Overall/Administer 授权并持久化，不能只依赖一次网页授权。
 
+### 修改密码与重启
+
+管理员和普通用户均可点击自己的用户名，进入 **Security → Password / Confirm Password → Save** 修改密码；
+管理员也可从 **Manage Jenkins → Users** 打开其他用户进行重置。
+当前版本的入口和保存方式见 [Jenkins 用户管理](https://www.jenkins.io/doc/book/managing/users/)。
+
+| 账号来源 | 只在网页改密后重启 |
+| --- | --- |
+| 管理员后续创建的个人账号 | 新密码随 Jenkins HOME/PVC 保留 |
+| 初始 `admin`、`builder1`、`builder2` | 启动时 JCasC 会重新应用 `xran-users` Secret 中的密码，需同步 Secret |
+
+初始账号不是只初始化一次。仅修改 `.state/jenkins/users.json` 也不会更新已有 Secret；部署脚本优先读取集群已有 Secret。
+保留同一 PVC 时，普通个人账号无需重做镜像或修改 Secret。账号持久化与正在运行的编译 Pod 分开，后者重启后可能中断。
+
+## 新增服务构建目标
+
+例如业务代码已经支持 `./build.sh -c -m DemoC`，并生成 `JDBG/Release/services/DemoC.tar.gz`：
+
+1. 在实际部署使用的 `config/site.local.yaml` 的 `services` 列表末尾增加 `DemoC`，保留 `services_all` 为第一项。
+2. 等待当前构建完成，再执行 `sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml OFFLINE=1`。
+3. 在 Jenkins 的 `SERVICE_TARGET` 选择 `DemoC`，并选择已经支持该服务的分支/tag/commit。
+
+这会更新 ConfigMap 并重启 Jenkins 加载列表，不需要重做 Controller 或编译镜像；服务引入新的编译依赖时才需更新编译环境。
+列表保存在本地 YAML 和部署后的 ConfigMap，服务器正常重启不会丢失。
+当前“构建平台设置”尚未提供服务/镜像列表编辑入口；只改任务网页的 Choices 会在启动时被初始化脚本覆盖，
+且流水线仍按站点配置校验合法目标。新增镜像同理修改 `images` 和 `imageRepositories` 后部署。
+
 ## 备份恢复
 
 先完成或取消运行/等待锁的任务。脚本在停止接收新任务后检查仍有构建则拒绝备份，并恢复接收。

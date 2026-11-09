@@ -65,7 +65,7 @@ xcn.addProperty(new ParametersDefinitionProperty([
     new StringParameterDefinition('CHART_VERSION', '', 'Chart 版本，默认当天日期'),
     new StringParameterDefinition('APP_VERSION', '', '应用版本，默认当天日期')
 ]))
-xcn.description = 'xcn 发布构建：三个镜像包和一个 Helm Chart。默认 main；版本留空按上海时区的构建日期生成。'
+xcn.description = 'xcn 参数化构建。登录后提交构建；历史包持续保存，磁盘压力时按最早完成时间清理未标记保留产物。'
 xcn.save()
 // Repair only empty historical versions, using that build's actual metadata.
 // Completed runs without metadata or with explicit values remain untouched.

@@ -49,7 +49,8 @@ editor config/site.local.yaml
 ```
 
 必须将 `JENKINS_NODE_IP` 改成实际 Jenkins 节点 IP，并核对 NodePort、StorageClass、服务/镜像清单、
-Registry 仓库映射和拉取凭据。示例的 `services`、`images`、`imageRepositories` 仍是演示名称，需要按内网脚本填写。
+Registry 仓库映射和拉取凭据。内网示例已包含确认的 40 个服务目标及 `usp-core`、`xran-simuphy` 两个镜像目标；
+`config/site.yaml` 保留外网演示名称。新增业务服务按 [新增服务构建目标](operations.md#新增服务构建目标) 修改实际本地站点文件后部署。
 示例已设置 `demo: false`、部署离线模式和 xcn 首次默认离线模式。
 
 两个源码地址分别为：
