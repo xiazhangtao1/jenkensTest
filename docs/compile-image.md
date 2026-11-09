@@ -68,6 +68,17 @@ DPDK 源码和 build 路径保留在 `/opt/dpdk-22.03`。镜像内 `/opt/package
 `/opt/xran/compile-sources.lock.json` 记录源码依赖。
 默认使用已安装 SDK 的 pkg-config 文件，避免 DPDK 的 uninstalled 元数据引用可选构建目录导致 CMake 拒绝配置。
 
+## DPDK 逻辑核上限
+
+两个 Dockerfile 共用的安装脚本显式设置 `-Dmax_lcores=256`，不依赖源码包的默认值。
+`RTE_MAX_LCORE=256` 表示逻辑核编号范围为 **0–255**。镜像自检同时核对 Meson 选项、build/安装目录的头文件，
+并通过编译期断言及实际 EAL 初始化检查编号 144、255 可用，256 被拒绝。
+自检将逻辑核映射到容器允许使用的一个 CPU，无需 256 核宿主机、网卡或 hugepages。
+
+本地已验证 `26.11.08-compat-r2` 和 `26.11.08-sdk-r2` 实际都是 256；本次只读挂载新版自检，两者均通过。
+相同内容的既有镜像无需为此重建。内网镜像若来源不同，先检查实际值；检查和按需重建步骤见
+[本次内网更新](formal-build-upgrade.md#dpdk-与内网构建目标更新2026-11-09)。
+
 ## 离线重建与验证
 
 先按 [分类搬运](transfer.md) 还原编译依赖和基础镜像；无需携带编译镜像成品。迁入后：

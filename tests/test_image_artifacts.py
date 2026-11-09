@@ -72,6 +72,30 @@ class ImageArtifactTests(unittest.TestCase):
         self.assertFalse(self.path.exists())
         self.assertEqual(list(self.directory.glob('*.tmp')), [])
 
+    def test_intranet_image_names_dispatch_and_support_both_archive_paths(self):
+        for target in ['usp-core', 'xran-simuphy']:
+            self.path = self.directory / (target + '.tar')
+            self.ref = '192.168.10.35/xnet/' + target + ':test'
+            os.environ.update(XRAN_TARGET=target, XRAN_IMAGE_REFERENCE=self.ref)
+            with patch.object(runner, 'ensure_docker'), patch.object(runner, 'run') as command:
+                runner.build()
+                command.assert_called_once_with(['./images-build.sh', target, 'test'],
+                    self.directory, input_text='/opt/dpdk-22.03\n')
+            for origin in ['script', 'docker-save']:
+                with self.subTest(target=target, origin=origin):
+                    if origin == 'script':
+                        self.archive(self.path)
+                    self.calls.clear()
+                    self.assertEqual(runner.collect(), 0)
+                    meta = self.metadata()
+                    self.assertEqual(meta['imageArchiveSource'], origin)
+                    self.assertEqual(meta['imageReference'], self.ref)
+                    self.assertEqual(meta['imageId'], self.image_id)
+                    self.assertEqual([f['name'] for f in meta['files']], [target + '.tar'])
+                    artifact = runner.PUBLISH / (target + '.tar')
+                    self.assertEqual(meta['files'][0]['sha256'], hashlib.sha256(artifact.read_bytes()).hexdigest())
+                    artifact.unlink()
+
     def test_script_package_is_used_without_save_even_if_image_was_removed(self):
         self.archive(self.path); self.present = False
         self.assertEqual(runner.collect(), 0)

@@ -1,3 +1,20 @@
+# DPDK 256 与内网构建目标验收（2026-11-09）
+
+共享安装脚本显式固定 `max_lcores=256`；内网模板提供 40 个服务目标（默认 `services_all`）和两个镜像目标（默认 `usp-core`）。
+外网演示目标、Controller、插件及依赖版本未变。
+
+- Python 回归 54 项通过；其中逐一验证 39 个单服务名称的脚本传参、同名有效 tar 收集及 SHA256，两个业务镜像的已有包和缺包自动导出路径均通过。这里使用小型测试归档，未编译私有业务代码。
+- 已有 compat-r2、sdk-r2 镜像均以 UID 1000、断网、只读根目录及移除全部 capabilities 运行新版只读挂载自检。Meson/build 头文件/安装头文件均为 256；每套五个 CTest 全部通过，实际 EAL 接受逻辑核编号 144、255，并拒绝 256。protobuf-c 两种既有组合和其他 SDK 检查通过，镜像内容及 tag 未改变。
+- 在独立 `jenkins-reliability-verify` 临时加载内网目标，原生参数定义和真实普通用户浏览器均确认完整列表、默认值、BUILD_KIND 条件字段和来回切换后保留选择。验收后精确恢复原 ConfigMap/演示目标，业务历史、账号、网页设置未变；主 Jenkins 的 Pod/PVC 身份与历史/设置快照前后一致。
+- 实际执行文档中的三字段合并命令，确认保留自定义节点地址、Git 凭据 ID、PVC 与 xcn 离线设置；渲染后的目标列表和仓库映射正确，继续使用 Controller 18。
+
+证据见 [DPDK 与内网目标报告](verification/dpdk-intranet-targets.json)，更新步骤见
+[本次内网更新](formal-build-upgrade.md#dpdk-与内网构建目标更新2026-11-09)。本次仅需更新 `02-code`、合并本地目标配置并部署；已有相同内容的 r2 镜像无需重建。
+现场 `latest`/`test` 内容不能根据 tag 推断，文档提供自检及按需离线重建命令。
+本轮未连接真实内网 Gerrit/APT/Harbor，未重跑长期负载测试；以下完整平台验收记录继续保留。
+
+---
+
 # 完整回归与持续构建验收（2026-11-09）
 
 Controller `2.580.2-18`、构建平台插件 `1.0.5` 在独立命名空间 `jenkins-reliability-verify` 完成 18 个阶段验收，全部通过。本轮开始至结束，主 Jenkins 的 Pod/PVC 身份、业务历史、账号及网页设置一致。

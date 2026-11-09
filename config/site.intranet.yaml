@@ -28,10 +28,52 @@ gitCredentialsId: intranet-gerrit-ssh
 registry: 192.168.10.35
 registryCredentialsId: ''
 registryInsecure: true
-# 按实际项目核对服务、镜像名称及镜像脚本使用的仓库路径。
-services: [serviceA, serviceB, serviceC]
-images: [imageA, imageB, imageC]
-imageRepositories: {imageA: xran-demo/imagea, imageB: xran-demo/imageb, imageC: xran-demo/imagec}
+# 列表第一项为 Jenkins 默认目标；单服务产物名为 <服务名>.tar.gz。
+services:
+  - services_all
+  - DemoA
+  - DemoB
+  - LbService
+  - taskMgr
+  - Das
+  - cucp
+  - CuAppCucpCTRL
+  - CuAppCucpCUC
+  - CuAppCucpNG
+  - CuAppCucpOAM
+  - CuAppCucpSRV
+  - CucpCore
+  - AmfNgStub
+  - ctrld
+  - up_ngu_core
+  - up_sdap_core
+  - up_flu_core
+  - up_dlrecv
+  - up_ngu_dl
+  - up_sdap_dl
+  - up_pdcp_dl
+  - up_flu_dl
+  - up_ulrecv
+  - up_flu_ul
+  - up_pdcp_ul
+  - up_sdap_ul
+  - up_ngu_ul
+  - du_rlc_core
+  - du_rlc_dl
+  - du_rlc_ul
+  - du_rlc_work0
+  - du_rlc_work1
+  - du_f1gtpu_core
+  - du_f1gtpu_dl
+  - du_mac_core
+  - du_mac_tti
+  - du_mac_ul
+  - du_wlsmgr
+  - du_wls
+images: [usp-core, xran-simuphy]
+imageRepositories:
+  usp-core: xnet/usp-core
+  xran-simuphy: xnet/xran-simuphy
 xcn:
   # Jenkins 入口仍叫 xcn；远端仓库改名为 ICT_CN 不影响相对路径。
   gitUrl: ssh://xiazhangtao@192.168.10.82:29418/ICT_CN

@@ -74,6 +74,26 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(cfg['compilerImagePullPolicy'], 'Always')
         self.assertIs(cfg['xcn']['offline'], True)
 
+    def test_intranet_targets_and_defaults_preserve_external_demo(self):
+        cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.intranet.yaml', namespace=None, offline=True))
+        expected = '''services_all DemoA DemoB LbService taskMgr Das cucp CuAppCucpCTRL
+            CuAppCucpCUC CuAppCucpNG CuAppCucpOAM CuAppCucpSRV CucpCore AmfNgStub ctrld
+            up_ngu_core up_sdap_core up_flu_core up_dlrecv up_ngu_dl up_sdap_dl up_pdcp_dl
+            up_flu_dl up_ulrecv up_flu_ul up_pdcp_ul up_sdap_ul up_ngu_ul du_rlc_core
+            du_rlc_dl du_rlc_ul du_rlc_work0 du_rlc_work1 du_f1gtpu_core du_f1gtpu_dl
+            du_mac_core du_mac_tti du_mac_ul du_wlsmgr du_wls'''.split()
+        self.assertEqual(cfg['services'], expected)
+        self.assertEqual(len(set(expected)), 40)
+        self.assertEqual(cfg['images'], ['usp-core', 'xran-simuphy'])
+        self.assertEqual(cfg['imageRepositories'], {
+            'usp-core': 'xnet/usp-core', 'xran-simuphy': 'xnet/xran-simuphy'})
+        self.assertIs(cfg['demo'], False)
+        self.assertEqual(cfg['registry'], '192.168.10.35')
+        demo = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False))
+        self.assertIs(demo['demo'], True)
+        self.assertEqual(demo['services'], ['serviceA', 'serviceB', 'serviceC'])
+        self.assertEqual(demo['images'], ['imageA', 'imageB', 'imageC'])
+
     def test_previous_site_configuration_keeps_project_values(self):
         source = yaml.safe_load((REPO / 'config/site.yaml').read_text())
         legacy = source.pop('xcn')

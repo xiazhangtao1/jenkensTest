@@ -5,6 +5,23 @@ trap 'rm -rf "$sdk_check_dir"' EXIT
 command -v pkgconf
 pkgconf --version
 test -d /opt/dpdk-22.03/build
+python3 - <<'PY'
+import json
+from pathlib import Path
+import re
+import subprocess
+
+options = json.loads(subprocess.check_output(
+    ['meson', 'introspect', '--buildoptions', '/opt/dpdk-22.03/build'], text=True))
+value = next(item['value'] for item in options if item['name'] == 'max_lcores')
+if str(value) != '256':
+    raise SystemExit('DPDK Meson max_lcores 必须为 256，实际为 ' + str(value))
+print('DPDK Meson max_lcores=256')
+for name in ['/opt/dpdk-22.03/build/rte_build_config.h', '/usr/local/include/rte_build_config.h']:
+    if not re.search(r'^#define\s+RTE_MAX_LCORE\s+256\s*$', Path(name).read_text(), re.MULTILINE):
+        raise SystemExit('DPDK RTE_MAX_LCORE 必须为 256: ' + name)
+    print(name + ': RTE_MAX_LCORE=256')
+PY
 test "$(pkg-config --modversion libprotobuf-c)" = "$XRAN_PROTOBUF_C_VERSION"
 protoc-c --version | grep -qx 'protobuf-c 1.5.2'
 python3 /opt/xran/run-build.py capabilities | python3 -c \

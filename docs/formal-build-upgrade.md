@@ -6,6 +6,62 @@
 已有 `26.11.08-compat-r2` / `26.11.08-sdk-r2` 编译镜像无需因本轮平台测试重新构建。
 初始化预算由部署脚本生成，更新代码后须执行 `make deploy` 更新模板；仅导入 Controller 或重启旧部署不会生成新模板。
 
+## DPDK 与内网构建目标更新（2026-11-09）
+
+本次在共享 DPDK 安装脚本中显式固定 `max_lcores=256`，并增加边界自检。
+内网模板改为 40 个服务目标（39 个单服务和 `services_all`），默认 `services_all`；
+镜像目标改为 `usp-core`、`xran-simuphy`，默认 `usp-core`，对应仓库为
+`192.168.10.35/xnet/usp-core:<tag>`、`192.168.10.35/xnet/xran-simuphy:<tag>`。
+单服务仍校验 `<服务名>.tar.gz`；总包仍校验唯一的 `L2L3_时间_commit前9位.tar.gz`。
+外网 `config/site.yaml` 的演示目标不变。
+
+已经完成此前 Controller 18 和 r2 镜像升级的站点，本次只需搬运新的 **02-code**。
+Controller 源码、插件和外部依赖未变，无需重建 Controller 或重复搬运依赖、镜像。
+在已有内网目录更新代码后，只把这三个目标配置合入本地站点文件，保留节点地址、Git、凭据 ID 及其他配置值：
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+import yaml
+
+path = Path('config/site.local.yaml')
+site = yaml.safe_load(path.read_text())
+template = yaml.safe_load(Path('config/site.intranet.yaml').read_text())
+for key in ('services', 'images', 'imageRepositories'):
+    site[key] = template[key]
+path.write_text(yaml.safe_dump(site, allow_unicode=True, sort_keys=False))
+PY
+sudo env "PATH=$PATH:$PWD/.cache/tools" \
+    make deploy SITE=config/site.local.yaml OFFLINE=1
+```
+
+部署后 Jenkins 重启加载目标列表，无需卸载；PVC 中的账号、构建历史和网页保存的平台设置继续保留。
+上面的合并命令会重新排版 YAML，原注释不保留。新部署直接复制内网模板，再填写实际节点等配置即可。
+
+本地两套 r2 镜像已用新版断网自检确认都是 256；不更改其已有 tag 或内容。
+内网 `latest`/`test` 的实际内容需要在现场核对，可只读挂载新自检到已经拉取或导入的镜像：
+
+```bash
+COMPILER_IMAGE=192.168.10.35/xnet/xran-compile:latest
+sudo docker run --rm --network none \
+    --mount "type=bind,source=$PWD/runtime/compile-check,target=/opt/xran/compile-check,readonly" \
+    --mount "type=bind,source=$PWD/runtime/verify-compile.sh,target=/opt/xran/verify-compile.sh,readonly" \
+    "$COMPILER_IMAGE" bash /opt/xran/verify-compile.sh
+```
+
+若实际镜像为 128，新自检会明确失败；使用新代码和已有依赖按需离线重建，并用新 tag 测试：
+
+```bash
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.09-compat-dpdk256
+sudo make push-compile-image IMAGE_TAG=26.11.09-compat-dpdk256
+# 全套 protobuf-c 1.5.2 对照版可另行选择：
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.09-sdk-dpdk256
+sudo make push-compile-image IMAGE_TAG=26.11.09-sdk-dpdk256
+```
+
+在 Jenkins 的 `COMPILER_IMAGE` 选择实际推送的新 tag，拉取策略按需选择（默认 `Always`）。
+无需在临时构建 Pod 中手动运行 Meson/Ninja。以下章节是完整平台升级流程，尚未完成此前升级时再按需执行。
+
 ## 同步源码和缓存
 
 联网环境正常更新 Git。离线更新按 [分类搬运](transfer.md) 交付，外部依赖与代码分开。

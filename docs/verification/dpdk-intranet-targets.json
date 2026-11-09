@@ -1,0 +1,329 @@
+{
+  "status": "PASS",
+  "testedAt": "2026-11-09T18:31:42+0800",
+  "baselineCommit": "99e6d7015851f70ed00d543e0d3c28a2a262b806",
+  "sourceFingerprint": "02f81dea9e116c39f3d56c5503f0630b26f59c6bae5680f7a573a2a9be2b8c9c",
+  "pythonRegression": {
+    "status": "PASS",
+    "testsPassed": 54,
+    "logSha256": "408a88a807440911eb254793b6e08fc7159948c194ab7f762279c214c0b891c2",
+    "testSourceSha256": {
+      "test_config.py": "b04d3728af60a15fb031f2e630c211f41eec3867d8ecaa5b4312b6700b5cbaec",
+      "test_runtime.py": "dd1591ef7a7184f8770bf98a6104fcee3f20fe466138193ed9242996ed11b6bf",
+      "test_image_artifacts.py": "b2cf1a250c16e34dac5cefaf87d915467a8cfbfc664bd29c237a7f564e7831ab"
+    }
+  },
+  "adapterContracts": {
+    "status": "PASS",
+    "individualServiceTargets": [
+      "DemoA",
+      "DemoB",
+      "LbService",
+      "taskMgr",
+      "Das",
+      "cucp",
+      "CuAppCucpCTRL",
+      "CuAppCucpCUC",
+      "CuAppCucpNG",
+      "CuAppCucpOAM",
+      "CuAppCucpSRV",
+      "CucpCore",
+      "AmfNgStub",
+      "ctrld",
+      "up_ngu_core",
+      "up_sdap_core",
+      "up_flu_core",
+      "up_dlrecv",
+      "up_ngu_dl",
+      "up_sdap_dl",
+      "up_pdcp_dl",
+      "up_flu_dl",
+      "up_ulrecv",
+      "up_flu_ul",
+      "up_pdcp_ul",
+      "up_sdap_ul",
+      "up_ngu_ul",
+      "du_rlc_core",
+      "du_rlc_dl",
+      "du_rlc_ul",
+      "du_rlc_work0",
+      "du_rlc_work1",
+      "du_f1gtpu_core",
+      "du_f1gtpu_dl",
+      "du_mac_core",
+      "du_mac_tti",
+      "du_mac_ul",
+      "du_wlsmgr",
+      "du_wls"
+    ],
+    "singleServiceArtifact": "<SERVICE_TARGET>.tar.gz",
+    "imageReferences": {
+      "usp-core": "192.168.10.35/xnet/usp-core:test",
+      "xran-simuphy": "192.168.10.35/xnet/xran-simuphy:test"
+    },
+    "imageArchivePaths": [
+      "script",
+      "docker-save"
+    ],
+    "scope": "Small valid archive fixtures exercise dispatch, collection and SHA256; private business code unavailable"
+  },
+  "compilerImages": {
+    "compat": {
+      "status": "PASS",
+      "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+      "imageId": "sha256:7fcfcb7cffccfea8c911ac93d3de42f108257a7e3fbbce676291e9240a688ca4",
+      "user": "1000:1000",
+      "network": "none",
+      "readOnlyRoot": true,
+      "capDrop": [
+        "ALL"
+      ],
+      "updatedChecksMountedReadOnly": true,
+      "mesonMaxLcores": 256,
+      "buildHeaderMaxLcores": 256,
+      "installedHeaderMaxLcores": 256,
+      "ctestPassed": 5,
+      "acceptedLogicalLcores": [
+        144,
+        255
+      ],
+      "rejectedLogicalLcores": [
+        256
+      ],
+      "logSha256": "9abcc14a48bd4d8d35cef71497be1a16b5878695596be8bda42c08ba1e95a837"
+    },
+    "sdk": {
+      "status": "PASS",
+      "image": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+      "imageId": "sha256:452ecad8aea4cbc645599867d64b4e13697a6f38796a31d5162945ee89e226f8",
+      "user": "1000:1000",
+      "network": "none",
+      "readOnlyRoot": true,
+      "capDrop": [
+        "ALL"
+      ],
+      "updatedChecksMountedReadOnly": true,
+      "mesonMaxLcores": 256,
+      "buildHeaderMaxLcores": 256,
+      "installedHeaderMaxLcores": 256,
+      "ctestPassed": 5,
+      "acceptedLogicalLcores": [
+        144,
+        255
+      ],
+      "rejectedLogicalLcores": [
+        256
+      ],
+      "logSha256": "fac52f9db98ef249c690d679c70037d08e696314033068a0b3c388a9ac2ae557"
+    }
+  },
+  "jenkins": {
+    "status": "PASS",
+    "namespace": "jenkins-reliability-verify",
+    "testedAt": 1794220169.622733,
+    "sourceFingerprint": "02f81dea9e116c39f3d56c5503f0630b26f59c6bae5680f7a573a2a9be2b8c9c",
+    "protectedBefore": {
+      "namespace": "jenkins",
+      "objects": [
+        {
+          "kind": "PersistentVolumeClaim",
+          "name": "jenkins",
+          "uid": "2157aac0-ca51-4eeb-a271-d1805ba7afcf"
+        },
+        {
+          "kind": "Pod",
+          "name": "jenkins-0",
+          "uid": "25924c57-32f4-498e-abd3-418a3ef83595"
+        }
+      ],
+      "historyAndSettingsSha256": "74902b156f2517b336ef9d99d5db7e6d585758d4172a61a482f397a277087074",
+      "businessHistories": {
+        "x-ran-cloud": 99,
+        "xcn": 5
+      }
+    },
+    "nativeParameters": {
+      "SERVICE_TARGET": {
+        "choices": [
+          "services_all",
+          "DemoA",
+          "DemoB",
+          "LbService",
+          "taskMgr",
+          "Das",
+          "cucp",
+          "CuAppCucpCTRL",
+          "CuAppCucpCUC",
+          "CuAppCucpNG",
+          "CuAppCucpOAM",
+          "CuAppCucpSRV",
+          "CucpCore",
+          "AmfNgStub",
+          "ctrld",
+          "up_ngu_core",
+          "up_sdap_core",
+          "up_flu_core",
+          "up_dlrecv",
+          "up_ngu_dl",
+          "up_sdap_dl",
+          "up_pdcp_dl",
+          "up_flu_dl",
+          "up_ulrecv",
+          "up_flu_ul",
+          "up_pdcp_ul",
+          "up_sdap_ul",
+          "up_ngu_ul",
+          "du_rlc_core",
+          "du_rlc_dl",
+          "du_rlc_ul",
+          "du_rlc_work0",
+          "du_rlc_work1",
+          "du_f1gtpu_core",
+          "du_f1gtpu_dl",
+          "du_mac_core",
+          "du_mac_tti",
+          "du_mac_ul",
+          "du_wlsmgr",
+          "du_wls"
+        ],
+        "defaultValue": "services_all"
+      },
+      "IMAGE_TARGET": {
+        "choices": [
+          "usp-core",
+          "xran-simuphy"
+        ],
+        "defaultValue": "usp-core"
+      }
+    },
+    "browser": {
+      "status": "PASS",
+      "user": "builder1",
+      "service": {
+        "value": "services_all",
+        "options": [
+          "services_all",
+          "DemoA",
+          "DemoB",
+          "LbService",
+          "taskMgr",
+          "Das",
+          "cucp",
+          "CuAppCucpCTRL",
+          "CuAppCucpCUC",
+          "CuAppCucpNG",
+          "CuAppCucpOAM",
+          "CuAppCucpSRV",
+          "CucpCore",
+          "AmfNgStub",
+          "ctrld",
+          "up_ngu_core",
+          "up_sdap_core",
+          "up_flu_core",
+          "up_dlrecv",
+          "up_ngu_dl",
+          "up_sdap_dl",
+          "up_pdcp_dl",
+          "up_flu_dl",
+          "up_ulrecv",
+          "up_flu_ul",
+          "up_pdcp_ul",
+          "up_sdap_ul",
+          "up_ngu_ul",
+          "du_rlc_core",
+          "du_rlc_dl",
+          "du_rlc_ul",
+          "du_rlc_work0",
+          "du_rlc_work1",
+          "du_f1gtpu_core",
+          "du_f1gtpu_dl",
+          "du_mac_core",
+          "du_mac_tti",
+          "du_mac_ul",
+          "du_wlsmgr",
+          "du_wls"
+        ]
+      },
+      "image": {
+        "value": "usp-core",
+        "options": [
+          "usp-core",
+          "xran-simuphy"
+        ]
+      },
+      "conditionalFields": "PASS",
+      "retainedSelections": "PASS"
+    },
+    "restoration": {
+      "status": "PASS",
+      "demoParameters": {
+        "SERVICE_TARGET": {
+          "choices": [
+            "serviceA",
+            "serviceB",
+            "serviceC",
+            "services_all"
+          ],
+          "defaultValue": "serviceA"
+        },
+        "IMAGE_TARGET": {
+          "choices": [
+            "imageA",
+            "imageB",
+            "imageC"
+          ],
+          "defaultValue": "imageA"
+        }
+      },
+      "historiesAccountsAndSettingsSha256": "8d2a1ebf0698c2e3359b21d9bcb4f1dac73e6397818c62ba90c60f3d4124ba80"
+    },
+    "protectedAfter": {
+      "namespace": "jenkins",
+      "objects": [
+        {
+          "kind": "PersistentVolumeClaim",
+          "name": "jenkins",
+          "uid": "2157aac0-ca51-4eeb-a271-d1805ba7afcf"
+        },
+        {
+          "kind": "Pod",
+          "name": "jenkins-0",
+          "uid": "25924c57-32f4-498e-abd3-418a3ef83595"
+        }
+      ],
+      "historyAndSettingsSha256": "74902b156f2517b336ef9d99d5db7e6d585758d4172a61a482f397a277087074",
+      "businessHistories": {
+        "x-ran-cloud": 99,
+        "xcn": 5
+      }
+    }
+  },
+  "migration": {
+    "status": "PASS",
+    "migrationCommandPreservesOtherValues": true,
+    "renderedTargetKeysMatch": true,
+    "controllerImage": {
+      "registry": "docker.io",
+      "repository": "xran-ci/controller",
+      "tag": "2.580.2-18",
+      "pullPolicy": "Never"
+    },
+    "services": 40,
+    "images": [
+      "usp-core",
+      "xran-simuphy"
+    ]
+  },
+  "unchangedInputs": {
+    "docker/builder-compat.Dockerfile": "b8af2dd04e4636688743ff1d27f8f5a4fa18d0b22b43372ee1a198ec66a2a406",
+    "docker/builder.Dockerfile": "bc18f340e07e53f70a277aa0d8872c41c6550b96590d53bfd3f5a0e022e5bf83",
+    "config/versions.env": "a6f5de5e84ea65f14edcd94015fb40b67bfecae3e1059bafe0f2f7b88d87d0d5",
+    "jenkins/init.groovy": "840c8490dccd3e3a11f5b23f4936585b6f508297152a93defe48b0bce9f7c0de",
+    "vendor/compile/manifest.json": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c"
+  },
+  "limitations": [
+    "未连接真实内网 Gerrit/APT/Harbor；现场镜像内容需自行核对",
+    "未编译私有业务代码，39 个服务的检查验证适配器传参和产物协议",
+    "本轮未重建已有编译镜像或 Controller，未重复长期负载测试"
+  ]
+}

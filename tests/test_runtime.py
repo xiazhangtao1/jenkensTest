@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import json
 import os
@@ -11,6 +12,8 @@ import unittest
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from unittest.mock import patch
+
+import yaml
 
 REPO = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('runner', REPO / 'runtime/run-build.py')
@@ -114,6 +117,40 @@ class RuntimeTests(unittest.TestCase):
         (directory / 'serviceA.tar.gz').symlink_to(secret)
         self.assertEqual(runner.collect(), 1)
         self.assertFalse((runner.PUBLISH / 'serviceA.tar.gz').exists())
+
+
+class IntranetServiceTests(unittest.TestCase):
+    def test_every_individual_service_dispatches_and_collects_its_exact_name(self):
+        targets = yaml.safe_load((REPO / 'config/site.intranet.yaml').read_text())['services']
+        for target in targets[1:]:
+            with self.subTest(target=target), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                source, publish = root / 'source', root / 'publish'
+                services = source / 'services'
+                services.mkdir(parents=True)
+                script = services / 'build.sh'
+                # Small valid packages exercise the adapter contract, not private business code.
+                script.write_text('''#!/bin/sh
+set -eu
+test "$1" = -c && test "$2" = -m
+printf '%s' "$3" > dispatched-target
+mkdir -p ../JDBG/Release/services
+tar -czf "../JDBG/Release/services/$3.tar.gz" dispatched-target
+''')
+                script.chmod(0o755)
+                (root / 'checkout.json').write_text(json.dumps({'commit': 'a' * 40}))
+                with patch.object(runner, 'ROOT', root), patch.object(runner, 'SOURCE', source), \
+                        patch.object(runner, 'PUBLISH', publish), patch.dict(os.environ,
+                        XRAN_KIND='service', XRAN_TARGET=target, XRAN_SERVICE_SERIAL='true',
+                        XRAN_BUILD_METADATA='{"result":"SUCCESS"}'):
+                    runner.build()
+                    self.assertEqual((services / 'dispatched-target').read_text(), target)
+                    self.assertEqual(runner.collect(), 0)
+                    metadata = json.loads((publish / 'metadata.json').read_text())
+                    self.assertEqual(metadata['result'], 'SUCCESS')
+                    self.assertEqual([f['name'] for f in metadata['files']], [target + '.tar.gz'])
+                    self.assertEqual(metadata['files'][0]['sha256'],
+                                     hashlib.sha256((publish / (target + '.tar.gz')).read_bytes()).hexdigest())
 
 
 class ServiceCompatibilityTests(unittest.TestCase):

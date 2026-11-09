@@ -92,7 +92,7 @@ networking)
     mkdir -p /opt/dpdk-22.03
     tar -xf /opt/xran/sources/dpdk-22.03.tar.gz -C /opt/dpdk-22.03 --strip-components=1
     cd /opt/dpdk-22.03
-    meson setup build --prefix=/usr/local --libdir=lib -Dplatform=generic -Dtests=false -Denable_kmods=false
+    meson setup build --prefix=/usr/local --libdir=lib -Dplatform=generic -Dmax_lcores=256 -Dtests=false -Denable_kmods=false
     ninja -C build -j"$jobs"
     ninja -C build install
     tar -xf /opt/xran/sources/airtracer.tar.gz -C /usr/local/lib --strip-components=1
