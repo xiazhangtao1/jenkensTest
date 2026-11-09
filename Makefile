@@ -10,9 +10,15 @@ APT_SOURCES ?= config/sources.online.list
 OFFLINE ?= 0
 BASE_COMMIT ?=
 TRANSFER_MANIFEST ?= dist/transfer/01-dependencies/MANIFEST.json
+SOAK_MINUTES ?= 30
+COMPAT_IMAGE ?= 192.168.10.35/xnet/xran-compile:26.11.08-compat-r2
+SDK_IMAGE ?= 192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2
+VERIFY_APT_MIRROR ?=
+VERIFY_XCN_NUMBER ?=
+VERIFY_RESUME ?= 0
 shell_quote = '$(subst ','"'"',$(1))'
 COMPILE_FLAGS = --image-name $(call shell_quote,$(IMAGE_NAME)) --image-tag $(call shell_quote,$(IMAGE_TAG)) --dockerfile $(call shell_quote,$(DOCKERFILE)) --jobs $(call shell_quote,$(BUILD_JOBS)) --apt-sources $(call shell_quote,$(APT_SOURCES)) $(if $(filter 1,$(OFFLINE)),--offline)
-.PHONY: prepare images render import-images deploy bundle test verify backup compile-image push-compile-image platform-plugin transfer transfer-deps transfer-code transfer-check transfer-git
+.PHONY: prepare images render import-images deploy bundle test verify verify-release backup compile-image push-compile-image platform-plugin transfer transfer-deps transfer-code transfer-check transfer-git
 transfer: transfer-deps transfer-code
 transfer-deps:
 	$(PYTHON) scripts/transfer.py deps
@@ -34,3 +40,5 @@ test:
 	$(PYTHON) -m unittest discover -s tests -p 'test_*.py' -v
 verify:
 	$(PYTHON) tests/verify.py --site $(SITE) --source $(SOURCE)
+verify-release:
+	$(PYTHON) tests/reliability.py --site $(call shell_quote,$(SITE)) --source $(call shell_quote,$(SOURCE)) --xcn-source $(call shell_quote,$(XCN_SOURCE)) --compat-image $(call shell_quote,$(COMPAT_IMAGE)) --sdk-image $(call shell_quote,$(SDK_IMAGE)) --soak-minutes $(call shell_quote,$(SOAK_MINUTES)) --apt-mirror $(call shell_quote,$(VERIFY_APT_MIRROR)) $(if $(VERIFY_XCN_NUMBER),--xcn-number $(call shell_quote,$(VERIFY_XCN_NUMBER))) $(if $(filter 1,$(VERIFY_RESUME)),--resume)

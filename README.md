@@ -100,6 +100,8 @@ make transfer-code BASE_COMMIT=内网当前提交
 检查已有文件，只拷缺少或变化的包。具体目录、清单和内网重建命令见 [分类搬运](docs/transfer.md)。
 
 `make verify SITE=/路径/验收站点.yaml` 会提交真实构建并测试并发和清理。
+完整回归使用 `make verify-release SITE=.state/reliability-site.yaml VERIFY_APT_MIRROR=http://软件源/ubuntu`，
+包含独立实例、真实业务编译、故障/恢复和至少 30 分钟持续负载；准备步骤及证据说明见 [可靠性验收](docs/reliability.md)。
 磁盘压力测试要求独立验收实例的配置包含 `verificationInstance: true`；日常仅验证功能可执行 `python3 tests/verify.py --quick`。
 两项目共享资源的专用验证为 `python3 tests/verify-shared.py --site /路径/验收站点.yaml`，同样只允许独立实例。
 `make bundle` 保留为完整快照的兼容命令，包含预编译镜像；日常更新使用分类包，不包含运行密码和 SSH 私钥。
@@ -110,6 +112,7 @@ make transfer-code BASE_COMMIT=内网当前提交
 - [分类搬运和避免重复拷贝](docs/transfer.md)
 - [运维与备份恢复](docs/operations.md)
 - [验证结果](docs/validation.md)
+- [完整回归与持续构建验收](docs/reliability.md)
 
 X-RAN-CLOUD 使用模拟仓库验收；xcn 使用验收脚本默认的发布开发分支，未改动业务源码或 main。
 X-RAN-CLOUD 的真实服务清单、依赖、FROM 镜像和 Registry 路径须按内网项目补充。

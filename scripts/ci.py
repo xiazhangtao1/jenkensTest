@@ -306,7 +306,9 @@ def pod_template(cfg, kind):
         builder['volumeMounts'].append({'name': 'xcn-bases', 'mountPath': '/opt/xran/open5gs-bases', 'readOnly': True})
         init = [{'name': 'xcn-bases', 'image': cfg['xcnBasesImage'],
                  'imagePullPolicy': 'Never' if cfg.get('offline') else 'IfNotPresent',
-                 'resources': {'requests': {'cpu': '100m', 'memory': '64Mi'}, 'limits': {'cpu': '500m', 'memory': '128Mi'}},
+                 # Copying the base archive charges file cache to this cgroup.
+                 # Init runs alone; its limit stays below the regular Pod budget.
+                 'resources': {'requests': {'cpu': '100m', 'memory': '256Mi'}, 'limits': {'cpu': '500m', 'memory': '1Gi'}},
                  'securityContext': {'runAsUser': 1000, 'runAsGroup': 1000, 'allowPrivilegeEscalation': False},
                  'volumeMounts': [{'name': 'xcn-bases', 'mountPath': '/base'}]}]
     if cfg.get('caSecret'):

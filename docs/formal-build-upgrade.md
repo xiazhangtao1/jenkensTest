@@ -1,7 +1,10 @@
 # 将临时验证环境升级为正式构建环境
 
-本次版本为构建平台插件 1.0.5、Controller `xran-ci/controller:2.580.2-17`。
+本次版本为构建平台插件 1.0.5、Controller `xran-ci/controller:2.580.2-18`。
 支持两个编译 Dockerfile，保留 `pkgconf`、DPDK 非交互输入、服务串行及取消 `all` 的修复；新增旧版业务镜像缺包自动导出和项目可见性开关。
+本轮关闭离线页面的 Jenkins 使用统计请求，固定 local-path helper 镜像 tag，并将 xcn 基础镜像复制初始化容器从 128MiB 调整为 1GiB，避免文件缓存触发 OOM；新增 [完整回归与持续构建验收](reliability.md)。
+已有 `26.11.08-compat-r2` / `26.11.08-sdk-r2` 编译镜像无需因本轮平台测试重新构建。
+初始化预算由部署脚本生成，更新代码后须执行 `make deploy` 更新模板；仅导入 Controller 或重启旧部署不会生成新模板。
 
 ## 同步源码和缓存
 
@@ -63,9 +66,9 @@ sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml 
 ```bash
 sudo make platform-plugin OFFLINE=1
 sudo env DOCKER_BUILDKIT=0 docker build --network none --pull=false \
-  -f docker/controller.Dockerfile -t xran-ci/controller:2.580.2-17 .
-sudo docker save -o /tmp/xran-controller-2.580.2-17.tar xran-ci/controller:2.580.2-17
-sudo ctr -n k8s.io images import /tmp/xran-controller-2.580.2-17.tar
+  -f docker/controller.Dockerfile -t xran-ci/controller:2.580.2-18 .
+sudo docker save -o /tmp/xran-controller-2.580.2-18.tar xran-ci/controller:2.580.2-18
+sudo ctr -n k8s.io images import /tmp/xran-controller-2.580.2-18.tar
 sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml OFFLINE=1
 ```
 

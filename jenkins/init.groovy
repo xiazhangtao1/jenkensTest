@@ -13,6 +13,8 @@ import org.jenkinsci.plugins.scriptsecurity.scripts.ScriptApproval
 import org.jenkinsci.plugins.scriptsecurity.scripts.languages.GroovyLanguage
 
 def j = Jenkins.get()
+// Offline pages must not request usage.jenkins.io from the user's browser.
+j.setNoUsageStatistics(true)
 // Rename the original job in place so build numbers, logs and artifacts survive.
 def legacyReleaseJob = j.getItem('open5gs')
 if (legacyReleaseJob != null) {

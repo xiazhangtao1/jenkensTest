@@ -1,0 +1,5044 @@
+{
+  "status": "PASS",
+  "startedAt": "2026-11-09T07:52:14.037158+00:00",
+  "namespace": "jenkins-reliability-verify",
+  "sourceFingerprint": "f7a1974a0c9603cc5abc4b64ed35e8a3a66fa0e7f1f4e65adbbd70c9154dab9e",
+  "phases": {
+    "isolation": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T07:52:14.479664+00:00",
+      "details": {
+        "pvcUid": "ef62030e-2d8f-40d5-8aa9-ee8a98a98e5d",
+        "controllerImage": "xran-ci/controller:2.580.2-18",
+        "controllerRuntimeImageId": "sha256:1162916531261de7d2070e6b5c75e911136bd2ce8dfe5d31e2cbde466474e265",
+        "controllerLockedImageId": "sha256:1162916531261de7d2070e6b5c75e911136bd2ce8dfe5d31e2cbde466474e265",
+        "fixtures": {
+          "X-RAN-CLOUD": "db3051980abe0cc90204f771b96ebb7a728341b2",
+          "xcn": "7019cb0340b0e35c09aca53245734489545da682",
+          "soak": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+          "demoImage": "xran-ci/reliability-demo:1",
+          "legacyImage": "xran-ci/reliability-legacy:1"
+        },
+        "sourceFingerprint": "f7a1974a0c9603cc5abc4b64ed35e8a3a66fa0e7f1f4e65adbbd70c9154dab9e"
+      },
+      "finishedAt": "2026-11-09T07:52:14.827181+00:00"
+    },
+    "python": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T07:52:15.860366+00:00",
+      "testInputsSha256": "1b91312ad381228a24eb0e49b83a100b318b248e770e792526d994bc52f2b84d",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/python-tests.log",
+        "sha256": "66922a88b29ef2c8ea73e8896c8db74ab2f0cbeadaddf15485743fe369b47b60",
+        "seconds": 2.72,
+        "tests": 51
+      },
+      "finishedAt": "2026-11-09T07:52:18.578771+00:00"
+    },
+    "plugin": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T07:52:19.017990+00:00",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/plugin-tests.log",
+        "sha256": "658565bd28c56e562ddc22ee6b9108d5770ed68a05235797318af219818d7677",
+        "seconds": 56.89,
+        "counts": {
+          "tests": 16,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 1
+        },
+        "skipped": [
+          {
+            "class": "io.xran.jenkins.xran_build_platform.InjectedTest",
+            "name": "testProperties(URL)[1]",
+            "reason": ""
+          }
+        ],
+        "sourceSha256": "8358b179a93251312c303736795b185d5fefb66fd465ca7cbbbce960649a09b3"
+      },
+      "finishedAt": "2026-11-09T07:53:15.951159+00:00"
+    },
+    "compiler": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T07:53:16.389425+00:00",
+      "details": {
+        "compat": {
+          "log": ".state/jenkins-reliability-verify/compiler-compat.log",
+          "sha256": "84761dbaa51952d7e3784cdffa8a48c040afc0120a37f33a20fcdc708205c98e",
+          "seconds": 6.72,
+          "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+          "imageId": "sha256:7fcfcb7cffccfea8c911ac93d3de42f108257a7e3fbbce676291e9240a688ca4"
+        },
+        "sdk": {
+          "log": ".state/jenkins-reliability-verify/compiler-sdk.log",
+          "sha256": "1ad85d3c5e4a6801a23751a674cfb5bfa08c4a6745878097b4f8edccea5c8a10",
+          "seconds": 6.62,
+          "image": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+          "imageId": "sha256:452ecad8aea4cbc645599867d64b4e13697a6f38796a31d5162945ee89e226f8"
+        }
+      },
+      "finishedAt": "2026-11-09T07:53:29.762312+00:00"
+    },
+    "functional": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T07:53:30.223203+00:00",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/verify-build-compatibility.log",
+        "sha256": "ec605a6dd001d0839ab470b83081c63d0e43f6c8b91684232cc114c994e9512f",
+        "seconds": 727.22
+      },
+      "finishedAt": "2026-11-09T08:05:37.442838+00:00"
+    },
+    "real-xcn": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:05:38.025451+00:00",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/verify-xcn.log",
+        "sha256": "d74ab99b459ebe49514fad29890d5347d72aab6e69c3b89d161b7f10bedde149",
+        "seconds": 16.34,
+        "number": 3,
+        "commit": "7019cb0340b0e35c09aca53245734489545da682",
+        "businessReportSha256": "51595ae4e0d26f12695db2ad770d6b1ad0677e99274449a44a37405d7196f11b"
+      },
+      "finishedAt": "2026-11-09T08:05:54.472346+00:00"
+    },
+    "parameters": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:05:54.988434+00:00",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/verify-parameters.log",
+        "sha256": "98038f02e49f93f0682f7d33adf09684d3f428c65b3dee9517153dace85631a9",
+        "seconds": 62.26
+      },
+      "finishedAt": "2026-11-09T08:06:57.247511+00:00"
+    },
+    "admission-restart": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:06:57.801596+00:00",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/verify-platform.log",
+        "sha256": "cba28c5380bf918d28a166faf214c115c6191c0a2f0e741f302cdf0e2f580631",
+        "seconds": 432.34
+      },
+      "finishedAt": "2026-11-09T08:14:10.146625+00:00"
+    },
+    "shared-storage": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:14:10.654695+00:00",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/verify-shared.log",
+        "sha256": "e5b415b2770926212615a08e373bdd5c118cb5726a0a42d151fac8c01f8b6d52",
+        "seconds": 164.84
+      },
+      "finishedAt": "2026-11-09T08:16:55.493428+00:00"
+    },
+    "resource-profiles": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:16:55.941729+00:00",
+      "details": {
+        "service": {
+          "pod": "x-ran-cloud-206-tj868-qh5gf-jqh96",
+          "cpu": 5,
+          "memoryGiB": 9,
+          "temporaryStorageGiB": 8,
+          "settingsVersion": 59,
+          "artifactValidation": {
+            "job": "x-ran-cloud",
+            "number": 206,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "34ab33e74767e95803af5533cbc8967c36d0a6de6486d262c175e6719e52d056"
+              }
+            ],
+            "settingsVersion": 59
+          }
+        },
+        "image": {
+          "pod": "x-ran-cloud-207-4c8sm-xdt25-sgqnz",
+          "cpu": 6,
+          "memoryGiB": 10,
+          "temporaryStorageGiB": 12,
+          "settingsVersion": 59,
+          "artifactValidation": {
+            "job": "x-ran-cloud",
+            "number": 207,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "c05783a2e41b037f813a9119a7a1fd416e675b9223d992a5679e9840a1d1d121"
+              }
+            ],
+            "settingsVersion": 59
+          }
+        },
+        "xcn": {
+          "pod": "xcn-86-kk5dn-mvh6z-l2pnh",
+          "cpu": 4,
+          "memoryGiB": 8,
+          "temporaryStorageGiB": 20,
+          "settingsVersion": 59,
+          "baseInitResources": {
+            "limits": {
+              "cpu": "500m",
+              "memory": "1Gi"
+            },
+            "requests": {
+              "cpu": "100m",
+              "memory": "256Mi"
+            }
+          },
+          "artifactValidation": {
+            "job": "xcn",
+            "number": 86,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "c6db88acdd65bb1ec323f21b24d1670c99b1b29351df1f4fc1586ea6377d5403"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "955db05f0f1f6118d9ebad54bfdc601dff1caa07e5dd76e3bfcc07bdfdb44412"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "896690e9455bb2aa47f30edd3b40af70750a8c90a6c662c2a4f0f46c48614019"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 389,
+                "sha256": "2c96621514d63ffd1add330256b1678fffeac2958ef72d42bd2716c56e83e479"
+              }
+            ],
+            "settingsVersion": 59
+          }
+        }
+      },
+      "finishedAt": "2026-11-09T08:20:09.115972+00:00"
+    },
+    "faults-restart": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:20:09.564969+00:00",
+      "details": [
+        {
+          "case": "missing-compiler",
+          "number": 208,
+          "result": "FAILURE"
+        },
+        {
+          "case": "agent-pod-deleted",
+          "number": 209,
+          "result": "FAILURE"
+        },
+        {
+          "case": "builder-memory-limit",
+          "number": 210,
+          "result": "FAILURE",
+          "testLimit": "96Mi",
+          "exitCode": 137
+        },
+        {
+          "case": "normal-build-after-faults",
+          "number": 211,
+          "result": "SUCCESS"
+        },
+        {
+          "case": "web-memory-and-history-after-restart",
+          "serviceMemoryGiB": 9,
+          "historySha256": "20ed57debf04f29c2c12df751877f1f916547dd73e694e10bfb2e0c0563fa1f3"
+        }
+      ],
+      "finishedAt": "2026-11-09T08:25:09.628052+00:00"
+    },
+    "compiler-selection": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:25:11.776938+00:00",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/verify-compiler.log",
+        "sha256": "9bb2da9652b5bba473a1353f62ec621c8f73f30d3ba5465034976b0410abe87a",
+        "seconds": 560.78
+      },
+      "finishedAt": "2026-11-09T08:34:33.811528+00:00"
+    },
+    "artifact-visibility": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:34:34.312371+00:00",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/verify-artifact-visibility.log",
+        "sha256": "b0b90501e0a286b558480bbb418650ebefac90533bb3168363a30a52e0d5b818",
+        "seconds": 980.5
+      },
+      "finishedAt": "2026-11-09T08:50:54.815735+00:00"
+    },
+    "browser": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:50:55.530423+00:00",
+      "details": {
+        "log": ".state/jenkins-reliability-verify/reliability_browser.log",
+        "sha256": "3cf02ea253880ca6c2b0776a22fd32e8a98502fbe2790b91441d77bceb8858b5",
+        "seconds": 36.02
+      },
+      "finishedAt": "2026-11-09T08:51:31.549824+00:00"
+    },
+    "backup-restore": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T08:51:32.039611+00:00",
+      "details": {
+        "archiveSha256": "84c046d1e8f2e2ca1da9460b7c4939f809396af2986b52fe5e06a2cbe230fa04",
+        "restoredNamespace": "jenkins-reliability-restore",
+        "exactHistoryRestored": true,
+        "restoredServiceBuild": 246,
+        "settingsVersion": 77,
+        "backupDeletedAfterValidation": true
+      },
+      "finishedAt": "2026-11-09T09:10:12.481213+00:00"
+    },
+    "soak": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T09:10:13.085966+00:00",
+      "details": {
+        "elapsedSeconds": 1995.434,
+        "completed": 118,
+        "kinds": {
+          "service": 40,
+          "image": 39,
+          "xcn": 39
+        },
+        "maximumLeases": 6,
+        "maximumRunningPods": 10,
+        "maximumWaiting": 6,
+        "unexpectedFailures": 0,
+        "artifacts": [
+          {
+            "job": "x-ran-cloud",
+            "number": 250,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "5315e99a1ccfbc7a4982a6c6dbd90c25d50a90c68ded92446461cf89c16a2b61"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 246,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "f5c8e4a5ebad3917a339c8c45f74a65cc88529d9d64361bf9cc5ba86b22c3a2d"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 248,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "4b6061ec436be96884855efa4b4d75917bbce0708858813ad8a259caa93a6f01"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 247,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "92f92aab7e14e66fe067500f2dbd170ef9a06ac85fa07a894d01147f05a04ca6"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 249,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "d1599575965e13d4ca50e3c1aaaab28b3a667f3eb583baa4ebfff2b70ba6823b"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 251,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "2b46f3322fd4dead6d7325e10524de464bcfd3b9f5547a57ae85e6899df5733d"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 87,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "762737e2c2264aad8d437020708be6c5706843a5790a60af097f732898a3b6f9"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "833cc880dccbab48f4481259ab678e3db3acb9e3b77ef2be42cb580737d3da9c"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "3cd2d3496fdc4ee7c85b63fd2fde0b0ea8e3c0d805ba5275c7537410903f3581"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "cc126b1dc556faead04578f02b32d93fea3efcf51afe4fceef6c6bbcd70b0bf5"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 88,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "f56951a730110b8ed2d3cc7acb55808430693288f54e7929c83ff175d5b1cb42"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "cdc9c19fdde8856e389f5bd534b97dd1e741391ff89a57874387f87563612393"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "4b48cab04a70c61094770f8a2d6f440dd078a04f97b0b82c6e5d9853f624792b"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 385,
+                "sha256": "48944cddf40abf21ec3056a25ac8862478a4e395d9498bde132d60dbe6a2621c"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 253,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "b47a550b55c18d5b0bb3ec78c8872968bf83e0a2b268ab29285324b30685653f"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 252,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "6a140adaf9f579ebe258d5b013383222f8e28b4cd170bccb54f3f9a141ab04cb"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 254,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "3d4f84526399f40256b46efafe6879f6efc445507769a1b521b8622b869a9f21"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 256,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "0450a1918b0f5008c91c9df46384e621b1e5e90cd7bb5420834a0fc73f7ce3df"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 255,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "cb3282ba7593108c8e91ae6828e7920e9ed4bb6112961f7eedd3d604783ccf2d"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 257,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "0fcce52180d157ecea9e93c58aee8b25dcac862355120df397913844a54ba2c9"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 258,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2497,
+                "sha256": "ebdea91be225e9b795f5baafeb8dce0bbb1c783dc00dba962c5991cc6f0b34ce"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 89,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "14e8662b0048e74fe6f0a721308eb59942cc19e9e0fb362b81f5de0382422fc3"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "42f5644f2d5d07b819b0e80398483f6efb039de38a8cb6709951e4ae9d52412f"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "f3d338996ef8095bb952de14d4d4a1eb7112cd9d43a678eeaebc8116bbeccf3a"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 388,
+                "sha256": "455462416e52359e3d344b37e6b3c528f1188fd50e50d25458c06e145551957c"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 90,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "a0da11d645ba8407b9e0b7c67c4ed867caae87cf53898d5240ef2c683100a8ed"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "cd45f4e9aeba697cdb2564e7de94264e0438b798a7a6bce4097540b2b3c577da"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "7b41e189234424f730194febdef1c8376cf7b623bd46b96eaa39e3e4dfceb0ec"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "0ee126dbf8773091e8ecab450aec2444d175442fa8aa7e93674c6c97bedc82a8"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 259,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "990b25c4c81a6591eeadd66d2c11dff3ca827ca584365eb19e06c22e87404fbe"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 260,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2497,
+                "sha256": "3dac9110acbf9e0ea2bbe171a254f749bec03c54cb7cbb899c6f4e7c5acc2852"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 91,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "becbfdec2cd93493a56362aedcb39f6cead56b2f0057b874b62b7d5b8ea22bf6"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "9129a0e616182037f4568ce8788466abd7a052eea04aa692908200031ba0e8ca"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "1368c9a976d26900d60098c13dcf4cd8775065912f6ba6c69471a8b6a3238b32"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 389,
+                "sha256": "83d6c74c3cfe5201247ebd45b673870faae0b9879ac341d06280e7701ccdf09e"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 262,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2497,
+                "sha256": "a87ba4aa174cac0bc272440b07bd05e601a8ec2999a9a3e5753644572240d36e"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 261,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "912bc6af8e1110feb0285fbc596f0db52e5469d980e1dfca59d99b46d7a97bed"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 92,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "063fc599152bb4a1de4d2eac6f96bfed311b5a3bd8381455acc266b8de25d8e0"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "db10647fd66d20f36259c5492893f057f348c8a870bb3c9066e5be0f2433ecd3"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "770a01f2870d41d25ab4c32f7bd665c1717e3bdb0033dba00f7e2c7798eedc40"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "17f6a696b8f10a5337b6289f95ea2732ea8ae89c90c130b7020d8742d5e8e0a2"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 93,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "b1cf0851c4d4cc2260ac3ef65bbe64e7b7bd9fb53481af3ac79b391394c644fe"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "e2b12e6ae2dfe11be0616b9412b142bae47f884fd2ba07b1ef56407b562a6ca3"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "fc3d5a8b97d880eff53f61ca25a028ee2e36aa35aa2a6686795061032e52a32e"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "43b7afccb39c81c2b3385465c174b2e2b343bf0ad34ca50f2ea7f3e273c0ae57"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 264,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "2c00d1eb0c6a08df234faa7da83f48eaccbcc6de896d96acc06b12f1be953055"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 266,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "131ea42b84272931bb5b97e459b83c7e9239464a263f2d0c666d72c33cad0708"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 263,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "cf173255c16b0f4d83638b6fef38bcfedd10cd3a1eaab53537f347ac8cca8ba4"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 95,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "e30717a174583849c5ef08acf0b2223c8b2c275b14a000e18d4c659e058ff794"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "6ceb16e4c34aa550b9410adb5be8bb69d7aae0047788616871fdb891eda68f93"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "7e3d9c43279889e07a7a352f0dbaa5f0f3edac7f18843ce37cf113ac6d7d224c"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "d14001140a02eeb0f6cc5785249b7122a8cc9c78296399aa74adcec69a93fb91"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 265,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "2b5387ca945d7f40a54b041d76662abd78ca21c285a1aaf31113d45c661defbb"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 94,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "f179c56969942919e84219a54df50d14778ce5a2bd2f3a576ba6235694c068a7"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "febfc9f4ab2563ce4ce4b10082cd8ca6fbbc3688145a909a01eceaab591ca775"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "c2287fc43396816bd3c2bcad6278a054550105486193d2d7f3554a642a12a40e"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "da79d952c6b9e55de6151a5476554a12e10ef0027478b13000d05a1c2f6a5fc8"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 268,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "cc209e886c48ff3d2de091fb3e52997e86ece3531dc5466cb4c17e6c8b9efdd3"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 96,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "166ba9eb40639f7e999e08f3ffca0b5e4641327e7c53f286c65461dabc11bb4e"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "45c0bc0a26abacac0b0f555bc1c698797434410656eda19b1d4526d9a06b96eb"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "967e2328272d12fe50e58e3be4e74663f1af107d864928acb5c6f4c42f416784"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "996c40c18080294e7f525f0231e1514cb82d105b69dd13bcaecc4669ec554535"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 267,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "200ff1ef4642fd93a3bb9071363847689862a878fe2178e76b2df93e38282cf0"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 270,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2500,
+                "sha256": "4eb2dd038a86aaa334f8a392b0eda89fd4e93c3bcaa8b1d31394c7a440803cd4"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 269,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "0c523edd4802ae7d1e4bb4156d389dc26f48219c83d0d8f8ef87c537d86e819a"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 97,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "7abb34047a275d5a00f68099aad84aed705b2460b8042e426c6b34bd5cb55e6a"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "b664e3bd4b794a042b0c79159b144c892f39e9526ea46da48bfef3b0625a0865"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "627923befddcda2ca53886df6c426fa773f11b53edeecdbbe14fe860b036e15d"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "a7029c008217b0e263b336a826dee975be2ea3bbd8cced4f310ac5e3ea04b543"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 272,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "99dfc4a8c192e19eb478091b86047eb051ed2493ca2b02c431dcd92f707fb888"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 271,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "62b93ce937ec869f7b2695fdd170107d67f11e9120fc2953163975cc078b3f7a"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 274,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2496,
+                "sha256": "97843de5965f733767c744ec3f6d33828f5a1a2969b2a8439fd3a02bd4fa7d8f"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 98,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "56032ff217983c85495c0a1a6d1930f1c91d0db457d1bf6958d0d294fac506c9"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "23ff7b52b598a250ba69aab9eaf5ca1247295549dcddfc1c3573ea44a19d6594"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "d0ec90c5f2e2f03dda2dbbec63f0387674143cfdb3704c9215c43724b55d1415"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "e5f45941f70305b3e885259fdafbc0af746d1df563765067363dd2121825147b"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 273,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "ad4ec25fca7e1abee608570506b6d3b90e654b95c3e9317af2d36ad2ffeaa869"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 99,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "c3bd7bdd93915cbed1b490ab807e37babfb14b4ef342c2ff5371421b1cd04fc1"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "305b35eaba1b31399c8b93720adc4137af92401039efec0f5d77a057160b3f6c"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "ef4c3dca1c0df583a8636a0a0b8de45c03b63432b84ea03fed7f8f78aea9e0d8"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "e46f8a921db27b54dbec5d1298e21c4ce973a79c3ae734f45f1ae4d2b0756edc"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 275,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "a4916fff0a48092cb034d71a0fb411ecd2b9846017ee373d63077f6c777971e6"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 276,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "04411ee81921627128cb323ba6ee7d51f54da4101436c0c8981b6bbff9a27607"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 278,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "831a25daf5a86e306d4e3c7dc8a570d12e114c0221235ce2379c328ff2534c0f"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 100,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "d87427ea733fea3d58fc07de121b08bf2adc0e30bf09cbfce0be7379b905dfca"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "d0179380bb80445ae5aaf6a4dec240fa3bfad1a4b5103972f03ffecd294713e8"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "07f6b7db2db47dde2459e2a6402e4c8e4a6318f9a31228a8b8e175ea1e49050f"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 388,
+                "sha256": "38ee6fc3c322c9f552c1f7c33874026571c68a2561267d479309377aa3162b07"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 277,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "3c456fffeb57cfb6acd2711f2123a737e92eff584c16e596d03d29e8a9b77605"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 280,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "1c400880cc191f43008d09bdd8b1b8a54f43d1fc986b33b69c3829e75e6b4586"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 279,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "a218e5eced3aa3b3c6671d435742f9c28203edba9d9d6672c378ad892b73b760"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 101,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "d73a83d72f81090599ce84d2dae9f66cb4102a7b292ca2ca2fac0bc87d95a128"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "ea0fc024ffd3c6cce03d77133613ccd03918afed7a6d44c8dc4bf52fcedaaa51"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "5dcccf30bff758cd5fe9e2c9fb82dea6f87ba4ee7cd4a71d38a4d1c0be28360a"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "fafaed823d71e578683a0d2612fc5df3bfdf854ea3fa2bc77c9c9ce682cf7b04"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 282,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "462ef9b77792ee88c8c6a6964be470ae9b2469b88830316e1e830f4856338fc7"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 102,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "48f2bbaccf59f920938e978dbc50bdfd8d57e486630d3569c5791db543f91b6d"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "856c4e8114bc0f1707fff77af6149022ea9351e732ac9da9fdeae65a47474542"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "6e4a9ec9653034c8460149335934ba843e35e5f49db5fc0784ad8452a6d24a0d"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "4c866b892d63ef096db0169e957cc5efaf3b12fa939165e11157670675e12003"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 281,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "57e35ab83fe0c95c38b978f0cc957cb5337f933b10c287353a3784609e91b55e"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 283,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "c986288f7750322bf35ea7e18cac966bcb7fa5cbda9280b420fdb180579ebe1a"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 103,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "bfea413f7f2498a9d22fc0bbb0c882d97ab89e9bb891a308b902f483febb10cd"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "9d44ebe7572f4b111dfe5988c58232591cb99a2d21a61c7a7ff2d48cb6286f92"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "9f148dfcd33aa75141ec1a58e6d56285c3090d351a1c1ccc4e6e3d4884163af5"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "7a750f44d0bcdc0ea2dcc928b1a24c1e48c6b3f2f381e073bc8bf632ba0d54b3"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 284,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2503,
+                "sha256": "68f780b8cbe29fb3b50646bc6831630e67a4a10d68040ae92d66fd7f44358ff8"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 104,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "3adebcc092daf7f7b95d8c511f78644016bcb82456ac954775eae98e452c5e34"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "ea6165425a996ae9ff38a2047d0874e5f8287c52ef7ae8dc41eeb48de17104b5"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "e75a34afc856d09583e4702a724ff10b4fa7657becc200cec7d0babce283be6d"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "9bc27535c6e1529cd4789cef39b8decbad656d374724690417848a880e62cd31"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 286,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2497,
+                "sha256": "9d50d49de9624d1247911ae6887b27b8d1fe47c75d3c47f94c43a8548f7c5f47"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 285,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "d605e4fd48a34976c3cacc62bce70eb15e44f5e783da1d7bb66a861b2a272ddc"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 288,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "cd948453c80d98e1d2f8f9b660e95cd669fe6cba5a282b1bc56beaacb0d643ad"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 287,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "fcebc550ffd69f7f130faa3a18cef2dc8d7ed703c994eb3dcb788bfc87065494"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 105,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "61ac60a2d498ec53fb9b8af0cbca52bb72f72bef0c0ed5444d16b1ce2e56ae2e"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "5180f9b06d8d592ec3e114d9e9be42b004e906eaa37098ad571bcea9a30691be"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "363151c6abab57d8dd759e79f0aced92442024150833f9086215ef56e625441d"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "d7a3b1306eef16264746f394694d313ef94ee25e169be60aa1f4a56c3fd682a1"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 289,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "314dc3286990f8264d2d7be361461fa545aa1d8f0fd8a1e60b079adc9a767ed0"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 290,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "56b934c5c6bcf04e7cc862581075302b3ce5926fa5a4d60f8bcd4c088e450edb"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 106,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "b2af4389bc10fbd0d5b31cf4aa1534e201c726b0cfa54042593cb8839beb0f1b"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "cf5c01c85de34ceab5cc7ad84683a0dbcb7da612b2623549b3fe34985cee1a72"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "4180e5e74050f09601d57016fb427a79178da20e376ed5322ceebcd8f3ca74c5"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "438a489417b42f287144ad91ad08750d5c446677c67d3b5536d5db7e54eae670"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 291,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "26800eec43cdad02de08f44a4bf648c645eaaf2ad1b772a289b1e63f2c7fe20b"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 292,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "7ee825830c9a39e485626a26296836e0118f159de15cf819e885b4accb51836c"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 107,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "c7cabb4b7b0e36910c94a7740036bf920abe6cc961f2bd262e8ab3f7f3ecfa7b"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "1eaf5aad935f0d28ded01c3bdf09d6cddc228a8303a124f3c1f4aef21063213e"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "04ef727478cbe5f59f29ba61a6f3d63caba6669e5bb2becba4857ff246e4a9d0"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "e56a349f93cbc62f0a22a517a62fa1cac7bdd8cc3d53149f2484c9cd183c12f8"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 108,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "609ad251dfa0d9d8f81bfb8c01a109a5520e9ddde49dcdff6d850931489f95e5"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "9fefa22e15e6a5ce0e857b22747f56bc30eebe8c49e2309580a87b12a612e0d2"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "c8b5833001a8fd8c2068e67213bd82d51919dcf51dd5fb616c498ffbe56bbcd2"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "5aefc1c53fe8e3cdd827bdef0a5d5eb862863bbfb109ed1816fe96e41c00d2d8"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 293,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "929cf3dd2b23685d30b46451bb9f28c080268ab3481070d06c24525802a49539"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 294,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "322161c0a0f70000456a799d2b3575d1167d03af4108c360337fbc1ec75c315b"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 109,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "7c27bd39cfc539babd28076657d3652b8675438076771774ab1a947aeed2db23"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "00ddc83feb5180e4e5d2f9f9e5ed6b47b094d7e823883e7989f93a33dba04276"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "c109f8dda5a8c238b5c4b4cb1d3fa1bbbaff21f6372e75a285d0af0d4c529675"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "bec16d90c2a88b5b2ebdfb961850c60ded420ef301807a98dc470bf2169e9418"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 296,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "e717cacee99b0e580e259df593888bffc07c994825507d770b4744d9bc7d01a4"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 295,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "1ecd13ccb091e29152f03b243bb6a436be0a6edb3b369b586a4aa9ec4eebd5cb"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 110,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "19624d6e4078a2372fd2928bd804e9e7bb592359e6bbf06a82794d7fb743af44"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "ba3cc1a95d2abef24b39cd1d7fb5e53d941a50b1bdc4dad597df51bb67077ff5"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "08eb65cf579abc4a18adebdc296c4f2911663fe08ef6f4035b01f2223ae1a075"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "2b9910b1d8cf73a3a954eecc84dcc6d21dd2baffea234fc0b22620a0f5793b87"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 298,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "cf9fa1e0a6be0950bbd25bfd24be953bd7bb410154a00f935b0e165287cf389c"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 297,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "bee907dc25b0d001232999589074b980dff217b7cf3016d443829d3cab9d8f32"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 111,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "225011f6554a9f8a59c5cd454c63bb905bd07948d9ecb3599c5de517ee578f02"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "6c47c26138f4b4df884bba1ff61bdf132cf34a39b7ee34db6f15bb4621d74c42"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "476eac75e93cbf696a692abbb4aeadde536898331c75a7cd12370f8a626cd69c"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "b6e4610b783e022e16a4a13f9a5a6e3f01869d03c9baaa80ea5c7f2164184f48"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 300,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "4dcd9ee3fa74c92767403cfe0947bf1fe8a115f3ac83e14bb051f9090259eecc"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 112,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "59362b6467ae7cd9ff683bd736a162a14e924dda151f00b2e31805deaa8ec0f7"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "254a56bf80803e083a85dfc811d5184c697697d75ba9d6596699e9498b08e288"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "fece758f3d1a68d3dd3a345507d7d93c71d9ec4c3da74fc391f5988b53bfc19c"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 388,
+                "sha256": "9cafae076e0bcd74ffd7ca3a95f387ce527023dcc4422dd5db2d7e9384eb1f9a"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 299,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "a3dd741bbfb6d99ed8cdf5cb91b974159cec37444748d3a361876c066e2594e6"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 302,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "cbfbb89d2b65328941b2b8b62871c51efdf1fc8d613aee4f0cc56b56cbbc5be0"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 301,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "edf3063fcca194a79c97ab5c1d2b8742dec5c85fb8fd18dd9dd241cfe84aa99e"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 304,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "420738ba0abf893a1b7430fc69f8c0ef63ecc329d2d5484dfb6bd5054e6cf6fd"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 303,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "5b7c655a7e85a1b39d757261c88f4065b0162fc9616aa118e83226eeb38c25ec"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 113,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "c1f0f2261ee93748840cb519ed65544df15cb503c3ec18e97f32e830d0c032be"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "9de002bc128e5f4a07b2f26ffdd9a095a9f7090771bda8329a5354d273e49142"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "8f5d2b7993f0a6286ecb88b5dc1b9598417965ac629310c8267a3976c99b681a"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "50374cfd6d0417717c759e9a8fe659c618cbbebe571d6a7edddc8847e21f7299"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 305,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "af875ca85e391305e8e51ce6dfbfebd77345a5107253081a07686f1bd5a7fee2"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 114,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "7d8e499b6dd935bfc4885f4d60c762c994b098db99548866fa0b1bebb926814f"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "4bb0c7287ef58f12a78b066cad5709aeabe6186ff1f6c72aa376b67ded2fb281"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "0d948d3e040bd9f002c9ca84a44798b06e4c4249c1cc41fdabb07710ab171b22"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "fa06a384c9673be0de3a2ee9cefd9bb3d964b173d7f9cea989dc69eb69c74887"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 306,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "35743480286de0220b9749631cd266113f9d691495fdd2f5c2c24548dc72885b"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 115,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "e0340dbc6588d17d10c4002aa7f7abee70e4121ddc6788e5d65ee13f9ba5c080"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "cfe7b9a356dfde4caf3eb7c09c31ea2db11f4154b1b4e64bc9e5a90195405fb3"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "779299dcc4cd4da054e257278da59e34e8f01e6973de815a6a6e7af052a78cd6"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "33bd8c24d33f44de5bb2148bc7590b55de60e78389e6570cd2d1b0b2f76c8354"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 308,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2500,
+                "sha256": "de2bc6975488df93d744c706e9808dc516efa7fea65f2f44d6d70afe58d85dfa"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 310,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "bd07a791495c109bf56723373877e5615122723cff83a526f4ddbb7db6cefa16"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 307,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "9ca1d76609daaf960952491f8417229e5cf69ab523aafd257c940b9e6f78e217"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 309,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "84becb45dd37fc753b565e12d7477c2867e6bd7ae4d90974039887b10ca0e9e9"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 116,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "67d513f88c3550af905b7b00486dacc955acf6052bf5b4392bafec4f85448293"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "60c13d83b60a4ceafec360c6d5126f1b91c2a8653ce4371c6588f55cb6602ca8"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "671f7aeb19c0d823b427fbc9dff7e27a9f6cb67881f1670a5df51e06901d9a9c"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "2d1a3cf4f1d914d3d40289e27aa1ef15cc66c2dba30019902f3fd0c3ece59dbb"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 117,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "44576d3743c810d7f8f059844095fcd5caadbb899ec1555c4f9d09d768c5e828"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "21a95f5cd7b88cbb488cd31080ce08a04f6fe02e0875912fb32a30ccaaabfdc0"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "5e396319850f78f27b8a0fe7016569c2cabcc50dbb03e0cd365526c7bc448e65"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "3b619d72d484a00a88285f73e28050ee7c66dca9fcdfb437b8c79ce7d4b9457b"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 312,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2503,
+                "sha256": "48a28dd9df8807ba26ac732731f8f21be99c1f8b4a520577c1787dfbc5679cdc"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 311,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "81e5afab4064173f6badcd892f7c6a7397bd964af4db6ce3f5eaa790dd9facef"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 314,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "1eccb17bab05a633ec87e4b3f4bdd535bf7d3ebd8066d59d56b6c180361008b9"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 313,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "bd097567c4ed2b9e19d216ff700937e90c947d75bcbc282d97981d303c3e6a62"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 118,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "84f8d43044c90753a76ab74430cfb807cfda085b2cdeecd920aaba75206d6c81"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "dd6abe71f1162089bebfe23dd138910ec4304573c81e2b1e8eeddf44eee0f63f"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "2747dd10d30b70bc7e0b20177af8af55a4835742ed3ac98b0481a8489732af97"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "5b91878f08a2021dfc8335dc815bf1995e297d15320737c88ce14790d175e1d5"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 119,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "d6b0dc0320a4cd77849b018ef5d6a6945565d86967f10f69e53978d11d6c0192"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "f7fdb7646d87b854fb7f50e871ce9c724278f17f9d0a52a5525f76a140ab1093"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "956bf491130d0683b885adeef32ef69f734690f3f02597a0bd52e57b929a5327"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "04d011f32eac55db9e1962807316dbc7e5d467b7c815e4933b0146941cb92b79"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 316,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "f11eeb0550f4ae4aa8358b7b987072927ae98a1f0c398f90b57482846b7c1aec"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 315,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "cdb740d1189c84dfc859048448ade870cdd1dd4ca11cf6b9115552096d21341d"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 317,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "08ea328fef80ee502030d0da1408b0baa5b3c77be9bd362bd178b7175853a240"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 120,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "32aee871d766ebfbf02a849e60d0c231af7525520fcdf097452511eb26f66991"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "f02ee8d6615ee030aef70a547fc72718db5251f0515161be98b827ef3a7e7954"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "2faff8ceaf0c9abfb3eff5779d985eca48015d37c39a132f96bf59720690e9ee"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "ff0d9ffdbf67ac51401f12f51a616aa79064cd40b8d22d0b0d78868a7dc101de"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 318,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2498,
+                "sha256": "9488280d12d1b15a7dd0c31650287820713a7ef119f911b0cc077fc2bacfbe9f"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 121,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "4c1359d17944dd8094713d1322f219c9e7654ccf4b944d6ed68b581890311ca1"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "2f6112b9c95123837805991ab34be821189a37af0468df4b9f104072113da0f0"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "8bde780d982a3005f3fbe5342a065f0cbdb6274c16e38a3bb946a32b9e5b9dfc"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "9636149482bdc5d3eb79e4eac7a7a2b9c8d110717afb579b3057adc182c5ee70"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 320,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2497,
+                "sha256": "7a721899d03690cc666f6d827b31b772da30a72b4d20cdbbd3b8663f34b663ff"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 319,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "e47878ce21e8b37f0d96b85775d134bbaf97dc98483325204c621247bb4a84bc"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 322,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2499,
+                "sha256": "0b17a04c7219b1a146ac6c67b07b250a2b006bf5cbf0e0c6bd415ea738beea8c"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 122,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "648c215710bb3c1e3e33a6a1fe7df1cba8d175db621f3fadf464fe58ddeb9fc4"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "e8ec790d33c6044bf565d6f39edbd07454f665fda86c9538642638dbf21f72a2"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "aa40ffc0e482f9857365571f2db9c84efe0adb45df4ae5e8d57f68db3c17f662"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 388,
+                "sha256": "6367d85af6a5505b012ff8953e64238463c3678de4af0b82d32414d0c3ec7bb6"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 321,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "1c2ee85e0bbc40b9e5e77fbb9760587671f4b9a67f86ee7b02752c26cda360d3"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 324,
+            "kind": "service",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "serviceA.tar.gz",
+                "size": 2497,
+                "sha256": "1f3a0e4b05da46102a2d4b03c76e5881b24c449d08b2dd62a820d0015be124d8"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 123,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "eb3816782922b892178a37abd0bdaa5f9d9f53ab79093a4e05ee2f87108ee6ba"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "7068963d0d44f272c122ff17234d7777f8d3b2d692df6edf4b0a9f982d2dc37a"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "644665abc377fab42fdfb0be5fe1527b5a45680fb88ccb6b9a04b0d21cbc3e7b"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "1751146f00f919f256127935413c815ce927a6ef00a2669e608338290df2db64"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "x-ran-cloud",
+            "number": 323,
+            "kind": "image",
+            "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "imageA.tar",
+                "size": 80658944,
+                "sha256": "28ff32a4c8457e09078e73e9e9ea85eee3c025535969a0e3ac5bb6fbe124f595"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 124,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "f4e4caafddd9c84f5b0fb22148f6134951cf8d5b8c40349bc82e2d2ccd931ff2"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "ae49f870cd940be045c40b229034fe8fa860e3c4930fb0ca5f7407e2c31d5d6a"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "d525b7ec68f25cdc72720c215b22ac2ddde122ae494cb1938bb3e1fdbb2b27aa"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 386,
+                "sha256": "a1a2b437418feb5a5e45b7922353de32c53e6931c70d73a665b81ab95015c593"
+              }
+            ],
+            "settingsVersion": 77
+          },
+          {
+            "job": "xcn",
+            "number": 125,
+            "kind": "xcn",
+            "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+            "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "files": [
+              {
+                "name": "xcn-runtime.tar",
+                "size": 80640512,
+                "sha256": "fc3e1da37fe9cbbbb5ec400759198bd334d6a99ca0f5d08ea89e17845090f331"
+              },
+              {
+                "name": "xcn-webui.tar",
+                "size": 80640512,
+                "sha256": "ceea582c06d182bb8558494c12f1ed3be63b98df999ee3a1cf90672bba9220a2"
+              },
+              {
+                "name": "xcn-monitor.tar",
+                "size": 80640512,
+                "sha256": "209806ae5a048d0e03b25d1c86fb741313bd09a9c64d8ced0cbe96e51fa87d3d"
+              },
+              {
+                "name": "xcn-1.0.0.tgz",
+                "size": 387,
+                "sha256": "3f73f3039ee322c2b9d90667d9c99e3d67963714e38f5393250a55f06ddf7218"
+              }
+            ],
+            "settingsVersion": 77
+          }
+        ],
+        "samples": "docs/verification/reliability-soak.jsonl",
+        "samplesSha256": "ce6ba23723b2c16f3adc4f0cee380b3d8d58e20549905a116feee01bf9180fdb",
+        "observations": 317,
+        "resourceTrends": {
+          "heapUsed": {
+            "first": 325582848,
+            "last": 382999944,
+            "minimum": 172490752,
+            "maximum": 506180560
+          },
+          "threads": {
+            "first": 35,
+            "last": 57,
+            "minimum": 35,
+            "maximum": 137
+          },
+          "homeFree": {
+            "first": 372293025792,
+            "last": 359655268352,
+            "minimum": 355893678080,
+            "maximum": 372293025792
+          }
+        }
+      },
+      "finishedAt": "2026-11-09T09:43:49.924728+00:00"
+    },
+    "final-idle": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T09:43:50.386206+00:00",
+      "details": {
+        "leases": [],
+        "settingsVersion": 77,
+        "running": [],
+        "locked": [],
+        "reservations": [],
+        "heapUsed": 420748680,
+        "heapCommitted": 536870912,
+        "homeFree": 359655174144,
+        "homeTotal": 941289119744,
+        "threads": 57,
+        "pods": [],
+        "controllerUid": "8c2dc479-cd98-4e9d-ae17-6047d07b6612",
+        "controllerRestarts": 0,
+        "at": "2026-11-09T09:43:50.546362+00:00"
+      },
+      "finishedAt": "2026-11-09T09:43:50.546390+00:00"
+    },
+    "primary-unchanged": {
+      "status": "PASS",
+      "startedAt": "2026-11-09T09:43:50.989025+00:00",
+      "details": {
+        "namespace": "jenkins",
+        "objects": [
+          {
+            "kind": "PersistentVolumeClaim",
+            "name": "jenkins",
+            "uid": "2157aac0-ca51-4eeb-a271-d1805ba7afcf"
+          },
+          {
+            "kind": "Pod",
+            "name": "jenkins-0",
+            "uid": "25924c57-32f4-498e-abd3-418a3ef83595"
+          }
+        ],
+        "historyAndSettingsSha256": "74902b156f2517b336ef9d99d5db7e6d585758d4172a61a482f397a277087074",
+        "businessHistories": {
+          "x-ran-cloud": 99,
+          "xcn": 5
+        }
+      },
+      "finishedAt": "2026-11-09T09:43:51.518477+00:00"
+    }
+  },
+  "limitations": [
+    "未访问真实内网 Gerrit/APT/Harbor",
+    "未重启宿主机",
+    "30 分钟稳定性不替代长期运行验证"
+  ],
+  "protectedBefore": {
+    "namespace": "jenkins",
+    "objects": [
+      {
+        "kind": "PersistentVolumeClaim",
+        "name": "jenkins",
+        "uid": "2157aac0-ca51-4eeb-a271-d1805ba7afcf"
+      },
+      {
+        "kind": "Pod",
+        "name": "jenkins-0",
+        "uid": "25924c57-32f4-498e-abd3-418a3ef83595"
+      }
+    ],
+    "historyAndSettingsSha256": "74902b156f2517b336ef9d99d5db7e6d585758d4172a61a482f397a277087074",
+    "businessHistories": {
+      "x-ran-cloud": 99,
+      "xcn": 5
+    }
+  },
+  "finishedAt": "2026-11-09T09:43:51.524548+00:00",
+  "baselineCommit": "b7d95c0fc911162813431ca92ddeffb22a7e5a76",
+  "inputIdentityNote": "验收在提交前工作区执行；baselineCommit 为启动时 HEAD，sourceFingerprint 与 testInputsSha256 绑定实际受测文件。",
+  "crossRunPrimaryObservation": {
+    "firstRunSnapshotSha256": "ce0d312f4098d69a2f1ad99fe21f3438d829cd18de7dd00c635391889e65abe4",
+    "finalRunSnapshotSha256": "74902b156f2517b336ef9d99d5db7e6d585758d4172a61a482f397a277087074",
+    "onlyDifferenceBetweenRuns": {
+      "addedUser": "test",
+      "userConfigModifiedAt": "2026-11-09T14:18:15+08:00"
+    },
+    "sameSettingsAuditHistoriesArtifactsAndExistingUsers": true,
+    "samePodAndPvcIdentities": true,
+    "finalRunBeforeAndAfterExactlyEqual": true
+  },
+  "supportingReports": {
+    "build-compatibility": {
+      "sha256": "65d57915c43aa4815ba44b75c35d7d3e870b6643bd0ccd8f2b99044ab7779942",
+      "report": {
+        "namespace": "jenkins-reliability-verify",
+        "startedAt": "2026-11-09T15:53:30+0800",
+        "checks": [
+          {
+            "name": "全部插件启用",
+            "status": "PASS",
+            "details": {
+              "count": 74
+            }
+          },
+          {
+            "name": "匿名访问及普通账号管理权限受限",
+            "status": "PASS",
+            "details": null
+          },
+          {
+            "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+            "status": "PASS",
+            "details": {
+              "builder1": {
+                "visibleJobs": [
+                  "x-ran-cloud",
+                  "xcn"
+                ],
+                "deniedEndpoints": {
+                  "job": 404,
+                  "api/json": 404,
+                  "config.xml": 404,
+                  "12/consoleText": 404,
+                  "build": 404
+                }
+              },
+              "builder2": {
+                "visibleJobs": [
+                  "x-ran-cloud",
+                  "xcn"
+                ],
+                "deniedEndpoints": {
+                  "job": 404,
+                  "api/json": 404,
+                  "config.xml": 404,
+                  "12/consoleText": 404,
+                  "build": 404
+                }
+              }
+            }
+          },
+          {
+            "name": "管理员开关及默认资源；页面仅提供单服务和 services_all",
+            "status": "PASS",
+            "details": {
+              "_class": "hudson.model.ChoiceParameterDefinition",
+              "name": "SERVICE_TARGET",
+              "choices": [
+                "serviceA",
+                "serviceB",
+                "serviceC",
+                "services_all"
+              ]
+            }
+          },
+          {
+            "name": "serviceA 分支",
+            "status": "PASS",
+            "details": {
+              "build": 173,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "serviceB 演示分支",
+            "status": "PASS",
+            "details": {
+              "build": 174,
+              "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+            }
+          },
+          {
+            "name": "serviceC tag",
+            "status": "PASS",
+            "details": {
+              "build": 175,
+              "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+            }
+          },
+          {
+            "name": "带注释 tag",
+            "status": "PASS",
+            "details": {
+              "build": 176,
+              "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+            }
+          },
+          {
+            "name": "services_all 历史完整 SHA",
+            "status": "PASS",
+            "details": {
+              "build": 177,
+              "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+            }
+          },
+          {
+            "name": "唯一短 SHA",
+            "status": "PASS",
+            "details": {
+              "build": 178,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "imageA build/save/push/load",
+            "status": "PASS",
+            "details": {
+              "build": 179,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "imageB build/save/push/load",
+            "status": "PASS",
+            "details": {
+              "build": 180,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "imageC build/save/push/load",
+            "status": "PASS",
+            "details": {
+              "build": 181,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "不存在的 Git 引用明确失败",
+            "status": "PASS",
+            "details": {
+              "build": 182
+            }
+          },
+          {
+            "name": "非法标签明确失败",
+            "status": "PASS",
+            "details": {
+              "build": 183
+            }
+          },
+          {
+            "name": "push 失败仍能下载并运行有效镜像 tar",
+            "status": "PASS",
+            "details": {
+              "build": 184
+            }
+          },
+          {
+            "name": "SDK 镜像构建 service/serviceA",
+            "status": "PASS",
+            "details": {
+              "build": 185,
+              "imageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56"
+            }
+          },
+          {
+            "name": "SDK 镜像构建 service/services_all",
+            "status": "PASS",
+            "details": {
+              "build": 186,
+              "imageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56"
+            }
+          },
+          {
+            "name": "SDK 镜像构建 image/imageA",
+            "status": "PASS",
+            "details": {
+              "build": 187,
+              "imageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56"
+            }
+          },
+          {
+            "name": "绕过页面提交 all 仍明确拒绝",
+            "status": "PASS",
+            "details": {
+              "build": 188
+            }
+          },
+          {
+            "name": "关闭开关真实传入 false 并记录到构建快照",
+            "status": "PASS",
+            "details": {
+              "build": 189
+            }
+          },
+          {
+            "name": "两种编译环境同时构建；单任务串行不影响任务并发",
+            "status": "PASS",
+            "details": {
+              "builds": [
+                190,
+                191
+              ],
+              "maximumPods": 2,
+              "imageIds": [
+                "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+                "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56"
+              ]
+            }
+          },
+          {
+            "name": "Controller 重启保留关闭状态、配置版本与构建历史",
+            "status": "PASS",
+            "details": {
+              "version": 47
+            }
+          }
+        ],
+        "builds": [
+          {
+            "number": 173,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 174,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "demo/feature",
+              "SERVICE_TARGET": "serviceB",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 175,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "tag",
+              "GIT_REF": "demo-v1.0.0",
+              "SERVICE_TARGET": "serviceC",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 176,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "tag",
+              "GIT_REF": "demo-v1.0.0-annotated",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 177,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "commit",
+              "GIT_REF": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+              "SERVICE_TARGET": "services_all",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 178,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "commit",
+              "GIT_REF": "db3051980",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 179,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "verify-1794210816",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 180,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageB",
+              "IMAGE_TAG": "verify-1794210816",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 181,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageC",
+              "IMAGE_TAG": "verify-1794210816",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 182,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "missing-ci-reference",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 183,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "bad;touch /tmp/injected",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 184,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "push-failure-ci",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 185,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "sdk-formal-1794211296149243125",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 186,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "services_all",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "sdk-formal-1794211327343973125",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 187,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "sdk-formal-1794211357308938421",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 189,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 190,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 191,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceB",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          }
+        ],
+        "status": "PASS",
+        "finishedAt": "2026-11-09T16:05:37+0800"
+      }
+    },
+    "xcn-release": {
+      "sha256": "51595ae4e0d26f12695db2ad770d6b1ad0677e99274449a44a37405d7196f11b",
+      "report": {
+        "number": 3,
+        "url": "http://10.2.0.119:32180/job/xcn/3/",
+        "checks": [
+          {
+            "name": "精确提交、构建人、时间、日期版本及编译镜像",
+            "status": "PASS",
+            "details": {
+              "commit": "7019cb0340b0e35c09aca53245734489545da682",
+              "ref": "7019cb0340b0e35c09aca53245734489545da682",
+              "refType": "commit",
+              "repository": "http://xran-demo:8000/xcn.git",
+              "buildNumber": "3",
+              "buildUrl": "http://10.2.0.119:32180/job/xcn/3/",
+              "job": "xcn",
+              "project": "xcn",
+              "userId": "builder1",
+              "userName": "Builder One",
+              "kind": "xcn",
+              "target": "release",
+              "imageTag": null,
+              "builderImage": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "builderImagePullPolicy": "Never",
+              "startedAt": "2026-11-09T11:23:09+08:00",
+              "chartVersion": "1.9.0",
+              "appVersion": "reliability-real-1794194581617572906",
+              "settingsVersion": 9,
+              "resourceProfile": "xcn",
+              "resourceAllocation": {
+                "jnlp": {
+                  "requests": {
+                    "ephemeral-storage": "64Mi",
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  },
+                  "limits": {
+                    "ephemeral-storage": "256Mi",
+                    "cpu": "250m",
+                    "memory": "512Mi"
+                  }
+                },
+                "builder": {
+                  "requests": {
+                    "ephemeral-storage": "1024Mi",
+                    "cpu": "500m",
+                    "memory": "1024Mi"
+                  },
+                  "limits": {
+                    "ephemeral-storage": "4096Mi",
+                    "cpu": "500m",
+                    "memory": "3584Mi"
+                  }
+                },
+                "dind": {
+                  "requests": {
+                    "ephemeral-storage": "1024Mi",
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                  },
+                  "limits": {
+                    "ephemeral-storage": "16128Mi",
+                    "cpu": "3250m",
+                    "memory": "4096Mi"
+                  }
+                }
+              },
+              "admittedAt": "2026-11-09T11:23:11.763209150+08:00",
+              "offline": false,
+              "builderImageId": "localhost:15050/xnet/xran-compile@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+              "builderPod": "xcn-3-gfbp3-379v2-gjgwx",
+              "result": "SUCCESS",
+              "durationMillis": 2285909,
+              "files": [
+                {
+                  "name": "xcn-runtime.tar",
+                  "size": 274084864,
+                  "sha256": "6ca66a28bf715d84d2ffd2fe3fcf2f8b1fd1d4f3ed9e31a79d16c9ff22964a90"
+                },
+                {
+                  "name": "xcn-webui.tar",
+                  "size": 466801152,
+                  "sha256": "23db0d2a70690ff2f63a1970bcbc68b937e578803503c2684400aa1e8d29070a"
+                },
+                {
+                  "name": "xcn-monitor.tar",
+                  "size": 436634624,
+                  "sha256": "419dfb2536c1eccf2ae58bd37de306a755c13d3f51450334809869ba21610c49"
+                },
+                {
+                  "name": "xcn-1.9.0.tgz",
+                  "size": 25734,
+                  "sha256": "630f45e01b23b7e4fa60a36c99850f392af9fd76ecb8b8292b6f27a0befa95b5"
+                }
+              ],
+              "images": [
+                {
+                  "name": "xcn-runtime",
+                  "reference": "192.168.10.35/xcn/xcn-runtime:reliability-real-1794194581617572906",
+                  "imageId": "sha256:29c46ca4b0480136854948eed1399ccc7464d7fef31f8b6dba8f16bce8391ce4",
+                  "pushStatus": "failed"
+                },
+                {
+                  "name": "xcn-webui",
+                  "reference": "192.168.10.35/xcn/xcn-webui:reliability-real-1794194581617572906",
+                  "imageId": "sha256:7ad26126a4d3e4347e8d692a5c8be2ea8576f947dc694f691241dc1b2f66e80b",
+                  "pushStatus": "failed"
+                },
+                {
+                  "name": "xcn-monitor",
+                  "reference": "192.168.10.35/xcn/xcn-monitor:reliability-real-1794194581617572906",
+                  "imageId": "sha256:58bf3cb14c4c9e3207321b94efc4862cb5851c4c6a58b88f7911f0a6f269da12",
+                  "pushStatus": "failed"
+                }
+              ],
+              "collectionErrors": [],
+              "warnings": [
+                "镜像推送未全部成功；有效本地包仍可下载"
+              ],
+              "finishedAt": "2026-11-09T04:01:18.884119+00:00"
+            }
+          },
+          {
+            "name": "普通账号下载四个产物及 SHA256 完整性",
+            "status": "PASS",
+            "details": {
+              "files": [
+                "xcn-1.9.0.tgz",
+                "xcn-monitor.tar",
+                "xcn-runtime.tar",
+                "xcn-webui.tar"
+              ]
+            }
+          },
+          {
+            "name": "Helm lint 与模板渲染",
+            "status": "PASS",
+            "details": {
+              "objects": 34,
+              "lint": "==> Linting /home/xiazhangtao/code/jenkensTest/.state/jenkins-reliability-verify/downloads/xcn/3/xcn-1.9.0.tgz\n[INFO] Chart.yaml: icon is recommended\n\n1 chart(s) linted, 0 chart(s) failed"
+            }
+          },
+          {
+            "name": "xcn-runtime 导入与断网运行检查",
+            "status": "PASS",
+            "details": {
+              "imageId": "sha256:29c46ca4b0480136854948eed1399ccc7464d7fef31f8b6dba8f16bce8391ce4",
+              "output": "xcn v2.7.7"
+            }
+          },
+          {
+            "name": "xcn-webui 导入与断网运行检查",
+            "status": "PASS",
+            "details": {
+              "imageId": "sha256:7ad26126a4d3e4347e8d692a5c8be2ea8576f947dc694f691241dc1b2f66e80b",
+              "output": "v19.9.0"
+            }
+          },
+          {
+            "name": "xcn-monitor 导入与断网运行检查",
+            "status": "PASS",
+            "details": {
+              "imageId": "sha256:58bf3cb14c4c9e3207321b94efc4862cb5851c4c6a58b88f7911f0a6f269da12",
+              "output": "TShark (Wireshark) 4.6.9 (Git commit 2d548b197c75).\n\nCopyright 1998-2026 Gerald Combs <gerald@wireshark.org> and contributors.\nLicensed under the terms of the GNU General Public License (version 2 or later).\nThis is free software; see the file named COPYING in the distribution. There is\nNO WARRANTY; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\nCompile-time info:\n Bit width: 64-bit\n  Compiler: GCC 11.4.0\n      GLib: 2.72.4\n With:\n  +Gcrypt 1.9.4            +PCRE2 10.39 2021-10-29\n  +libxml2 2.9.13          +zlib 1.2.11\n Without:\n  -brotli     -libpcap    -LZ4        -nghttp3    -zlib-ng\n  -GnuTLS     -libsmi     -MaxMind    -Snappy     -Zstandard\n  -Kerberos   -Lua        -nghttp2    -xxhash\n\nRuntime info:\n      OS: Linux 5.15.148-rt74-rc202408\n     CPU: INTEL(R) XEON(R) GOLD 6554S (with SSE4.2)\n  Memory: 515474 MB of physical memory\n    GLib: 2.72.4\n  Locale: LC_TYPE=C\n Plugins: disabled at compile time\n With:\n  +c-ares 1.18.1           +PCRE2 10.39 2021-10-29\n  +Gcrypt 1.9.4            +zlib 1.2.11"
+            }
+          },
+          {
+            "name": "推送状态如实记录；非致命 push 失败仍保留有效产物",
+            "status": "PASS",
+            "details": {
+              "192.168.10.35/xcn/xcn-runtime:reliability-real-1794194581617572906": "failed",
+              "192.168.10.35/xcn/xcn-webui:reliability-real-1794194581617572906": "failed",
+              "192.168.10.35/xcn/xcn-monitor:reliability-real-1794194581617572906": "failed"
+            }
+          }
+        ],
+        "status": "PASS",
+        "finishedAt": "2026-11-09T16:05:54+0800"
+      }
+    },
+    "parameters-verification": {
+      "sha256": "59911e6869fcf7b10d88d7117e0502a0fea9b458e8bf380451d38ecce680c65c",
+      "report": {
+        "namespace": "jenkins-reliability-verify",
+        "offline": false,
+        "checks": [
+          {
+            "name": "API 实际参数保存及后台构建模式 #63",
+            "status": "PASS",
+            "details": {
+              "parameters": {
+                "CHART_VERSION": "26.11.9",
+                "APP_VERSION": "26.11.9",
+                "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                "COMPILER_IMAGE_PULL_POLICY": "Always",
+                "REF_TYPE": "branch",
+                "GIT_REF": "main"
+              },
+              "offline": false
+            }
+          },
+          {
+            "name": "API 实际参数保存及后台构建模式 #64",
+            "status": "PASS",
+            "details": {
+              "parameters": {
+                "CHART_VERSION": "26.11.9",
+                "APP_VERSION": "26.11.9",
+                "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                "COMPILER_IMAGE_PULL_POLICY": "Always",
+                "REF_TYPE": "branch",
+                "GIT_REF": "main"
+              },
+              "offline": false
+            }
+          },
+          {
+            "name": "API 实际参数保存及后台构建模式 #65",
+            "status": "PASS",
+            "details": {
+              "parameters": {
+                "CHART_VERSION": "26.11.9",
+                "APP_VERSION": "26.11.9",
+                "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                "COMPILER_IMAGE_PULL_POLICY": "Always",
+                "REF_TYPE": "branch",
+                "GIT_REF": "main"
+              },
+              "offline": false
+            }
+          },
+          {
+            "name": "API 实际参数保存及后台构建模式 #66",
+            "status": "PASS",
+            "details": {
+              "parameters": {
+                "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                "COMPILER_IMAGE_PULL_POLICY": "Always",
+                "REF_TYPE": "branch",
+                "GIT_REF": "main",
+                "CHART_VERSION": "2.3.4-rc.1",
+                "APP_VERSION": "26.11.06-custom"
+              },
+              "offline": false
+            }
+          },
+          {
+            "name": "API 实际参数保存及后台构建模式 #67",
+            "status": "PASS",
+            "details": {
+              "parameters": {
+                "APP_VERSION": "26.11.9",
+                "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                "COMPILER_IMAGE_PULL_POLICY": "Always",
+                "REF_TYPE": "branch",
+                "GIT_REF": "main",
+                "CHART_VERSION": "4.5.6"
+              },
+              "offline": false
+            }
+          },
+          {
+            "name": "API 实际参数保存及后台构建模式 #68",
+            "status": "PASS",
+            "details": {
+              "parameters": {
+                "CHART_VERSION": "5.6.7",
+                "APP_VERSION": "release-test",
+                "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                "COMPILER_IMAGE_PULL_POLICY": "Always",
+                "REF_TYPE": "branch",
+                "GIT_REF": "main"
+              },
+              "offline": false
+            }
+          },
+          {
+            "name": "按历史元数据回填、显式值保护、缺失元数据跳过、幂等及磁盘重载",
+            "status": "PASS",
+            "details": {
+              "numbers": [
+                63,
+                64,
+                65,
+                67
+              ],
+              "versions": [
+                {
+                  "CHART_VERSION": "25.1.2",
+                  "APP_VERSION": "25.1.2-release",
+                  "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                  "COMPILER_IMAGE_PULL_POLICY": "Always",
+                  "REF_TYPE": "branch",
+                  "GIT_REF": "main"
+                },
+                {
+                  "CHART_VERSION": "",
+                  "APP_VERSION": "",
+                  "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                  "COMPILER_IMAGE_PULL_POLICY": "Always",
+                  "REF_TYPE": "branch",
+                  "GIT_REF": "main"
+                },
+                {
+                  "CHART_VERSION": "26.11.9",
+                  "APP_VERSION": "26.11.9",
+                  "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                  "COMPILER_IMAGE_PULL_POLICY": "Always",
+                  "REF_TYPE": "branch",
+                  "GIT_REF": "main"
+                },
+                {
+                  "APP_VERSION": "25.3.4",
+                  "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:latest",
+                  "COMPILER_IMAGE_PULL_POLICY": "Always",
+                  "REF_TYPE": "branch",
+                  "GIT_REF": "main",
+                  "CHART_VERSION": "4.5.6"
+                }
+              ],
+              "explicitPreserved": true,
+              "missingMetadataSkipped": true,
+              "idempotent": true,
+              "reloadVerified": true
+            }
+          }
+        ],
+        "status": "PASS"
+      }
+    },
+    "platform-verification": {
+      "sha256": "b82af2d5f39580dd7e138e213ed346439bf2e9e575deaaa1f27a7ebdbf5f36e5",
+      "report": {
+        "namespace": "jenkins-reliability-verify",
+        "checks": [
+          {
+            "name": "管理员资源预览及普通用户接口拒绝",
+            "status": "PASS",
+            "details": {
+              "actions": [
+                "preview",
+                "reapply",
+                "state"
+              ]
+            }
+          },
+          {
+            "name": "并发 6→2→4；旧构建不变、排队构建使用新配置",
+            "status": "PASS",
+            "details": {
+              "oldVersion": 48,
+              "newVersion": 50,
+              "builds": [
+                [
+                  "x-ran-cloud",
+                  192
+                ],
+                [
+                  "xcn",
+                  69
+                ],
+                [
+                  "x-ran-cloud",
+                  193
+                ],
+                [
+                  "xcn",
+                  70
+                ],
+                [
+                  "x-ran-cloud",
+                  194
+                ],
+                [
+                  "xcn",
+                  71
+                ],
+                [
+                  "x-ran-cloud",
+                  195
+                ],
+                [
+                  "xcn",
+                  72
+                ]
+              ]
+            }
+          },
+          {
+            "name": "运行中重启保持快照；取消及完成均释放持久化槽位",
+            "status": "PASS",
+            "details": {
+              "version": 50,
+              "restoredLeases": 3
+            }
+          },
+          {
+            "name": "同标签等待不占全局容量",
+            "status": "PASS",
+            "details": {
+              "first": [
+                "xcn",
+                73
+              ],
+              "waiter": [
+                "xcn",
+                74
+              ],
+              "independent": [
+                "x-ran-cloud",
+                196
+              ]
+            }
+          },
+          {
+            "name": "全局槽位等待超过总超时后仍可正常入场",
+            "status": "PASS",
+            "details": {
+              "waiter": [
+                "x-ran-cloud",
+                198
+              ],
+              "waitSeconds": 65,
+              "timeoutMinutes": 1
+            }
+          },
+          {
+            "name": "同标签等待超过总超时后仍可正常入场",
+            "status": "PASS",
+            "details": {
+              "waiter": [
+                "xcn",
+                76
+              ],
+              "waitSeconds": 65,
+              "timeoutMinutes": 1
+            }
+          },
+          {
+            "name": "总超时从入场开始并释放槽位",
+            "status": "PASS",
+            "details": {
+              "build": [
+                "x-ran-cloud",
+                199
+              ],
+              "result": "ABORTED"
+            }
+          }
+        ],
+        "status": "PASS"
+      }
+    },
+    "shared-verification": {
+      "sha256": "5e000c16cd813fdef1134ccebccf9949ad616f4573cbf3429439ce12fa41e6ef",
+      "report": {
+        "namespace": "jenkins-reliability-verify",
+        "checks": [
+          {
+            "name": "三类 Pod 模板及镜像参数校验",
+            "status": "PASS",
+            "details": {
+              "status": "PASS",
+              "templateCases": 27,
+              "resourceCases": 3,
+              "invalidReferencesRejected": 5,
+              "invalidPolicyRejected": true
+            }
+          },
+          {
+            "name": "相同构建号按项目分别选择 Pod",
+            "status": "PASS",
+            "details": {
+              "xran": "shared-pod-check-xran",
+              "xcn": "shared-pod-check-xcn"
+            }
+          },
+          {
+            "name": "两项目合计六个槽位、其余排队",
+            "status": "PASS",
+            "details": {
+              "builds": [
+                [
+                  "x-ran-cloud",
+                  200
+                ],
+                [
+                  "xcn",
+                  77
+                ],
+                [
+                  "x-ran-cloud",
+                  201
+                ],
+                [
+                  "xcn",
+                  78
+                ],
+                [
+                  "x-ran-cloud",
+                  202
+                ],
+                [
+                  "xcn",
+                  79
+                ],
+                [
+                  "x-ran-cloud",
+                  203
+                ],
+                [
+                  "xcn",
+                  80
+                ]
+              ],
+              "maximumSlots": 6,
+              "queued": true
+            }
+          },
+          {
+            "name": "xcn 相同 APP_VERSION 等待标签锁且不占额外槽位",
+            "status": "PASS",
+            "details": {
+              "builds": [
+                [
+                  "xcn",
+                  81
+                ],
+                [
+                  "xcn",
+                  82
+                ]
+              ],
+              "maximumSlots": 1
+            }
+          },
+          {
+            "name": "跨项目最早回收、运行/保留保护、提示审计及空间不足拒绝",
+            "status": "PASS",
+            "details": {
+              "oldestDeleted": "x-ran-cloud#205",
+              "protectedBuild": "xcn#83",
+              "secondDeleted": "xcn#84",
+              "runningProtected": [
+                "xcn#85"
+              ],
+              "rejectedWhenInsufficient": true,
+              "audit": true,
+              "liveDiskThreshold": true,
+              "reservationUsesBuildSnapshot": true
+            }
+          }
+        ],
+        "status": "PASS"
+      }
+    },
+    "compiler-selection": {
+      "sha256": "4327d8e85caa6f318263f0a3fc5a442c9105a8d57e19b14e2275cfcd43e16b32",
+      "report": {
+        "namespace": "jenkins-reliability-verify",
+        "startedAt": "2026-11-09T16:25:12+0800",
+        "checks": [
+          {
+            "name": "全部插件启用",
+            "status": "PASS",
+            "details": {
+              "count": 74
+            }
+          },
+          {
+            "name": "匿名访问及普通账号管理权限受限",
+            "status": "PASS",
+            "details": null
+          },
+          {
+            "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+            "status": "PASS",
+            "details": {
+              "builder1": {
+                "visibleJobs": [
+                  "x-ran-cloud",
+                  "xcn"
+                ],
+                "deniedEndpoints": {
+                  "job": 404,
+                  "api/json": 404,
+                  "config.xml": 404,
+                  "16/consoleText": 404,
+                  "build": 404
+                }
+              },
+              "builder2": {
+                "visibleJobs": [
+                  "x-ran-cloud",
+                  "xcn"
+                ],
+                "deniedEndpoints": {
+                  "job": 404,
+                  "api/json": 404,
+                  "config.xml": 404,
+                  "16/consoleText": 404,
+                  "build": 404
+                }
+              }
+            }
+          },
+          {
+            "name": "服务与镜像任务公共编译参数及默认值",
+            "status": "PASS",
+            "details": {
+              "COMPILER_IMAGE": {
+                "_class": "hudson.model.StringParameterDefinition",
+                "defaultParameterValue": {
+                  "_class": "hudson.model.StringParameterValue",
+                  "value": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2"
+                },
+                "name": "COMPILER_IMAGE"
+              },
+              "COMPILER_IMAGE_PULL_POLICY": {
+                "_class": "hudson.model.ChoiceParameterDefinition",
+                "defaultParameterValue": {
+                  "_class": "hudson.model.StringParameterValue",
+                  "value": "Always"
+                },
+                "name": "COMPILER_IMAGE_PULL_POLICY",
+                "choices": [
+                  "Always",
+                  "IfNotPresent",
+                  "Never"
+                ]
+              },
+              "BUILD_KIND": {
+                "_class": "hudson.model.ChoiceParameterDefinition",
+                "defaultParameterValue": {
+                  "_class": "hudson.model.StringParameterValue",
+                  "value": "service"
+                },
+                "name": "BUILD_KIND",
+                "choices": [
+                  "service",
+                  "image"
+                ]
+              },
+              "REF_TYPE": {
+                "_class": "hudson.model.ChoiceParameterDefinition",
+                "defaultParameterValue": {
+                  "_class": "hudson.model.StringParameterValue",
+                  "value": "branch"
+                },
+                "name": "REF_TYPE",
+                "choices": [
+                  "branch",
+                  "tag",
+                  "commit"
+                ]
+              },
+              "GIT_REF": {
+                "_class": "hudson.model.StringParameterDefinition",
+                "defaultParameterValue": {
+                  "_class": "hudson.model.StringParameterValue",
+                  "value": "main"
+                },
+                "name": "GIT_REF"
+              },
+              "SERVICE_TARGET": {
+                "_class": "hudson.model.ChoiceParameterDefinition",
+                "defaultParameterValue": {
+                  "_class": "hudson.model.StringParameterValue",
+                  "value": "serviceA"
+                },
+                "name": "SERVICE_TARGET",
+                "choices": [
+                  "serviceA",
+                  "serviceB",
+                  "serviceC",
+                  "services_all"
+                ]
+              },
+              "IMAGE_TARGET": {
+                "_class": "hudson.model.ChoiceParameterDefinition",
+                "defaultParameterValue": {
+                  "_class": "hudson.model.StringParameterValue",
+                  "value": "imageA"
+                },
+                "name": "IMAGE_TARGET",
+                "choices": [
+                  "imageA",
+                  "imageB",
+                  "imageC"
+                ]
+              },
+              "IMAGE_TAG": {
+                "_class": "hudson.model.StringParameterDefinition",
+                "defaultParameterValue": {
+                  "_class": "hudson.model.StringParameterValue",
+                  "value": "latest"
+                },
+                "name": "IMAGE_TAG"
+              }
+            }
+          },
+          {
+            "name": "真实插件环境的模板隔离与非法输入检查",
+            "status": "PASS",
+            "details": {
+              "status": "PASS",
+              "templateCases": 18,
+              "resourceCases": 2,
+              "invalidReferencesRejected": 5,
+              "invalidPolicyRejected": true
+            }
+          },
+          {
+            "name": "Always 服务包及实际 Pod 镜像 ID",
+            "status": "PASS",
+            "details": {
+              "build": 212,
+              "metadataImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+              "pod": {
+                "pod": "x-ran-cloud-212-63qrd-n8xps-j7pr3",
+                "image": "127.0.0.1:15060/reliability/compat:1",
+                "policy": "Always",
+                "imageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+                "waiting": null,
+                "resources": {
+                  "limits": {
+                    "cpu": "3750m",
+                    "ephemeral-storage": "20224Mi",
+                    "memory": "7680Mi"
+                  },
+                  "requests": {
+                    "cpu": "500m",
+                    "ephemeral-storage": "1Gi",
+                    "memory": "1Gi"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "IfNotPresent 使用已导入内网地址镜像",
+            "status": "PASS",
+            "details": {
+              "build": 213,
+              "metadataImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+              "pod": {
+                "pod": "x-ran-cloud-213-snl0q-jkwhv-51b7t",
+                "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+                "policy": "IfNotPresent",
+                "imageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+                "waiting": null,
+                "resources": {
+                  "limits": {
+                    "cpu": "3750m",
+                    "ephemeral-storage": "20224Mi",
+                    "memory": "7680Mi"
+                  },
+                  "requests": {
+                    "cpu": "500m",
+                    "ephemeral-storage": "1Gi",
+                    "memory": "1Gi"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "Never 使用已导入内网地址镜像",
+            "status": "PASS",
+            "details": {
+              "build": 214,
+              "metadataImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+              "pod": {
+                "pod": "x-ran-cloud-214-lns8v-q30t6-576jj",
+                "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+                "policy": "Never",
+                "imageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+                "waiting": null,
+                "resources": {
+                  "limits": {
+                    "cpu": "3750m",
+                    "ephemeral-storage": "20224Mi",
+                    "memory": "7680Mi"
+                  },
+                  "requests": {
+                    "cpu": "500m",
+                    "ephemeral-storage": "1Gi",
+                    "memory": "1Gi"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "指定另一个 SDK 版本构建业务镜像并下载运行",
+            "status": "PASS",
+            "details": {
+              "build": 215,
+              "metadataImageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56",
+              "pod": {
+                "pod": "x-ran-cloud-215-xn5jd-06wdp-h0mjw",
+                "image": "127.0.0.1:15060/reliability/sdk:1",
+                "policy": "Always",
+                "imageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56",
+                "waiting": null,
+                "resources": {
+                  "limits": {
+                    "cpu": "2500m",
+                    "ephemeral-storage": "10Gi",
+                    "memory": "3584Mi"
+                  },
+                  "requests": {
+                    "cpu": "500m",
+                    "ephemeral-storage": "1Gi",
+                    "memory": "1Gi"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "不同编译镜像并发运行且互不影响",
+            "status": "PASS",
+            "details": {
+              "builds": [
+                216,
+                217
+              ],
+              "pods": {
+                "216": {
+                  "pod": "x-ran-cloud-216-n1vq4-wgg35-4jb1n",
+                  "image": "127.0.0.1:15060/reliability/compat:1",
+                  "policy": "Always",
+                  "imageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+                  "waiting": null,
+                  "resources": {
+                    "limits": {
+                      "cpu": "3750m",
+                      "ephemeral-storage": "20224Mi",
+                      "memory": "7680Mi"
+                    },
+                    "requests": {
+                      "cpu": "500m",
+                      "ephemeral-storage": "1Gi",
+                      "memory": "1Gi"
+                    }
+                  }
+                },
+                "217": {
+                  "pod": "x-ran-cloud-217-xsb21-s9xds-8rvh2",
+                  "image": "127.0.0.1:15060/reliability/sdk:1",
+                  "policy": "Always",
+                  "imageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56",
+                  "waiting": null,
+                  "resources": {
+                    "limits": {
+                      "cpu": "2500m",
+                      "ephemeral-storage": "10Gi",
+                      "memory": "3584Mi"
+                    },
+                    "requests": {
+                      "cpu": "500m",
+                      "ephemeral-storage": "1Gi",
+                      "memory": "1Gi"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "同 tag 已更新时 IfNotPresent 仍使用节点缓存",
+            "status": "PASS",
+            "details": {
+              "build": 218,
+              "metadataImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+              "pod": {
+                "pod": "x-ran-cloud-218-p5snd-4vw28-zsxbf",
+                "image": "127.0.0.1:15060/reliability/compat:1",
+                "policy": "IfNotPresent",
+                "imageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+                "waiting": null,
+                "resources": {
+                  "limits": {
+                    "cpu": "3750m",
+                    "ephemeral-storage": "20224Mi",
+                    "memory": "7680Mi"
+                  },
+                  "requests": {
+                    "cpu": "500m",
+                    "ephemeral-storage": "1Gi",
+                    "memory": "1Gi"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "同 tag 已更新时 Always 使用新摘要",
+            "status": "PASS",
+            "details": {
+              "build": 219,
+              "metadataImageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56",
+              "pod": {
+                "pod": "x-ran-cloud-219-fqjsk-qfg0v-b003f",
+                "image": "127.0.0.1:15060/reliability/compat:1",
+                "policy": "Always",
+                "imageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56",
+                "waiting": null,
+                "resources": {
+                  "limits": {
+                    "cpu": "3750m",
+                    "ephemeral-storage": "20224Mi",
+                    "memory": "7680Mi"
+                  },
+                  "requests": {
+                    "cpu": "500m",
+                    "ephemeral-storage": "1Gi",
+                    "memory": "1Gi"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "name": "非法编译镜像引用明确失败",
+            "status": "PASS",
+            "details": {
+              "build": 220
+            }
+          },
+          {
+            "name": "不兼容的编译镜像明确失败",
+            "status": "PASS",
+            "details": {
+              "build": 221
+            }
+          },
+          {
+            "name": "缺少镜像时 Never 有界失败并给出诊断",
+            "status": "PASS",
+            "details": {
+              "build": 222,
+              "durationMillis": 60750,
+              "result": "FAILURE"
+            }
+          },
+          {
+            "name": "缺少镜像时 Always 有界失败并给出诊断",
+            "status": "PASS",
+            "details": {
+              "build": 223,
+              "durationMillis": 60658,
+              "result": "FAILURE"
+            }
+          }
+        ],
+        "builds": [
+          {
+            "number": 212,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "sdk-1794212712",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 213,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceB",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "sdk-1794212712",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "IfNotPresent"
+            }
+          },
+          {
+            "number": 214,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceC",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "sdk-1794212712",
+              "COMPILER_IMAGE": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 215,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "sdk-1794212712",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/sdk:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 216,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 217,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageB",
+              "IMAGE_TAG": "sdk-parallel-1794212712",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/sdk:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 218,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "sdk-1794212712",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "IfNotPresent"
+            }
+          },
+          {
+            "number": 219,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "sdk-1794212712",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 220,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "ubuntu:latest\nprivileged: true",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 221,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/incompatible:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 222,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:missing-1794212712",
+              "COMPILER_IMAGE_PULL_POLICY": "Never"
+            }
+          },
+          {
+            "number": 223,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:missing-1794212712",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          }
+        ],
+        "status": "PASS",
+        "finishedAt": "2026-11-09T16:34:33+0800"
+      }
+    },
+    "artifact-visibility": {
+      "sha256": "6e8fb400d9b167ef0aa2cc54ec717939f80b249e967efa591e3e99dc2d8c8eae",
+      "report": {
+        "namespace": "jenkins-reliability-verify",
+        "startedAt": "2026-11-09T16:34:34+0800",
+        "checks": [
+          {
+            "name": "全部插件启用",
+            "status": "PASS",
+            "details": {
+              "count": 74
+            }
+          },
+          {
+            "name": "匿名访问及普通账号管理权限受限",
+            "status": "PASS",
+            "details": null
+          },
+          {
+            "name": "维护任务仅管理员可见；普通账号首页、API、直链、日志及手动触发受限",
+            "status": "PASS",
+            "details": {
+              "builder1": {
+                "visibleJobs": [
+                  "x-ran-cloud",
+                  "xcn"
+                ],
+                "deniedEndpoints": {
+                  "job": 404,
+                  "api/json": 404,
+                  "config.xml": 404,
+                  "16/consoleText": 404,
+                  "build": 404
+                }
+              },
+              "builder2": {
+                "visibleJobs": [
+                  "x-ran-cloud",
+                  "xcn"
+                ],
+                "deniedEndpoints": {
+                  "job": 404,
+                  "api/json": 404,
+                  "config.xml": 404,
+                  "16/consoleText": 404,
+                  "build": 404
+                }
+              }
+            }
+          },
+          {
+            "name": "serviceA 分支",
+            "status": "PASS",
+            "details": {
+              "build": 224,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "serviceB 演示分支",
+            "status": "PASS",
+            "details": {
+              "build": 225,
+              "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+            }
+          },
+          {
+            "name": "serviceC tag",
+            "status": "PASS",
+            "details": {
+              "build": 226,
+              "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+            }
+          },
+          {
+            "name": "带注释 tag",
+            "status": "PASS",
+            "details": {
+              "build": 227,
+              "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+            }
+          },
+          {
+            "name": "services_all 历史完整 SHA",
+            "status": "PASS",
+            "details": {
+              "build": 228,
+              "commit": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e"
+            }
+          },
+          {
+            "name": "唯一短 SHA",
+            "status": "PASS",
+            "details": {
+              "build": 229,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "imageA build/save/push/load",
+            "status": "PASS",
+            "details": {
+              "build": 230,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "imageB build/save/push/load",
+            "status": "PASS",
+            "details": {
+              "build": 231,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "imageC build/save/push/load",
+            "status": "PASS",
+            "details": {
+              "build": 232,
+              "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+            }
+          },
+          {
+            "name": "不存在的 Git 引用明确失败",
+            "status": "PASS",
+            "details": {
+              "build": 233
+            }
+          },
+          {
+            "name": "非法标签明确失败",
+            "status": "PASS",
+            "details": {
+              "build": 234
+            }
+          },
+          {
+            "name": "push 失败仍能下载并运行有效镜像 tar",
+            "status": "PASS",
+            "details": {
+              "build": 235
+            }
+          },
+          {
+            "name": "compat 旧版仅生成镜像时自动导出并下载运行",
+            "status": "PASS",
+            "details": {
+              "build": 236,
+              "imageId": "sha256:4174fb64e64b796ab72c4c7d22cdc7888c31fa179261cc739583944fc4f8ec99"
+            }
+          },
+          {
+            "name": "sdk 旧版仅生成镜像时自动导出并下载运行",
+            "status": "PASS",
+            "details": {
+              "build": 237,
+              "imageId": "sha256:d6439e5607b33751ed0f15cc7ee01c74412cfe9ea7c814cf7e6cf4f75d6aed46"
+            }
+          },
+          {
+            "name": "corrupt 不发布错误镜像包",
+            "status": "PASS",
+            "details": {
+              "build": 238,
+              "errors": [
+                "镜像产物: file could not be opened successfully:\n- method gz: ReadError('not a gzip file')\n- method bz2: ReadError('not a bzip2 file')\n- method xz: ReadError('not an lzma file')\n- method tar: ReadError('truncated header')",
+                "构建没有产生有效产物"
+              ]
+            }
+          },
+          {
+            "name": "missing 不发布错误镜像包",
+            "status": "PASS",
+            "details": {
+              "build": 239,
+              "errors": [
+                "镜像产物: 缺少镜像包，且本次 DinD 中找不到镜像 xran-registry:5000/xran-demo/imagea:missing-1794213927098237611；请核对 registry、imageRepositories 和 tag",
+                "构建没有产生有效产物"
+              ]
+            }
+          },
+          {
+            "name": "unwritable 不发布错误镜像包",
+            "status": "PASS",
+            "details": {
+              "build": 240,
+              "errors": [
+                "镜像产物: [Errno 13] Permission denied: '/home/jenkins/agent/workspace/x-ran-cloud/source/platform/k8s/images-build/.imageA.tar.7t7t6kjq.tmp'"
+              ]
+            }
+          },
+          {
+            "name": "旧版 push 失败仍自动导出有效镜像并保留失败结果",
+            "status": "PASS",
+            "details": {
+              "build": 241
+            }
+          },
+          {
+            "name": "旧编译镜像明确提示缺少自动导出能力",
+            "status": "PASS",
+            "details": {
+              "build": 242
+            }
+          },
+          {
+            "name": "可见性组合 (False, False)",
+            "status": "PASS",
+            "details": {
+              "xran": false,
+              "xcn": false
+            }
+          },
+          {
+            "name": "可见性组合 (True, False)",
+            "status": "PASS",
+            "details": {
+              "xran": true,
+              "xcn": false
+            }
+          },
+          {
+            "name": "可见性组合 (False, True)",
+            "status": "PASS",
+            "details": {
+              "xran": false,
+              "xcn": true
+            }
+          },
+          {
+            "name": "可见性组合 (True, True)",
+            "status": "PASS",
+            "details": {
+              "xran": true,
+              "xcn": true
+            }
+          },
+          {
+            "name": "限制可见性不取消已运行和等待槽位的构建",
+            "status": "PASS",
+            "details": {
+              "builds": [
+                244,
+                245
+              ]
+            }
+          },
+          {
+            "name": "Controller 重启保留限制状态；关闭后精确恢复原用户、组和继承方式",
+            "status": "PASS",
+            "details": {
+              "version": 74,
+              "aclSha256": "cff49dc36b1032689346c167fb4f9267769298ebf2e614fde89a4d82c32efe94"
+            }
+          }
+        ],
+        "builds": [
+          {
+            "number": 224,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 225,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "demo/feature",
+              "SERVICE_TARGET": "serviceB",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 226,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "tag",
+              "GIT_REF": "demo-v1.0.0",
+              "SERVICE_TARGET": "serviceC",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 227,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "tag",
+              "GIT_REF": "demo-v1.0.0-annotated",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 228,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "commit",
+              "GIT_REF": "c8ebfd1f2aa25a34e1fdef6365869ffd15a0381e",
+              "SERVICE_TARGET": "services_all",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 229,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "commit",
+              "GIT_REF": "db3051980",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 230,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "verify-1794213279",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 231,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageB",
+              "IMAGE_TAG": "verify-1794213279",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 232,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageC",
+              "IMAGE_TAG": "verify-1794213279",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 233,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "missing-ci-reference",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 234,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "bad;touch /tmp/injected",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 235,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "push-failure-ci",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 236,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "legacy-compat-1794213760620287517",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 237,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "legacy-sdk-1794213822148231795",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/sdk:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 238,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "corrupt-1794213891756924741",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 239,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "missing-1794213927098237611",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 240,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "unwritable-1794213963534726188",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 241,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "legacy-push-1794214006206360830",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 242,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "image",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/legacy:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 243,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 244,
+            "user": "builder1",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          },
+          {
+            "number": 245,
+            "user": "builder2",
+            "parameters": {
+              "BUILD_KIND": "service",
+              "REF_TYPE": "branch",
+              "GIT_REF": "main",
+              "SERVICE_TARGET": "serviceA",
+              "IMAGE_TARGET": "imageA",
+              "IMAGE_TAG": "latest",
+              "COMPILER_IMAGE": "127.0.0.1:15060/reliability/compat:1",
+              "COMPILER_IMAGE_PULL_POLICY": "Always"
+            }
+          }
+        ],
+        "status": "PASS",
+        "finishedAt": "2026-11-09T16:50:54+0800"
+      }
+    },
+    "browser-verification": {
+      "sha256": "9ae9d2d1a1817a20481d8593c2501407113fb9b6e38d1d95712e5078983383dd",
+      "report": {
+        "status": "PASS",
+        "namespace": "jenkins-reliability-verify",
+        "sourceFingerprint": "f7a1974a0c9603cc5abc4b64ed35e8a3a66fa0e7f1f4e65adbbd70c9154dab9e",
+        "checks": [
+          {
+            "name": "管理员原生系统表单保存 9GiB 并刷新保留",
+            "status": "PASS"
+          },
+          {
+            "name": "离线页面无外网使用统计脚本",
+            "status": "PASS"
+          },
+          {
+            "name": "普通用户 BUILD_KIND 双向切换及输入保留",
+            "status": "PASS"
+          },
+          {
+            "name": "xcn 四类参数、历史 Chart/app 版本和 HTTP 复制",
+            "status": "PASS"
+          }
+        ],
+        "testedAt": 1794214290.4023092,
+        "xcnNumber": 3,
+        "tools": {
+          "cli": "0.1.23",
+          "node": "20.20.2",
+          "chromiumHeadlessRevision": "1248"
+        }
+      }
+    }
+  },
+  "regressionFoundAndFixed": {
+    "beforeFixSourceFingerprint": "8a25239ee1887cd69d3073934238e3e85de73880277eaef5e9fb391dc2c022d8",
+    "failedStage": {
+      "status": "FAIL",
+      "startedAt": "2026-11-09T07:14:54.391557+00:00",
+      "error": "稳定性构建失败：xcn#62",
+      "finishedAt": "2026-11-09T07:40:42.596087+00:00"
+    },
+    "completedBeforeFailure": 98,
+    "diagnosis": {
+      "namespace": "jenkins-reliability-verify",
+      "pod": "xcn-62-d3wjh-k7zpl-nzlrm",
+      "podUid": "82dccb21-ba09-4cab-a802-6f699c8225ea",
+      "cause": "init file cache exceeded 128MiB memory cgroup",
+      "formerLimit": "128Mi",
+      "correctedLimit": "1Gi",
+      "kernelEvidence": [
+        "Nov  9 15:40:27 xnet-server kernel: [258070.315936] cp invoked oom-killer: gfp_mask=0x1101cca(GFP_HIGHUSER_MOVABLE|__GFP_WRITE), order=0, oom_score_adj=999",
+        "Nov  9 15:40:27 xnet-server kernel: [258070.316083] memory: usage 131072kB, limit 131072kB, failcnt 0",
+        "Nov  9 15:40:27 xnet-server kernel: [258070.316085] Memory cgroup stats for /kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod82dccb21_ba09_4cab_a802_6f699c8225ea.slice/cri-containerd-7ef80ee096f546b2200ec7f89b8f1d537226e51ca5690113540aee5fc19ba672.scope:",
+        "Nov  9 15:40:27 xnet-server kernel: [258070.316145] file 129032192",
+        "Nov  9 15:40:27 xnet-server kernel: [258070.316159] Memory cgroup out of memory: Killed process 2979249 (cp) total-vm:4428kB, anon-rss:68kB, file-rss:336kB, shmem-rss:0kB, UID:1000 pgtables:40kB oom_score_adj:999"
+      ],
+      "firstAttemptUnexpectedFailures": 1
+    },
+    "verifiedInitResources": {
+      "limits": {
+        "cpu": "500m",
+        "memory": "1Gi"
+      },
+      "requests": {
+        "cpu": "100m",
+        "memory": "256Mi"
+      }
+    }
+  }
+}

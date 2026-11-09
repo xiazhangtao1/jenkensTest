@@ -4,12 +4,19 @@ import argparse
 import base64
 import json
 from pathlib import Path
+import re
 import subprocess
 import time
 from types import SimpleNamespace
 
 from verify import Verification, ROOT
 from ci import kube_env
+
+
+def image_digest(value):
+    match=re.search(r'(?:^|@|://)(sha256:[a-f0-9]{64})$',value)
+    if not match:raise ValueError('Pod 镜像 ID 缺少有效 SHA256 摘要')
+    return match[1]
 
 
 def run(args):
@@ -83,7 +90,7 @@ def run(args):
         success('IfNotPresent 使用已导入内网地址镜像', args.cached_compiler_image, 'IfNotPresent', target='serviceB')
         success('Never 使用已导入内网地址镜像', args.cached_compiler_image, 'Never', target='serviceC')
         second = success('指定另一个 SDK 版本构建业务镜像并下载运行', args.second_compiler_image, 'Always', kind='image', user='builder2')
-        assert second['builderImageId'] != baseline['builderImageId']
+        assert image_digest(second['builderImageId']) != image_digest(baseline['builderImageId'])
 
         original = json.loads(v.admin.script("println(groovy.json.JsonOutput.toJson(jenkins.model.Jenkins.get().getItem('x-ran-cloud').definition.script));return null"))
         v.set_script(original.replace('def sourceType =', 'cfg.demoBuildDelaySeconds = 8\ndef sourceType =', 1))
@@ -103,10 +110,10 @@ def run(args):
         subprocess.run(['docker', 'tag', args.second_compiler_image, args.compiler_image], check=True)
         subprocess.run(['docker', 'push', args.compiler_image], check=True)
         cached = success('同 tag 已更新时 IfNotPresent 仍使用节点缓存', args.compiler_image, 'IfNotPresent')
-        assert cached['builderImageId'] == baseline['builderImageId']
+        assert image_digest(cached['builderImageId']) == image_digest(baseline['builderImageId'])
         refreshed = success('同 tag 已更新时 Always 使用新摘要', args.compiler_image, 'Always')
-        assert refreshed['builderImageId'] == second['builderImageId']
-        assert refreshed['builderImageId'] != baseline['builderImageId']
+        assert image_digest(refreshed['builderImageId']) == image_digest(second['builderImageId'])
+        assert image_digest(refreshed['builderImageId']) != image_digest(baseline['builderImageId'])
 
         for name, changes, expected in [
             ('非法编译镜像引用明确失败', {'COMPILER_IMAGE': 'ubuntu:latest\nprivileged: true'}, '非法编译镜像地址'),

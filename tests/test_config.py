@@ -37,7 +37,12 @@ class ConfigurationTests(unittest.TestCase):
                 self.assertEqual(memory(dind['resources']['limits']['memory']), 4096)
                 self.assertEqual(dind['command'], ['sh', '/etc/xran/dind-start.sh'])
             if kind == 'xcn':
-                self.assertEqual(pod['spec']['initContainers'][0]['image'], cfg['xcnBasesImage'])
+                init = pod['spec']['initContainers'][0]
+                self.assertEqual(init['image'], cfg['xcnBasesImage'])
+                bases = next(v for v in pod['spec']['volumes'] if v['name'] == 'xcn-bases')
+                # File cache during archive copy must fit without increasing the Pod budget.
+                self.assertGreaterEqual(memory(init['resources']['limits']['memory']), memory(bases['emptyDir']['sizeLimit']))
+                self.assertLessEqual(memory(init['resources']['limits']['memory']), sum(memory(x['memory']) for x in limits))
                 self.assertLess(cfg['xcn']['innerBuildMemoryGiB'], cfg['dindMemoryGiB'])
 
     def test_offline_profiles_keep_selected_compiler_policy(self):
