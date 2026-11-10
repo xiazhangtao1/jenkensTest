@@ -63,7 +63,10 @@ Registry 仓库映射和拉取凭据。内网示例已包含确认的 40 个服�
 两项目都检出到工作区 `source/`，脚本通过相对路径执行，不依赖远端仓库外层名字。
 Jenkins 业务任务名仍为 `x-ran-cloud` 和 `xcn`，保留各自历史；无需改成 `ICT_CN`。
 分支/tag/commit 选择方式与外网一致，默认 main；内网 main 必须已有 `helm/build-release.sh` 等所需入口。
-TLS Registry 设置 registryInsecure: false；proxy 通常留空，noProxy 包含 API、Pod/Service CIDR、内网域名与 apt 源。
+内网模板已默认使用 HTTPS Harbor：顶层和 `xcn.registryInsecure` 均为 `false`，并启用 `caSecret: xran-registry-ca`。
+使用该模板时，须在首次构建前按下文创建含 `ca.crt` 的同名 Secret；否则构建 Pod 无法挂载证书。
+已有 `config/site.local.yaml` 不会被更新模板自动覆盖，需同步这三个字段；`make deploy SITE=config/site.local.yaml` 读取本地站点文件。
+proxy 通常留空，noProxy 包含 API、Pod/Service CIDR、内网域名与 apt 源。
 
 首次部署完成后，管理员在 **Manage Jenkins → Credentials → System → Global credentials → Add Credentials**
 新增 `SSH Username with private key`：ID 为 `intranet-gerrit-ssh`，Username 为 `xiazhangtao`，
@@ -104,7 +107,7 @@ sudo kubectl -n jenkins create secret generic xran-registry-ca \
   --dry-run=client -o yaml | sudo kubectl apply -f -
 ```
 
-在 `config/site.local.yaml` 顶层增加 `caSecret`，将已有 Harbor 配置改为严格 HTTPS 校验：
+新版 `config/site.intranet.yaml` 已启用下面配置；已有 `config/site.local.yaml` 需同步修改：
 
 ```yaml
 caSecret: xran-registry-ca

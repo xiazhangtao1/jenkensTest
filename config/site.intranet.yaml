@@ -27,9 +27,9 @@ gitUrl: ssh://xiazhangtao@192.168.10.82:29418/X-RAN-CLOUD
 gitCredentialsId: intranet-gerrit-ssh
 registry: 192.168.10.35
 registryCredentialsId: ''
-registryInsecure: true
-# HTTPS Harbor 使用自建 CA 时，创建含 ca.crt 的 Secret，并改为 registryInsecure: false。
-# caSecret: xran-registry-ca
+registryInsecure: false
+# 部署前创建此 Secret，键为 ca.crt；编译容器与 DinD 共用 Harbor CA。
+caSecret: xran-registry-ca
 # 列表第一项为 Jenkins 默认目标；单服务产物名为 <服务名>.tar.gz。
 services:
   - services_all
@@ -83,7 +83,7 @@ xcn:
   offline: true
   registry: 192.168.10.35
   registryCredentialsId: ''
-  registryInsecure: true
+  registryInsecure: false
   ubuntuImage: 192.168.10.35/xnet/ubuntu:22.04
   vppImage: 192.168.10.35/xcn/vpp:26.06
   innerBuildMemoryGiB: 3
