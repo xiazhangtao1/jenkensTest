@@ -1,3 +1,17 @@
+# Harbor token 客户端 CA 信任验收（2026-11-10）
+
+配置了 `caSecret` 的编译容器新增 `SSL_CERT_DIR`，补齐 Buildx 的 Go 客户端信任；DinD、Git/curl 的既有 CA 配置保留。
+
+- Python 回归 59 项通过，覆盖三类 Pod 的只读 CA 挂载、客户端证书目录、xcn 独立 Registry 端口、严格 TLS 及未配置 CA 的默认行为。
+- 用现有编译镜像中的真实 Buildx，访问临时本机 Registry 和 HTTPS bearer-token 服务：旧配置仅设置 Git/curl CA 时复现 unknown authority；新配置成功获取 token 和 OCI manifest；错误 CA 仍被拒绝。
+- 测试 CA、私钥和凭据临时生成并清理；未跳过 HTTPS token 证书校验，未修改主机 Docker 信任或任何 Jenkins 部署。
+
+测试 Registry 为 loopback HTTP 入口，HTTPS token 服务用于隔离验证客户端信任；不是一次完整 DinD Docker build。
+真实内网 Harbor、原始证书和业务构建仍需现场验证。证据见 [CA 验收报告](verification/harbor-ca.json)，
+步骤见 [Harbor CA 更新](formal-build-upgrade.md#harbor-基础镜像的-token-请求证书错误2026-11-10)。
+
+---
+
 # Readline 开发依赖补齐验收（2026-11-10）
 
 公共额外依赖新增 `libreadline-dev`，两套 Dockerfile 共用；缓存同时包含匹配的 ncurses 开发及运行依赖。

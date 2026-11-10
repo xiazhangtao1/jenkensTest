@@ -6,6 +6,7 @@
 本次 xcn 描述随 Controller 19 更新；旧站点带入 `02-code` 后只需重建 Controller，也可另带其成品，见 [升级 Jenkins](formal-build-upgrade.md#升级-jenkins)。
 业务编译新增 readline、hwloc 和 zstd 开发依赖时，已有完整环境需同步新版 `02-code` 和完整
 `.cache/compile-extra-apt/`，再重建、推送编译镜像；不能只带代码。具体见 [readline 更新](formal-build-upgrade.md#cli-编译缺少-readlinereadlineh2026-11-10)。
+Harbor token 请求的 CA 信任修复只需新的 `02-code`，在内网配置证书 Secret 后部署即可；不重建镜像或重复搬运依赖。
 
 ## 全新服务器最少携带
 

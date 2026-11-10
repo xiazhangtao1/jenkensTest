@@ -1,0 +1,113 @@
+{
+  "status": "PASS",
+  "date": "2026-11-10",
+  "baselineCommit": "d5881843fba11dd8f76f842bc7ddde5470727452",
+  "sourceFingerprint": "a1eccc130613e91fcd12320811c37d54e0f6e0ec8b8c83e77948cfb3da8189d3",
+  "files": {
+    "scripts/ci.py": "bdd78515e912f2a0050ddb2c72a939ba3a7e3e78b5df08fcce6ec5b6ad2071e1",
+    "tests/test_config.py": "8d85840f12e3c7082bd9e5d878ea082fbce0a5670bad09d529e160f29f60389c",
+    "config/site.intranet.yaml": "47613015793c557f3c073ddbea8ccf41a0f4067fbd1884fa2af643bdfc20f119"
+  },
+  "pythonRegression": {
+    "tests": 59,
+    "result": "OK",
+    "logSha256": "65608bebd644a12b1598926bb43b8f89ec2f82f4549b4b2b356ddc1b68eee188"
+  },
+  "renderedConfig": {
+    "profiles": [
+      "service",
+      "image",
+      "xcn"
+    ],
+    "strictTLS": true,
+    "runtimeHash": "0fdc37a25524083dbeb452713e4de6ca014b935dd96303cf738bfe958b5e7202"
+  },
+  "buildxTokenTLS": {
+    "status": "PASS",
+    "image": "192.168.10.35/xnet/xran-compile:26.11.10-compat-readline",
+    "imageId": "sha256:7b5e268fdb63171e939b075ad7cd4675311987a764299f4ee79f2aaecd5e3237",
+    "client": "docker buildx imagetools inspect --raw",
+    "checks": [
+      {
+        "name": "before",
+        "result": "PASS",
+        "exitCode": 1,
+        "environment": {
+          "GIT_SSL_CAINFO": "/var/xran/ca/ca.crt",
+          "CURL_CA_BUNDLE": "/var/xran/ca/ca.crt"
+        },
+        "requests": [
+          {
+            "method": "HEAD",
+            "path": "/v2/verify/base/manifests/latest",
+            "tls": false
+          }
+        ],
+        "logSha256": "be92d1852b865522864a0f5b9c5944a55b9fa771ab88d7936d82d1d0bf9383f1"
+      },
+      {
+        "name": "fixed",
+        "result": "PASS",
+        "exitCode": 0,
+        "environment": {
+          "GIT_SSL_CAINFO": "/var/xran/ca/ca.crt",
+          "CURL_CA_BUNDLE": "/var/xran/ca/ca.crt",
+          "SSL_CERT_DIR": "/var/xran/ca:/etc/ssl/certs"
+        },
+        "requests": [
+          {
+            "method": "HEAD",
+            "path": "/v2/verify/base/manifests/latest",
+            "tls": false
+          },
+          {
+            "method": "POST",
+            "path": "/service/token",
+            "tls": true
+          },
+          {
+            "method": "HEAD",
+            "path": "/v2/verify/base/manifests/latest",
+            "tls": false
+          },
+          {
+            "method": "GET",
+            "path": "/v2/verify/base/manifests/sha256:5e52742c8ec6d5137108d18815552740864243812d1c6feeed7e9b2ba971c744",
+            "tls": false
+          }
+        ],
+        "logSha256": "79c22aaf3bd92123bc514bd5427ec6539e16e47de321597f656d07f785bb1e2d"
+      },
+      {
+        "name": "wrong-ca",
+        "result": "PASS",
+        "exitCode": 1,
+        "environment": {
+          "GIT_SSL_CAINFO": "/var/xran/ca/ca.crt",
+          "CURL_CA_BUNDLE": "/var/xran/ca/ca.crt",
+          "SSL_CERT_DIR": "/var/xran/ca:/etc/ssl/certs"
+        },
+        "requests": [
+          {
+            "method": "HEAD",
+            "path": "/v2/verify/base/manifests/latest",
+            "tls": false
+          }
+        ],
+        "logSha256": "54b2d5c51cd5e39829a4b6a8f152176ea23c4306d2dfc2cc28c716d0cca0925d"
+      }
+    ],
+    "testCaSha256": "707bad3db59e6692a208dd45f59a27c552fee8c84295438ff05d340aec5ba502",
+    "method": "Temporary loopback HTTP registry with an HTTPS bearer-token endpoint isolates client token TLS. A generated test CA is mounted in the existing compiler image. HTTPS token verification remains enabled; no intranet access or daemon configuration changes."
+  },
+  "temporaryKeysAndCredentialsRemoved": true,
+  "pastedCertificate": {
+    "opensslExitCode": 1,
+    "result": "Unparseable PEM content; actual intranet file not available for verification"
+  },
+  "limitations": [
+    "No access to intranet Harbor or the original intranet CA file.",
+    "Buildx imagetools TLS token flow was exercised; this was not a full DinD Docker build.",
+    "No Jenkins deployment, Controller rebuild or compiler image changes."
+  ]
+}

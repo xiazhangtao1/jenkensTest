@@ -95,6 +95,36 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual(annotations[0]['xran-ci/site-sha256'], annotations[2]['xran-ci/site-sha256'])
             self.assertNotEqual(annotations[0]['xran-ci/runtime-sha256'], annotations[2]['xran-ci/runtime-sha256'])
 
+    def test_private_registry_ca_covers_buildx_token_client_and_dind(self):
+        cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.intranet.yaml', namespace=None, offline=True))
+        cfg.update(caSecret='test-registry-ca', registryInsecure=False)
+        cfg['xcn'].update(registry='registry.example:5443', registryInsecure=False)
+        for kind in ('service', 'image', 'xcn'):
+            with self.subTest(kind=kind):
+                pod = ci.pod_template(cfg, kind)
+                containers = {item['name']: item for item in pod['spec']['containers']}
+                builder = containers['builder']
+                environment = {item['name']: item['value'] for item in builder['env']}
+                self.assertEqual(environment['SSL_CERT_DIR'], '/var/xran/ca:/etc/ssl/certs')
+                self.assertNotIn('SSL_CERT_FILE', environment)
+                self.assertEqual(environment['GIT_SSL_CAINFO'], '/var/xran/ca/ca.crt')
+                self.assertEqual(environment['CURL_CA_BUNDLE'], '/var/xran/ca/ca.crt')
+                ca = next(item for item in pod['spec']['volumes'] if item['name'] == 'registry-ca')
+                self.assertEqual(ca['secret']['secretName'], 'test-registry-ca')
+                mount = next(item for item in builder['volumeMounts'] if item['name'] == 'registry-ca')
+                self.assertEqual(mount['mountPath'], '/var/xran/ca')
+                self.assertTrue(mount['readOnly'])
+                if kind != 'service':
+                    dind = containers['dind']
+                    registry = cfg['xcn']['registry'] if kind == 'xcn' else cfg['registry']
+                    mount = next(item for item in dind['volumeMounts'] if item['name'] == 'registry-ca')
+                    self.assertEqual(mount['mountPath'], '/etc/docker/certs.d/' + registry)
+                    self.assertTrue(mount['readOnly'])
+                    self.assertEqual(dind['args'], [])
+        cfg.pop('caSecret')
+        builder = next(item for item in ci.pod_template(cfg, 'image')['spec']['containers'] if item['name'] == 'builder')
+        self.assertNotIn('SSL_CERT_DIR', {item['name'] for item in builder['env']})
+
     def test_compiler_image_override_and_secrets(self):
         args = SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False,
                                image_name='registry.local:5000/team/sdk', image_tag='26.11.05')

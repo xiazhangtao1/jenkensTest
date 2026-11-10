@@ -86,14 +86,46 @@ kubectl -n jenkins create secret generic xran-build-trust \
 Secret 会自动只读挂载到每个编译 Pod；流水线启用严格主机校验，并通过 ssh-agent 注入所选 Jenkins 凭据。
 离线出口策略允许 RFC1918 内网的所有端口，包含 `192.168.10.82:29418`，仍需目标网络/防火墙允许节点与 Pod 访问。
 
-Registry 凭据同样使用 Credentials，填 registryCredentialsId。内网 CA 可配置：
+Registry 凭据同样使用 Credentials，填 registryCredentialsId。内网 Harbor CA 通过 Secret 挂载给每个新构建 Pod；
+宿主机 `/usr/local/share/ca-certificates/` 中的证书不会自动出现在容器中。
+先使用原始证书文件验证格式；聊天中粘贴的证书可能缺失或损坏，不要靠修改 Base64 字符修补：
 
 ```bash
-kubectl -n jenkins create secret generic xran-registry-ca \
-  --from-file=ca.crt=/data/internal-ca.crt
+sudo openssl x509 -in /usr/local/share/ca-certificates/harbor-ca.crt \
+  -noout -subject -issuer -dates
 ```
 
-增加 caSecret: xran-registry-ca，CA 同时供 Git/HTTP 和 DinD 的 Registry TLS 使用。
+确认命令成功后，创建或更新 Secret。文件名可以是 `harbor-ca.crt`，Secret 内的键必须叫 `ca.crt`：
+
+```bash
+set -o pipefail
+sudo kubectl -n jenkins create secret generic xran-registry-ca \
+  --from-file=ca.crt=/usr/local/share/ca-certificates/harbor-ca.crt \
+  --dry-run=client -o yaml | sudo kubectl apply -f -
+```
+
+在 `config/site.local.yaml` 顶层增加 `caSecret`，将已有 Harbor 配置改为严格 HTTPS 校验：
+
+```yaml
+caSecret: xran-registry-ca
+registryInsecure: false
+```
+
+`registry` 保持实际地址 `192.168.10.35`。xcn 使用同一 HTTPS Harbor 时，也将已有 `xcn.registryInsecure` 改为 `false`，
+保留其他 xcn 配置。更新代码后在项目根目录执行，无需卸载或重建镜像：
+
+```bash
+sudo env "PATH=$PATH:$PWD/.cache/tools" \
+  make deploy SITE=config/site.local.yaml OFFLINE=1
+```
+
+CA 只读挂载到编译容器 `/var/xran/ca`，Git/curl 使用相应 CA 变量；Buildx 的 Go 令牌客户端通过
+`SSL_CERT_DIR=/var/xran/ca:/etc/ssl/certs` 同时信任该 CA 和系统证书。DinD 继续使用
+`/etc/docker/certs.d/192.168.10.35/ca.crt`。仅给 DinD 挂证书，或仅设置 Git/curl 的变量，不能覆盖客户端所有 TLS 请求。
+重新提交构建，新 Pod 会读取 Secret。更新 CA 后也应重新创建构建 Pod，不要依赖运行中的进程重新加载信任池。
+这与 Kubernetes 节点 containerd 拉取编译镜像的信任配置分别处理。
+参考：[Docker 容器 CA 信任](https://docs.docker.com/engine/network/ca-certs/)、
+[Go SystemCertPool](https://pkg.go.dev/crypto/x509#SystemCertPool)。
 运行密码、私钥不进入通用离线包。已有用户和历史通过 Jenkins_HOME 备份恢复。
 
 ## 安装和首启验证

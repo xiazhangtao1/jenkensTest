@@ -319,6 +319,9 @@ def pod_template(cfg, kind):
         volumes.append({'name': 'registry-ca', 'secret': {'secretName': cfg['caSecret']}})
         builder['volumeMounts'].append({'name': 'registry-ca', 'mountPath': '/var/xran/ca', 'readOnly': True})
         builder['env'] += [{'name': key, 'value': '/var/xran/ca/ca.crt'} for key in ['GIT_SSL_CAINFO', 'CURL_CA_BUNDLE']]
+        # Buildx fetches registry bearer tokens in the client container. Its Go
+        # TLS client does not use Git/curl CA variables; keep OS roots as well.
+        builder['env'].append({'name': 'SSL_CERT_DIR', 'value': '/var/xran/ca:/etc/ssl/certs'})
         if image:
             dind['volumeMounts'].append({'name': 'registry-ca', 'mountPath': '/etc/docker/certs.d/' + project['registry'], 'readOnly': True})
     for container in containers:

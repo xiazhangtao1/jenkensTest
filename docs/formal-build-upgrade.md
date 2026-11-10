@@ -7,6 +7,37 @@ Controller 19 仅统一 xcn 与 X-RAN-CLOUD 的任务描述；已有部署须按
 此前平台测试与 root 兼容修复无需重建编译镜像；业务使用 zstd、hwloc 或 readline 时须按下面章节更新编译镜像。
 初始化预算由部署脚本生成，更新代码后须执行 `make deploy` 更新模板；仅导入 Controller 或重启旧部署不会生成新模板。
 
+## Harbor 基础镜像的 token 请求证书错误（2026-11-10）
+
+`failed to fetch oauth token ... x509: certificate signed by unknown authority` 表示 TLS 信任失败。
+此时业务代码已经编译到 Docker 阶段；不应继续补 APT 包或重新制作 SDK 来解决证书信任。
+宿主机的 `/usr/local/share/ca-certificates/harbor-ca.crt` 不会自动进入临时构建容器。
+
+现有 `caSecret` 会将 CA 挂载到编译容器及 DinD。旧配置只给 Git/curl 设置 CA 变量，
+未覆盖 Buildx 的 Go 令牌客户端；现在额外设置 `SSL_CERT_DIR=/var/xran/ca:/etc/ssl/certs`，
+保留系统证书并信任挂载的 CA，不跳过 HTTPS 校验。
+
+已有完整依赖时，只需带入最新 `02-code`，保留内网站点配置；依赖包、Controller 和编译镜像不变。
+按 [内网 CA 配置](offline.md) 使用原始有效证书创建或更新 `xran-registry-ca`，
+站点顶层配置 `caSecret: xran-registry-ca`，HTTPS Harbor 的 `registryInsecure` 设为 `false`。
+然后执行并重新提交构建：
+
+```bash
+sudo env "PATH=$PATH:$PWD/.cache/tools" \
+  make deploy SITE=config/site.local.yaml OFFLINE=1
+```
+
+不方便带入完整代码时，可在 `scripts/ci.py` 的 `if cfg.get('caSecret'):` 分支中，
+紧接设置 Git/curl CA 变量的一行之后临时添加下面这一行，再按上述步骤创建 Secret、配置站点并部署：
+
+```python
+        builder['env'].append({'name': 'SSL_CERT_DIR', 'value': '/var/xran/ca:/etc/ssl/certs'})
+```
+
+此更新修改 Pod 模板，部署会更新配置并滚动 Controller；只重启旧部署不会生成新模板。
+请先等待现有构建结束。只更新 Secret 时，也应重新提交构建，让新 Pod 及进程重新加载证书。
+若 `openssl x509` 无法解析原始文件，应重新取完整证书文件，不修补聊天粘贴的 Base64 内容。
+
 ## CLI 编译缺少 readline/readline.h（2026-11-10）
 
 `fatal error: readline/readline.h: No such file or directory` 需要补装 `libreadline-dev`。

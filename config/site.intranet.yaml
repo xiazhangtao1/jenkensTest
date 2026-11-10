@@ -28,6 +28,8 @@ gitCredentialsId: intranet-gerrit-ssh
 registry: 192.168.10.35
 registryCredentialsId: ''
 registryInsecure: true
+# HTTPS Harbor 使用自建 CA 时，创建含 ca.crt 的 Secret，并改为 registryInsecure: false。
+# caSecret: xran-registry-ca
 # 列表第一项为 Jenkins 默认目标；单服务产物名为 <服务名>.tar.gz。
 services:
   - services_all
