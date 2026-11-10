@@ -4,8 +4,8 @@
 
 ```bash
 make compile-image
-make compile-image DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-zstd
-make compile-image DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-zstd
+make compile-image DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-hwloc
+make compile-image DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-hwloc
 make compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.11.05 BUILD_JOBS=4
 make compile-image APT_SOURCES=config/sources.intranet.list
 make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.11.05
@@ -48,8 +48,9 @@ asn1c 0.9.29 和资料中的 x86-64 `libairtracer.so`。该二进制没有随附
 gRPC 所需外部 proto 源码也已锁定提交并入库。`wls_mod.tar` 和 Intel oneAPI 不参与构建。
 protobuf、gRPC、Abseil、OpenTelemetry 和 spdlog 同时提供共享库与静态归档，兼容原装机资料中直接链接 `.a` 的用法；CMake 默认使用共享版本。
 
-APT 包拆为通用工具、编译依赖、额外工具及兼容版 protobuf-c 清单；额外工具同时提供 `pkgconf`、xcn 发布需要的 PyYAML 和 `libzstd-dev`。
+APT 包拆为通用工具、编译依赖、额外工具及兼容版 protobuf-c 清单；额外工具同时提供 `pkgconf`、xcn 发布需要的 PyYAML、`libzstd-dev` 和 `libhwloc-dev`。
 `libzstd-dev` 提供业务代码使用的 `zstd.h` 及链接库。仅安装 `libzstd1` 运行库无法编译这些代码。
+`libhwloc-dev` 提供 `hwloc.h`、拓扑 API 的链接库和 pkg-config 元数据，连同运行依赖一起冻结到额外 APT 缓存。
 公共缓存为 `.cache/compile-apt`、`.cache/compile-extra-apt`，兼容版专用缓存为 `.cache/compile-compat-apt`。
 同基础镜像、同软件清单且所有 `.deb` 校验通过时，联网和离线模式均复用缓存；只切换 APT 镜像地址不会重新解析整套 SDK 依赖。
 缓存清单保留实际下载来源的哈希。需要主动刷新时先将对应缓存目录移走备份，再准备；新增软件或更换基础镜像仍需匹配的新缓存。
@@ -89,7 +90,7 @@ DPDK 源码和 build 路径保留在 `/opt/dpdk-22.03`。镜像内 `/opt/package
 ```bash
 docker load -i .cache/build-base-images.tar
 make compile-image OFFLINE=1
-make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-zstd
+make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-hwloc
 docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/xran/verify-compile.sh
 ```
 
@@ -97,24 +98,25 @@ docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/
 已有完整缓存可以用于断网安装。需要新增或调整 APT 依赖时，应在能够访问所选软件源的准备机上重新制作缓存和离线包。
 内网源必须提供与基础镜像配套的开发包和运行库；`apt update` 成功只代表索引可下载。
 遇到 GCC 不可安装或 libc/OpenSSL 开发包严格版本不匹配时，优先使用已验证的完整缓存，或按
-[已有镜像小补包](formal-build-upgrade.md#内网-apt-依赖冲突与小补包2026-11-10) 为现有 SDK 只补 zstd。
+[已有镜像小补包](formal-build-upgrade.md#内网-apt-依赖冲突与小补包2026-11-10) 为现有 SDK 只补 zstd；该历史小补包不包含 hwloc，后者按 [hwloc 更新](formal-build-upgrade.md#业务编译缺少-hwloch2026-11-10) 同步新依赖并重建。
 
 验证脚本以镜像默认 UID/GID 1000 执行 protobuf 代码生成、主要 SDK 的编译/链接/运行、ASN.1 工具和共享库加载检查。
 还会检查上述软件包的安装状态及实际文件校验值，并用标准 include/library 路径验证 protobuf-c 头文件与运行库一致。
 zstd 自检以 C 编译并链接 `libzstd`，实际执行压缩、解压及内容比较；缺少开发包或链接失败时镜像验证直接失败。
+hwloc 自检包含 `hwloc.h` 并链接 `libhwloc`，加载合成拓扑并验证 8 个处理单元，不执行绑核或依赖宿主机 CPU 数量。
 完整 Jenkins 镜像构建、渲染和离线打包支持同样的 `DOCKERFILE` / `IMAGE_NAME` / `IMAGE_TAG` 参数，定制版本时各命令应使用相同参数。
 
 已部署环境的完整升级流程见 [正式构建修复升级](formal-build-upgrade.md)。
 先同步源码和新增 APT 缓存，再重建所选镜像：
 
 ```bash
-make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-zstd
-make push-compile-image IMAGE_TAG=26.11.10-compat-zstd
+make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-hwloc
+make push-compile-image IMAGE_TAG=26.11.10-compat-hwloc
 ```
 
 选择直接搬运成品时，先使用所需 Dockerfile 构建并导出新 tag，再从
 `dist/transfer/03-generated-images/compiler/镜像引用转换后的目录名/image.tar` 拷贝成品，
-在内网执行 `docker load -i 文件路径` 后推送同名镜像到 Harbor。既有 r2 成品未包含本次新增的 `libzstd-dev`。
+在内网执行 `docker load -i 文件路径` 后推送同名镜像到 Harbor。既有 r2 成品未包含新增的 `libzstd-dev` 和 `libhwloc-dev`，此前 zstd 版本也未包含 hwloc。
 Jenkins 构建参数 `COMPILER_IMAGE` 填该完整新版本地址，拉取策略使用 `Always` 即可，无需重新部署 Jenkins。
 
 ## 新旧镜像构建脚本的产物兼容

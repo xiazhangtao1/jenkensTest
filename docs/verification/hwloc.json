@@ -1,0 +1,146 @@
+{
+  "status": "PASS",
+  "date": "2026-11-10",
+  "baselineCommit": "8549799adcdc916519f63edc539636a1ca603acd",
+  "sourceFingerprint": "eb0e51c8f71f5721247efff9890390054b68d2abb4728e6be07626797da7dc14",
+  "files": {
+    "config/compiler-extra-apt-packages.txt": "844f9a154a3abc717aceacb11f4374f8eae50c4c5e25c31124d3c46540c3af65",
+    "runtime/verify-compile.sh": "fe279e744795564746dc167c5b243ddd9f8714541a23951834e0c701032d94b8",
+    "runtime/compile-check/CMakeLists.txt": "13ab4aa730815228f2b064487ae8533a0176655645fae5fd989e56396c018f8b",
+    "runtime/compile-check/hwloc-check.c": "92543e8555504958e565acee3aae032e4a315c81e3c89134f343685ac7adcaa1"
+  },
+  "pythonRegression": {
+    "tests": 58,
+    "result": "OK",
+    "logSha256": "a3379914c5bc7066c658a36249aa52a29b987604f32f209c03a5934f02503e78"
+  },
+  "before": [
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.10-compat-zstd",
+      "imageId": "sha256:b7ff6c1b46acd56b722aeb6539f54f4cdf87d947e214824503e715d7bfc28c2c",
+      "exitCode": 1,
+      "stderr": "/tmp/hwloc-check.c:1:10: fatal error: hwloc.h: No such file or directory\n    1 | #include <hwloc.h>\n      |          ^~~~~~~~~\ncompilation terminated.\n",
+      "user": "1000:1000"
+    },
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.10-sdk-zstd",
+      "imageId": "sha256:f13091b1f24c43072610282d39b8e8107127fdc018e0d67f32c2ce68da9114ea",
+      "exitCode": 1,
+      "stderr": "/tmp/hwloc-check.c:1:10: fatal error: hwloc.h: No such file or directory\n    1 | #include <hwloc.h>\n      |          ^~~~~~~~~\ncompilation terminated.\n",
+      "user": "1000:1000"
+    }
+  ],
+  "sdkImages": [
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.10-compat-hwloc",
+      "imageId": "sha256:5cc6b1118d7e7189e7202a76ab7d20ffef4dff8a241ea77fdbd497955856a2e5",
+      "originalImage": "192.168.10.35/xnet/xran-compile:26.11.10-compat-zstd",
+      "originalImageId": "sha256:b7ff6c1b46acd56b722aeb6539f54f4cdf87d947e214824503e715d7bfc28c2c",
+      "originalUnchanged": true,
+      "uid": 1000,
+      "gid": 1000,
+      "hwlocVersion": "2.7.0",
+      "selectedPackages": {
+        "libhwloc-dev:amd64": "2.7.0-2ubuntu1",
+        "libhwloc15:amd64": "2.7.0-2ubuntu1",
+        "libnuma-dev:amd64": "2.0.14-3ubuntu2",
+        "libprotobuf-c-dev:amd64": "1.3.3-1ubuntu2.1",
+        "libzstd-dev:amd64": "1.4.8+dfsg-3build1",
+        "pkgconf": "1.8.0-1"
+      },
+      "newOrChangedPackages": {
+        "libhwloc-dev:amd64": "2.7.0-2ubuntu1",
+        "libhwloc15:amd64": "2.7.0-2ubuntu1",
+        "libltdl-dev:amd64": "2.4.6-15build2",
+        "libltdl7:amd64": "2.4.6-15build2",
+        "linux-libc-dev:amd64": "5.15.0-203.213"
+      },
+      "removedPackages": [],
+      "network": "none",
+      "ctestPassed": 7,
+      "buildAndVerificationLogSha256": "00cbf2a980e907c63b07b49ca5dce00b005f024a1a0661297193ab4a9e59620f",
+      "validationDockerfile": "FROM 192.168.10.35/xnet/xran-compile:26.11.10-compat-zstd\nUSER 0:0\nCOPY .cache/compile-extra-apt/ /tmp/extra-apt/\nRUN apt-get install -y --no-install-recommends /tmp/extra-apt/*.deb \\\n    && dpkg-query -W > /opt/packages.lock && rm -rf /tmp/extra-apt /var/lib/apt/lists/*\nCOPY runtime/compile-check/ /opt/xran/compile-check/\nCOPY runtime/verify-compile.sh /opt/xran/verify-compile.sh\nUSER 1000:1000\nWORKDIR /home/jenkins/agent\nCMD [\"sleep\", \"infinity\"]\n"
+    },
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.10-sdk-hwloc",
+      "imageId": "sha256:20d8ab69616033d1935e4bc68aecc0561e874a937e7b79fdb589d8ba1085cea6",
+      "originalImage": "192.168.10.35/xnet/xran-compile:26.11.10-sdk-zstd",
+      "originalImageId": "sha256:f13091b1f24c43072610282d39b8e8107127fdc018e0d67f32c2ce68da9114ea",
+      "originalUnchanged": true,
+      "uid": 1000,
+      "gid": 1000,
+      "hwlocVersion": "2.7.0",
+      "selectedPackages": {
+        "libhwloc-dev:amd64": "2.7.0-2ubuntu1",
+        "libhwloc15:amd64": "2.7.0-2ubuntu1",
+        "libnuma-dev:amd64": "2.0.14-3ubuntu2",
+        "libprotobuf-c-dev": "1.5.2-1xran1",
+        "libzstd-dev:amd64": "1.4.8+dfsg-3build1",
+        "pkgconf": "1.8.0-1"
+      },
+      "newOrChangedPackages": {
+        "libhwloc-dev:amd64": "2.7.0-2ubuntu1",
+        "libhwloc15:amd64": "2.7.0-2ubuntu1",
+        "libltdl-dev:amd64": "2.4.6-15build2",
+        "libltdl7:amd64": "2.4.6-15build2",
+        "linux-libc-dev:amd64": "5.15.0-203.213"
+      },
+      "removedPackages": [],
+      "network": "none",
+      "ctestPassed": 7,
+      "buildAndVerificationLogSha256": "bcc71f8e755c0b784e9d185f5db9db401667da598879216101672ec889485e0c",
+      "validationDockerfile": "FROM 192.168.10.35/xnet/xran-compile:26.11.10-sdk-zstd\nUSER 0:0\nCOPY .cache/compile-extra-apt/ /tmp/extra-apt/\nRUN apt-get install -y --no-install-recommends /tmp/extra-apt/*.deb \\\n    && dpkg-query -W > /opt/packages.lock && rm -rf /tmp/extra-apt /var/lib/apt/lists/*\nCOPY runtime/compile-check/ /opt/xran/compile-check/\nCOPY runtime/verify-compile.sh /opt/xran/verify-compile.sh\nUSER 1000:1000\nWORKDIR /home/jenkins/agent\nCMD [\"sleep\", \"infinity\"]\n"
+    }
+  ],
+  "method": "Reuse verified SDK images; build the identical extra-APT installation layer used by both production Dockerfiles and copy current SDK checks. Build and all seven SDK CTests use network none. SDK sources were not rebuilt end to end.",
+  "extraAptCache": {
+    "path": ".cache/compile-extra-apt",
+    "manifestSha256": "1afd35f351bba65347f69660be7c471cc3a821b5363743a6a76fe2e630c1ffec",
+    "packages": [
+      "libhwloc-dev",
+      "libzstd-dev",
+      "pkgconf",
+      "python3-yaml"
+    ],
+    "debCount": 57,
+    "bytes": 31105812,
+    "allDebChecksumsVerified": true
+  },
+  "dependencyDelivery": {
+    "changedPackages": [
+      "compiler-deps.tar.gz"
+    ],
+    "compilerPackageSha256": "d9befe56427063e50250942173e07c3dc1c1101d6f32448292cc65000d90c21b",
+    "compilerPackageBytes": 556761903,
+    "extraAptArchiveFilesVerified": 58,
+    "otherComponentsUnchanged": true,
+    "changedCompilerFiles": [
+      ".cache/compile-extra-apt/autoconf_2.71-2_all.deb",
+      ".cache/compile-extra-apt/automake_1%3a1.16.5-1.3_all.deb",
+      ".cache/compile-extra-apt/autotools-dev_20220109.1_all.deb",
+      ".cache/compile-extra-apt/libc-dev-bin_2.35-0ubuntu3.15_amd64.deb",
+      ".cache/compile-extra-apt/libc6-dev_2.35-0ubuntu3.15_amd64.deb",
+      ".cache/compile-extra-apt/libc6_2.35-0ubuntu3.15_amd64.deb",
+      ".cache/compile-extra-apt/libcrypt-dev_1%3a4.4.27-1_amd64.deb",
+      ".cache/compile-extra-apt/libhwloc-dev_2.7.0-2ubuntu1_amd64.deb",
+      ".cache/compile-extra-apt/libhwloc15_2.7.0-2ubuntu1_amd64.deb",
+      ".cache/compile-extra-apt/libltdl-dev_2.4.6-15build2_amd64.deb",
+      ".cache/compile-extra-apt/libltdl7_2.4.6-15build2_amd64.deb",
+      ".cache/compile-extra-apt/libnsl-dev_1.3.0-2build2_amd64.deb",
+      ".cache/compile-extra-apt/libnuma-dev_2.0.14-3ubuntu2_amd64.deb",
+      ".cache/compile-extra-apt/libnuma1_2.0.14-3ubuntu2_amd64.deb",
+      ".cache/compile-extra-apt/libsigsegv2_2.13-1ubuntu3_amd64.deb",
+      ".cache/compile-extra-apt/libtirpc-dev_1.3.2-2ubuntu0.1_amd64.deb",
+      ".cache/compile-extra-apt/linux-libc-dev_5.15.0-203.213_amd64.deb",
+      ".cache/compile-extra-apt/m4_1.4.18-5ubuntu2_amd64.deb",
+      ".cache/compile-extra-apt/manifest.json",
+      ".cache/compile-extra-apt/rpcsvc-proto_1.4.2-0ubuntu6_amd64.deb"
+    ]
+  },
+  "limitations": [
+    "Private intranet business compilation is unavailable; known SDK tests cannot establish all private application dependencies.",
+    "No access to intranet APT/Gerrit/Harbor.",
+    "No Controller rebuild or Jenkins deployment; existing SDK image tags were preserved.",
+    "Existing SDK layers were reused; SDK sources were not rebuilt end to end."
+  ]
+}

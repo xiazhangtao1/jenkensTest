@@ -4,6 +4,8 @@
 
 此前 DPDK 固定参数和内网目标列表更新只需新的 `02-code`；既有 r2 镜像已验证为 256，无需重复拷贝编译镜像。
 本次 xcn 描述随 Controller 19 更新；旧站点带入 `02-code` 后只需重建 Controller，也可另带其成品，见 [升级 Jenkins](formal-build-upgrade.md#升级-jenkins)。
+业务编译新增 `libhwloc-dev` 和 zstd 开发依赖时，已有完整环境需同步新版 `02-code` 和完整
+`.cache/compile-extra-apt/`，再重建、推送编译镜像；不能只带代码。具体见 [hwloc 更新](formal-build-upgrade.md#业务编译缺少-hwloch2026-11-10)。
 
 ## 全新服务器最少携带
 
@@ -13,7 +15,7 @@
 - `02-code`：完整的 `code.tar.gz`，以及 `CODE.json`、`DEPENDENCIES.json`、`SHA256SUMS`。全新目录不能只带 `code.patch`；外网执行 `make transfer-code` 生成完整包。
 
 `optional-verification-tools*` 仅供浏览器验收，可省略。`03-generated-images` 是可选成品，内网执行 `make images` 会制作 Controller、编译镜像和 xcn 基础镜像载体。
-`01-dependencies/optional-zstd-dev/` 是约 400KB 的可选小补包，只用于给已有 SDK 镜像补 zstd 开发文件；完整离线重建不需要它。
+`01-dependencies/optional-zstd-dev/` 是约 400KB 的可选小补包，只用于给已有 SDK 镜像补 zstd 开发文件，不包含 hwloc；完整离线重建不需要它。
 全新安装无需旧 Jenkins HOME 备份、外网账号文件、模拟业务仓库或 `.git` 历史。
 目标机仍需先有 Kubernetes/containerd；本项目不提供集群安装离线包。Python/PyYAML、make、Git、Docker 等基础软件可从内网 apt 安装。
 站点 IP/存储、Gerrit 私钥与主机信任、Harbor 登录和实际需要的 CA/拉取 Secret 在目标环境另配，不包含在通用包中。

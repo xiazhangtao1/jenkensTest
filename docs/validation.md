@@ -1,3 +1,17 @@
+# hwloc 开发依赖补齐验收（2026-11-10）
+
+公共额外依赖新增 `libhwloc-dev`，同时交付匹配的运行库；两套编译 Dockerfile 共享此清单。
+
+- 两套此前的 zstd SDK 镜像均实际复现 `hwloc.h` 缺失。补齐后，新增依赖安装层及全部 SDK 自检均以 `--network none` 成功执行；默认 UID/GID 保持 1000。
+- 每套 7 项 CTest 全部通过，包含 hwloc 头文件编译、链接及合成拓扑 API 运行；既有 zstd、protobuf 静态链接和 DPDK 144/255/256 边界检查继续通过。
+- Python 回归 58 项通过。新版额外 APT 缓存包含 57 个 `.deb` 和 manifest，全部 SHA256 校验通过；`libhwloc-dev` 和 `libhwloc15` 均为 Ubuntu `2.7.0-2ubuntu1`。
+
+本轮复用已有 SDK 层，未从头重编全部 SDK 源码，也未访问内网私有业务、APT、Gerrit 或 Harbor。
+未重建 Controller、部署 Jenkins 或改变现有镜像 tag。证据见 [hwloc 验收报告](verification/hwloc.json)，
+搬运及重建步骤见 [hwloc 更新](formal-build-upgrade.md#业务编译缺少-hwloch2026-11-10)。
+
+---
+
 # APT 缓存跨源复用与 zstd 小补包验收（2026-11-10）
 
 相同基础镜像和软件清单的完整缓存不再因源地址变化失效，清单保留真实来源记录；损坏、缺包、不同基础镜像仍拒绝复用。

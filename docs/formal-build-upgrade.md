@@ -4,8 +4,54 @@
 Controller 19 仅统一 xcn 与 X-RAN-CLOUD 的任务描述；已有部署须按 [升级 Jenkins](#升级-jenkins) 更新 Controller，编译镜像不变。
 支持两个编译 Dockerfile，保留 `pkgconf`、DPDK 非交互输入、服务串行及取消 `all` 的修复；新增旧版业务镜像缺包自动导出和项目可见性开关。
 此前 Controller 18 关闭离线页面的 Jenkins 使用统计请求，固定 local-path helper 镜像 tag，并将 xcn 基础镜像复制初始化容器从 128MiB 调整为 1GiB，避免文件缓存触发 OOM；新增 [完整回归与持续构建验收](reliability.md)。
-此前平台测试与 root 兼容修复无需重建编译镜像；业务使用 zstd 时须按下面章节更新编译镜像。
+此前平台测试与 root 兼容修复无需重建编译镜像；业务使用 zstd 或 hwloc 时须按下面章节更新编译镜像。
 初始化预算由部署脚本生成，更新代码后须执行 `make deploy` 更新模板；仅导入 Controller 或重启旧部署不会生成新模板。
+
+## 业务编译缺少 hwloc.h（2026-11-10）
+
+`fatal error: hwloc.h: No such file or directory` 表示编译环境缺少 `libhwloc-dev`。
+上一轮额外依赖只补了 zstd，未包含 hwloc；按当时说明拷贝完整缓存并使用 `OFFLINE=1`，仍会遇到此错误。
+这不是拷贝步骤或拉取策略的问题。`OFFLINE=1` 禁止下载，安装内容仍由软件清单和缓存决定。
+
+现在公共额外依赖清单同时包含 `libzstd-dev`、`libhwloc-dev`，两套 Dockerfile 均会安装。
+镜像验证新增 hwloc 头文件编译、链接和合成拓扑运行检查，缺少开发包时不能通过验证。
+合成拓扑检查不执行绑核，也不依赖宿主机 CPU 数量。
+
+**已经拷贝过完整编译依赖的内网目录，本次只需同步两项：**
+
+1. 最新 `dist/transfer/02-code/`，校验并解包代码，保留内网 `config/site.local.yaml`。
+2. 外网项目中的完整 `.cache/compile-extra-apt/`，包括全部 `.deb` 和 `manifest.json`，
+   替换内网项目的同名目录。替换前将旧目录移走备份，不要将新旧 `.deb` 混放。
+
+`.cache/compile-apt/`、`.cache/compile-compat-apt/`、SDK 源码及基础镜像未变，不必重复拷贝。
+全新部署仍使用新版 `01-dependencies/` 和 `02-code/`；其中本轮只有 `compiler-deps.tar.gz` 及依赖清单变化。
+历史 `optional-zstd-dev/` 小补包仅补 zstd，不包含 hwloc，不能解决本次错误。
+
+在内网项目根目录重建并推送新的编译镜像 tag：
+
+```bash
+sudo make compile-image OFFLINE=1 \
+    APT_SOURCES=config/sources.intranet.list \
+    DOCKERFILE=docker/builder-compat.Dockerfile \
+    IMAGE_TAG=26.11.10-compat-hwloc
+sudo make push-compile-image IMAGE_TAG=26.11.10-compat-hwloc
+```
+
+全套 SDK 版使用 `DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-hwloc`。
+在 Jenkins 的 `COMPILER_IMAGE` 填实际推送的新地址，例如
+`192.168.10.35/xnet/xran-compile:26.11.10-compat-hwloc`，策略选 `Always` 后重新构建。
+**本次不用重建 Controller，也不用重新部署 Jenkins。** 仅替换代码或缓存，不会改变 Harbor 中已推送的编译镜像。
+
+镜像验证和实际业务使用同一 tag；可再次检查：
+
+```bash
+sudo docker run --rm --network none \
+    192.168.10.35/xnet/xran-compile:26.11.10-compat-hwloc \
+    bash /opt/xran/verify-compile.sh
+```
+
+该检查覆盖已知 SDK 依赖，不能替代当前不可访问的内网私有业务编译。
+包说明见 [Ubuntu libhwloc-dev](https://packages.ubuntu.com/jammy/libhwloc-dev)。
 
 ## 内网 APT 依赖冲突与小补包（2026-11-10）
 
