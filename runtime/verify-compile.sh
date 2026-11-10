@@ -26,7 +26,7 @@ test "$(pkg-config --modversion libprotobuf-c)" = "$XRAN_PROTOBUF_C_VERSION"
 protoc-c --version | grep -qx 'protobuf-c 1.5.2'
 python3 /opt/xran/run-build.py capabilities | python3 -c \
     'import json,sys; c=json.load(sys.stdin); assert c["xranServiceCompatibility"] == c["xranImageArchiveFallback"] == 1'
-for package in protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1 uuid-dev; do
+for package in protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1 uuid-dev libzstd-dev; do
     test "$(dpkg-query -W -f='${Status}' "$package")" = 'install ok installed'
 done
 for package in protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1; do
@@ -59,7 +59,7 @@ mkdir "$sdk_check_dir/asn1"
 printf 'Check DEFINITIONS ::= BEGIN Value ::= INTEGER END\n' > "$sdk_check_dir/asn1/check.asn1"
 (cd "$sdk_check_dir/asn1" && asn1c -pdu=all -fcompound-names check.asn1 > generation.log 2>&1)
 test -s "$sdk_check_dir/asn1/Value.c"
-pkg-config --modversion libdpdk rohc protobuf libprotobuf-c libwebsockets
+pkg-config --modversion libdpdk rohc protobuf libprotobuf-c libwebsockets libzstd
 docker --version
 python3 - <<'PY'
 import ctypes

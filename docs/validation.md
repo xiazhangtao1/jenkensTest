@@ -1,3 +1,20 @@
+# zstd 编译依赖补齐验收（2026-11-10）
+
+两套编译镜像共用的额外 APT 清单新增 `libzstd-dev`，SDK 自检新增独立的 C 语言压缩解压用例。
+
+- Python 回归 56 项通过。两套原 r2 镜像均用新 C 文件复现 `zstd.h: No such file or directory`。
+- 复用已验证的两套 r2 SDK，按正式 Dockerfile 的相同额外 APT 安装层断网构建验证镜像，再以默认 UID 1000 执行完整自检。
+  每套 6 项 CTest 全部通过；新增用例以 `-Wall -Wextra -Werror` 编译，验证标准头文件、链接、实际压缩解压及内容一致性。
+- `libzstd-dev` 为 Ubuntu `1.4.8+dfsg-3build1`，pkg-config 为 `1.4.8`。原 protobuf-c 1.3.3/1.5.2 两种组合和 DPDK 256 核边界检查仍通过。
+- 新增开发包和更新的完整额外 APT 缓存已纳入 `compiler-deps.tar.gz`；逐文件核对该缓存的大小及 SHA256。
+  其他四个依赖包未变，既有 r2 镜像标签及内容未改变。
+
+证据见 [zstd 验收报告](verification/zstd.json)，内网重建及临时补包见
+[zstd 依赖更新](formal-build-upgrade.md#业务编译缺少-zstdh2026-11-10)。Controller 和 Jenkins 部署无需调整。
+本轮验证新增依赖安装层与完整 SDK 自检，未从头重编全部 SDK 源码、编译私有业务或访问真实内网服务。
+
+---
+
 # X-RAN-CLOUD 镜像任务 root 兼容验收（2026-11-10）
 
 仅镜像任务的 Agent、编译容器改为 UID/GID 0，SSH 信任挂载到 `/root/.ssh`；服务包和 xcn 保持 1000。

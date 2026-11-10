@@ -4,8 +4,8 @@
 
 ```bash
 make compile-image
-make compile-image DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat-r2
-make compile-image DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.08-sdk-r2
+make compile-image DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-zstd
+make compile-image DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-zstd
 make compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.11.05 BUILD_JOBS=4
 make compile-image APT_SOURCES=config/sources.intranet.list
 make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.11.05
@@ -48,7 +48,8 @@ asn1c 0.9.29 和资料中的 x86-64 `libairtracer.so`。该二进制没有随附
 gRPC 所需外部 proto 源码也已锁定提交并入库。`wls_mod.tar` 和 Intel oneAPI 不参与构建。
 protobuf、gRPC、Abseil、OpenTelemetry 和 spdlog 同时提供共享库与静态归档，兼容原装机资料中直接链接 `.a` 的用法；CMake 默认使用共享版本。
 
-APT 包拆为通用工具、编译依赖、额外工具及兼容版 protobuf-c 清单；额外工具同时提供 `pkgconf` 和 xcn 发布需要的 PyYAML。
+APT 包拆为通用工具、编译依赖、额外工具及兼容版 protobuf-c 清单；额外工具同时提供 `pkgconf`、xcn 发布需要的 PyYAML 和 `libzstd-dev`。
+`libzstd-dev` 提供业务代码使用的 `zstd.h` 及链接库。仅安装 `libzstd1` 运行库无法编译这些代码。
 公共缓存为 `.cache/compile-apt`、`.cache/compile-extra-apt`，兼容版专用缓存为 `.cache/compile-compat-apt`。
 准备步骤会校验、准备两种 Dockerfile 所需的缓存，方便迁入后切换；两版自行选择安装内容。
 Helm 3.17.3 二进制及 SHA256 固定于 `config/helm.lock.json`，缓存随离线包交付。
@@ -86,7 +87,7 @@ DPDK 源码和 build 路径保留在 `/opt/dpdk-22.03`。镜像内 `/opt/package
 ```bash
 docker load -i .cache/build-base-images.tar
 make compile-image OFFLINE=1
-make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.08-sdk-r2
+make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-zstd
 docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/xran/verify-compile.sh
 ```
 
@@ -95,18 +96,20 @@ docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/
 
 验证脚本以镜像默认 UID/GID 1000 执行 protobuf 代码生成、主要 SDK 的编译/链接/运行、ASN.1 工具和共享库加载检查。
 还会检查上述软件包的安装状态及实际文件校验值，并用标准 include/library 路径验证 protobuf-c 头文件与运行库一致。
+zstd 自检以 C 编译并链接 `libzstd`，实际执行压缩、解压及内容比较；缺少开发包或链接失败时镜像验证直接失败。
 完整 Jenkins 镜像构建、渲染和离线打包支持同样的 `DOCKERFILE` / `IMAGE_NAME` / `IMAGE_TAG` 参数，定制版本时各命令应使用相同参数。
 
 已部署环境的完整升级流程见 [正式构建修复升级](formal-build-upgrade.md)。
 先同步源码和新增 APT 缓存，再重建所选镜像：
 
 ```bash
-make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat-r2
-make push-compile-image IMAGE_TAG=26.11.08-compat-r2
+make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-zstd
+make push-compile-image IMAGE_TAG=26.11.10-compat-zstd
 ```
 
-选择直接搬运成品时，拷贝 `dist/transfer/03-generated-images/compiler/192.168.10.35_xnet_xran-compile_26.11.08-compat-r2/image.tar`，
-在内网执行 `docker load -i 文件路径` 后推送同名镜像到 Harbor。
+选择直接搬运成品时，先使用所需 Dockerfile 构建并导出新 tag，再从
+`dist/transfer/03-generated-images/compiler/镜像引用转换后的目录名/image.tar` 拷贝成品，
+在内网执行 `docker load -i 文件路径` 后推送同名镜像到 Harbor。既有 r2 成品未包含本次新增的 `libzstd-dev`。
 Jenkins 构建参数 `COMPILER_IMAGE` 填该完整新版本地址，拉取策略使用 `Always` 即可，无需重新部署 Jenkins。
 
 ## 新旧镜像构建脚本的产物兼容

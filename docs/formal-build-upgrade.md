@@ -4,8 +4,52 @@
 Controller 19 仅统一 xcn 与 X-RAN-CLOUD 的任务描述；已有部署须按 [升级 Jenkins](#升级-jenkins) 更新 Controller，编译镜像不变。
 支持两个编译 Dockerfile，保留 `pkgconf`、DPDK 非交互输入、服务串行及取消 `all` 的修复；新增旧版业务镜像缺包自动导出和项目可见性开关。
 此前 Controller 18 关闭离线页面的 Jenkins 使用统计请求，固定 local-path helper 镜像 tag，并将 xcn 基础镜像复制初始化容器从 128MiB 调整为 1GiB，避免文件缓存触发 OOM；新增 [完整回归与持续构建验收](reliability.md)。
-已有 `26.11.08-compat-r2` / `26.11.08-sdk-r2` 编译镜像无需因本轮平台测试重新构建。
+此前平台测试与 root 兼容修复无需重建编译镜像；业务使用 zstd 时须按下面章节更新编译镜像。
 初始化预算由部署脚本生成，更新代码后须执行 `make deploy` 更新模板；仅导入 Controller 或重启旧部署不会生成新模板。
+
+## 业务编译缺少 zstd.h（2026-11-10）
+
+`fatal error: zstd.h: No such file or directory` 表示编译环境缺少 `libzstd-dev`。
+此前两套 r2 镜像只有 `libzstd1` 运行库；公共额外依赖清单现已补上开发包，两套 Dockerfile 均会安装。
+自检新增 C 语言的头文件、链接、压缩解压验证。业务 Makefile 的 `Error 1 (ignored)` 表示忽略了错误，继续输出日志不代表编译成功。
+
+本项需更新编译镜像，Controller 和 Jenkins 部署无须调整。已有内网软件源且原依赖、基础镜像齐全时，
+同步代码后允许准备阶段访问内网 APT，Docker 编译阶段仍断网：
+
+```bash
+sudo make compile-image OFFLINE=0 \
+    APT_SOURCES=config/sources.intranet.list \
+    DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-zstd
+sudo make push-compile-image IMAGE_TAG=26.11.10-compat-zstd
+```
+
+`OFFLINE=0` 在这里允许从指定的内网源补充 `.deb`，并不要求访问外网；原有基础镜像、SDK 源码、工具缓存需已备齐。
+全套 SDK 版可改用 `DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-zstd`。
+在 Jenkins 的 `COMPILER_IMAGE` 选择实际推送的完整新 tag，策略选 `Always`，重新提交构建。
+
+严格使用 `OFFLINE=1` 时，应同步本次更新的 `01-dependencies/compiler-deps.tar.gz`、`MANIFEST.json` 和 `SHA256SUMS`，
+以及 `02-code`；其他依赖包未变。先校验、解包新版编译依赖，再执行上述构建命令并改为 `OFFLINE=1`。
+只更新代码、继续使用旧 `.deb` 缓存时，会因依赖清单不匹配被明确拒绝。
+
+不方便传文件时，可用现有镜像做临时补包验证。以下 `FROM` 应填写失败任务实际选择的编译镜像，使用新的输出 tag：
+
+```bash
+cat > /tmp/Dockerfile.zstd <<'EOF'
+FROM 192.168.10.35/xnet/xran-compile:latest
+USER root
+COPY config/sources.intranet.list /etc/apt/sources.list
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libzstd-dev \
+    && rm -rf /var/lib/apt/lists/*
+USER 1000:1000
+EOF
+sudo docker build --network host --pull=false -f /tmp/Dockerfile.zstd \
+    -t 192.168.10.35/xnet/xran-compile:test-zstd .
+sudo docker push 192.168.10.35/xnet/xran-compile:test-zstd
+```
+
+将 Jenkins 的 `COMPILER_IMAGE` 改为 `192.168.10.35/xnet/xran-compile:test-zstd` 后重试。
+临时 Dockerfile 直接访问内网 APT，不使用 `make compile-image OFFLINE=1` 的断网构建阶段。
 
 ## 业务镜像脚本要求 root 的兼容修复（2026-11-10）
 
@@ -120,10 +164,10 @@ cp /交付路径/02-code/CODE.json TRANSFER_SOURCE.json
 
 ```bash
 sudo docker load -i .cache/build-base-images.tar
-sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat-r2
-sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.08-sdk-r2
-sudo make push-compile-image IMAGE_TAG=26.11.08-compat-r2
-sudo make push-compile-image IMAGE_TAG=26.11.08-sdk-r2
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-zstd
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-zstd
+sudo make push-compile-image IMAGE_TAG=26.11.10-compat-zstd
+sudo make push-compile-image IMAGE_TAG=26.11.10-sdk-zstd
 ```
 
 Harbor 需要登录时，使用与推送相同的用户登录；上述 sudo 示例对应 `sudo docker login 192.168.10.35`。
@@ -135,7 +179,7 @@ Harbor 需要登录时，使用与推送相同的用户登录；上述 sudo 示�
 完成兼容版验收后，如果要继续使用默认的 `latest` 地址：
 
 ```bash
-sudo docker tag 192.168.10.35/xnet/xran-compile:26.11.08-compat-r2 192.168.10.35/xnet/xran-compile:latest
+sudo docker tag 192.168.10.35/xnet/xran-compile:26.11.10-compat-zstd 192.168.10.35/xnet/xran-compile:latest
 sudo make push-compile-image IMAGE_TAG=latest
 ```
 
