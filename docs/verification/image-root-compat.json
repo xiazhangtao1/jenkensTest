@@ -1,0 +1,358 @@
+{
+  "status": "PASS",
+  "date": "2026-11-10",
+  "namespace": "jenkins-reliability-verify",
+  "sourceFingerprint": "6ccf77f4c66d86d37b25ac93483659726d0846dd9136210b7e4246e828c7bd33",
+  "baselineCommit": "8a1807cbc780fc0f07b58d38371d8ee9d6937025",
+  "sourceFiles": {
+    "scripts/ci.py": "3810e666f62829a0caf02d4a8eaba15977530679f5911ee939943756bd8653de",
+    "tests/test_config.py": "38fdeced7ef1c97a053038ffe991fe8634d0cf6d0faf66886e74380605888eab"
+  },
+  "pythonRegression": {
+    "tests": 56,
+    "result": "OK",
+    "logSha256": "9fdb264bf53f743635a83bb0e54e5aad961649ab0940ac57e0c6fddf6bd4d8b3"
+  },
+  "fixture": {
+    "baseCommit": "db3051980abe0cc90204f771b96ebb7a728341b2",
+    "commit": "bc86d7c435422a8edc5384d30cc114b2fb8133ee",
+    "scriptSha256": "9734b79dffb0d9b6a685983e7be57bb21a400936c519880caf4106c719f4c29d",
+    "changes": [
+      "Require effective UID 0 before any image build",
+      "Create mode-0600 image archive owned by root",
+      "Delete archive for fallback tag, retaining exact tagged DinD image"
+    ],
+    "git": "Disposable SSH server on port 29419, generated known_hosts, strict checking, ssh-agent Jenkins credential"
+  },
+  "rollout": {
+    "beforeUid": "41fc7764-d893-4f37-be89-6f9b6fc4aaa7",
+    "afterUid": "b093dd00-3ab6-479f-840b-0607aff2e42c",
+    "controllerImageId": "sha256:c59902fc221bf1cc1fb52867c220bc1d00e7b168c885103fb67eb8f1f8c1ec37",
+    "siteJsonUnchanged": false,
+    "runtimeSha256": "b6ea45533eb275de805911f7ea37df607f0d7ba52a11ae41156f8f523add52b2"
+  },
+  "checks": [
+    {
+      "job": "x-ran-cloud",
+      "number": 325,
+      "kind": "image",
+      "result": "FAILURE",
+      "pod": {
+        "pod": "x-ran-cloud-325-t4j65-1fllr-q4d2l",
+        "securityContext": {
+          "fsGroup": 1000,
+          "runAsGroup": 1000,
+          "runAsUser": 1000
+        },
+        "containers": {
+          "jnlp": {
+            "securityContext": {},
+            "image": "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25",
+            "imageId": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
+            "identity": "1000"
+          },
+          "builder": {
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "runAsGroup": 1000,
+              "runAsUser": 1000
+            },
+            "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+            "imageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "identity": "{\"uid\": 1000, \"gid\": 1000, \"sshHome\": \"/home/jenkins\", \"knownHosts\": true}"
+          }
+        }
+      },
+      "consoleSha256": "5d2bd01b8d0681d6ebd56c8cd0115ae5d927fac52c4531a6163731dc2c7a5b14",
+      "rootFailureReproduced": true
+    },
+    {
+      "job": "x-ran-cloud",
+      "number": 326,
+      "kind": "image",
+      "result": "SUCCESS",
+      "pod": {
+        "pod": "x-ran-cloud-326-qqg50-c3cnj-3lxpl",
+        "securityContext": {
+          "fsGroup": 1000,
+          "runAsGroup": 0,
+          "runAsUser": 0
+        },
+        "containers": {
+          "jnlp": {
+            "securityContext": {},
+            "image": "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25",
+            "imageId": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
+            "identity": "0"
+          },
+          "builder": {
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "runAsGroup": 0,
+              "runAsUser": 0
+            },
+            "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+            "imageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "identity": "{\"uid\": 0, \"gid\": 0, \"sshHome\": \"/root\", \"knownHosts\": true}"
+          }
+        }
+      },
+      "consoleSha256": "a4644670e22e02608e7eb13063aa10f6d63aea4a5ac25581cdce3bfe3a5f5bd5",
+      "archiveSource": "script",
+      "files": [
+        {
+          "name": "imageA.tar",
+          "size": 80658944,
+          "sha256": "933fb1dc815fc97536837342ec2493090e814fd7750d47ade1dd3b056c8b82df"
+        }
+      ],
+      "downloadedImageRun": "serviceA version=1.1.0 commit=bc86d7c435422a8edc5384d30cc114b2fb8133ee",
+      "metadata": {
+        "commit": "bc86d7c435422a8edc5384d30cc114b2fb8133ee",
+        "userId": "builder1",
+        "builderImage": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+        "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+        "result": "SUCCESS",
+        "startedAt": "2026-11-10T14:26:16+08:00",
+        "finishedAt": "2026-11-10T06:26:53.562027+00:00",
+        "imageReference": "xran-registry:5000/xran-demo/imagea:root-compat-script-1794291966379199688"
+      }
+    },
+    {
+      "job": "x-ran-cloud",
+      "number": 327,
+      "kind": "image",
+      "result": "SUCCESS",
+      "pod": {
+        "pod": "x-ran-cloud-327-pmvr0-6rtxb-wf030",
+        "securityContext": {
+          "fsGroup": 1000,
+          "runAsGroup": 0,
+          "runAsUser": 0
+        },
+        "containers": {
+          "jnlp": {
+            "securityContext": {},
+            "image": "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25",
+            "imageId": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
+            "identity": "0"
+          },
+          "builder": {
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "runAsGroup": 0,
+              "runAsUser": 0
+            },
+            "image": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+            "imageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56",
+            "identity": "{\"uid\": 0, \"gid\": 0, \"sshHome\": \"/root\", \"knownHosts\": true}"
+          }
+        }
+      },
+      "consoleSha256": "e40e040bbeebeedd13e9c88530240db6166d3cd2b13bb6604597d0447a4698ac",
+      "archiveSource": "docker-save",
+      "files": [
+        {
+          "name": "imageB.tar",
+          "size": 80658944,
+          "sha256": "9717881b05269270587c6f25f531bee5df8c3e7aded1dd1307630d4a6de1079b"
+        }
+      ],
+      "downloadedImageRun": "serviceB version=1.1.0 commit=bc86d7c435422a8edc5384d30cc114b2fb8133ee",
+      "metadata": {
+        "commit": "bc86d7c435422a8edc5384d30cc114b2fb8133ee",
+        "userId": "builder1",
+        "builderImage": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+        "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:cdc16c72c39288eec1c7e04f3591d4a24549bd0b808d454d042c14e23c20db56",
+        "result": "SUCCESS",
+        "startedAt": "2026-11-10T14:27:31+08:00",
+        "finishedAt": "2026-11-10T06:28:06.980382+00:00",
+        "imageReference": "xran-registry:5000/xran-demo/imageb:root-compat-fallback-1794292042248167719"
+      }
+    },
+    {
+      "job": "x-ran-cloud",
+      "number": 328,
+      "kind": "service",
+      "result": "SUCCESS",
+      "pod": {
+        "pod": "x-ran-cloud-328-84glq-lqss7-jjvl1",
+        "securityContext": {
+          "fsGroup": 1000,
+          "runAsGroup": 1000,
+          "runAsUser": 1000
+        },
+        "containers": {
+          "jnlp": {
+            "securityContext": {},
+            "image": "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25",
+            "imageId": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
+            "identity": "1000"
+          },
+          "builder": {
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "runAsGroup": 1000,
+              "runAsUser": 1000
+            },
+            "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+            "imageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "identity": "{\"uid\": 1000, \"gid\": 1000, \"sshHome\": \"/home/jenkins\", \"knownHosts\": true}"
+          }
+        }
+      },
+      "consoleSha256": "3099bda068ec4337bc63924fdee8335165ee657012072666b271c12aba9d8f12",
+      "files": [
+        {
+          "name": "serviceA.tar.gz",
+          "size": 2500,
+          "sha256": "522341b4a96456cc6e721558b69be9d6384743c6bacc51dc1b39abe93f186498"
+        }
+      ],
+      "metadata": {
+        "commit": "bc86d7c435422a8edc5384d30cc114b2fb8133ee",
+        "userId": "builder1",
+        "builderImage": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+        "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+        "result": "SUCCESS",
+        "startedAt": "2026-11-10T14:28:41+08:00",
+        "finishedAt": "2026-11-10T06:29:01.408485+00:00"
+      }
+    },
+    {
+      "job": "xcn",
+      "number": 127,
+      "kind": "xcn",
+      "result": "SUCCESS",
+      "pod": {
+        "pod": "xcn-127-mht3m-t7l57-kf678",
+        "securityContext": {
+          "fsGroup": 1000,
+          "runAsGroup": 1000,
+          "runAsUser": 1000
+        },
+        "containers": {
+          "jnlp": {
+            "securityContext": {},
+            "image": "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25",
+            "imageId": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
+            "identity": "1000"
+          },
+          "builder": {
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "runAsGroup": 1000,
+              "runAsUser": 1000
+            },
+            "image": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+            "imageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+            "identity": "{\"uid\": 1000, \"gid\": 1000, \"sshHome\": \"/home/jenkins\", \"knownHosts\": true}"
+          }
+        }
+      },
+      "consoleSha256": "ef7e463b14d031145c36eb871ff81f0cf7b8803152d74ee39325c55ea601bb41",
+      "files": [
+        {
+          "name": "xcn-runtime.tar",
+          "size": 80640512,
+          "sha256": "8c6e6ef6db67335dbbb67ee4d34f3a97ba148f81b01e9d99b611699d418e7357"
+        },
+        {
+          "name": "xcn-webui.tar",
+          "size": 80640512,
+          "sha256": "14a6e92a70d78669206689da05c86441e299d067cc187c1ee0ad7289dd9d72c5"
+        },
+        {
+          "name": "xcn-monitor.tar",
+          "size": 80640512,
+          "sha256": "b15cb7abf63d49bcc3a2349e5b6406509591dace0adb0b0362d367a96be2b028"
+        },
+        {
+          "name": "xcn-1.10.0.tgz",
+          "size": 377,
+          "sha256": "f0760b688dc7061a3379309c3422d570b6a689a31a216c6e704840dc5a475995"
+        }
+      ],
+      "metadata": {
+        "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75",
+        "userId": "builder1",
+        "builderImage": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+        "builderImageId": "127.0.0.1:15060/reliability/compat@sha256:efaf0f9b777bf55d89a5b5c3f240074feffb65250d74cde201200116126ea4cd",
+        "result": "SUCCESS",
+        "startedAt": "2026-11-10T14:31:26+08:00",
+        "finishedAt": "2026-11-10T06:32:27.586447+00:00"
+      }
+    }
+  ],
+  "primaryBefore": {
+    "namespace": "jenkins",
+    "objects": [
+      {
+        "kind": "PersistentVolumeClaim",
+        "name": "jenkins",
+        "uid": "2157aac0-ca51-4eeb-a271-d1805ba7afcf"
+      },
+      {
+        "kind": "Pod",
+        "name": "jenkins-0",
+        "uid": "25924c57-32f4-498e-abd3-418a3ef83595"
+      }
+    ],
+    "historyAndSettingsSha256": "74902b156f2517b336ef9d99d5db7e6d585758d4172a61a482f397a277087074",
+    "businessHistories": {
+      "x-ran-cloud": 99,
+      "xcn": 5
+    }
+  },
+  "primaryAfter": {
+    "namespace": "jenkins",
+    "objects": [
+      {
+        "kind": "PersistentVolumeClaim",
+        "name": "jenkins",
+        "uid": "2157aac0-ca51-4eeb-a271-d1805ba7afcf"
+      },
+      {
+        "kind": "Pod",
+        "name": "jenkins-0",
+        "uid": "25924c57-32f4-498e-abd3-418a3ef83595"
+      }
+    ],
+    "historyAndSettingsSha256": "74902b156f2517b336ef9d99d5db7e6d585758d4172a61a482f397a277087074",
+    "businessHistories": {
+      "x-ran-cloud": 99,
+      "xcn": 5
+    }
+  },
+  "primaryUnchanged": true,
+  "verificationSettingsAndUsersUnchanged": true,
+  "cleanup": {
+    "pipelinesRestored": true,
+    "temporaryCredentialDeleted": true,
+    "temporaryTrustSecretDeleted": true,
+    "temporarySshServerStopped": true,
+    "remaining": {
+      "running": 0,
+      "leases": 0,
+      "locked": 0,
+      "reservations": 0,
+      "pods": 0
+    }
+  },
+  "harnessCorrections": [
+    {
+      "detail": "Refresh test client CSRF crumb after Controller restart; no production source change"
+    },
+    {
+      "job": "xcn",
+      "number": 126,
+      "result": "FAILURE",
+      "detail": "Initial fixture used HTTP Registry without matching DinD insecure-registry override. Corrected test-only Pipeline using existing short_pipeline helper; #127 passed."
+    }
+  ],
+  "limitations": [
+    "X-RAN-CLOUD image workload is simulated; the private intranet script is unavailable",
+    "No access to real intranet Gerrit, Harbor or APT",
+    "No host reboot or repeated soak test in this change"
+  ]
+}

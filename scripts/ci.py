@@ -256,6 +256,10 @@ def pod_template(cfg, kind):
         raise ValueError('包含 Agent/DinD 的总预算至少 2 CPU / 2Gi 内存')
     if maximum < 1024:
         raise ValueError('临时空间应至少 1Gi')
+    # Legacy X-RAN image scripts require root. Keep the agent and builder on
+    # the same UID so checkout credentials and mode-0600 archives remain usable.
+    build_uid = 0 if kind == 'image' else 1000
+    ssh_home = '/root' if build_uid == 0 else '/home/jenkins'
     shared = {'name': 'workspace-volume', 'mountPath': '/home/jenkins/agent'}
     proxy = cfg.get('proxy', '')
     bypass = cfg.get('noProxy', '') + ',xran-demo,xran-registry,jenkins,.svc,.cluster.local'
@@ -273,8 +277,8 @@ def pod_template(cfg, kind):
             'ephemeral-storage': f'{min(1024, maximum // 2 if image else maximum - 256)}Mi'},
             'limits': {'cpu': f'{500 if kind == "xcn" else cpu - (1500 if image else 250)}m', 'memory': f'{memory - (dind_memory + 512 if image else 512)}Mi',
                        'ephemeral-storage': f'{maximum // 2 if image else maximum - 256}Mi'}},
-        'securityContext': {'runAsUser': 1000, 'runAsGroup': 1000, 'allowPrivilegeEscalation': False},
-        'volumeMounts': [dict(shared), {'name': 'build-trust', 'mountPath': '/home/jenkins/.ssh', 'readOnly': True}]}
+        'securityContext': {'runAsUser': build_uid, 'runAsGroup': build_uid, 'allowPrivilegeEscalation': False},
+        'volumeMounts': [dict(shared), {'name': 'build-trust', 'mountPath': ssh_home + '/.ssh', 'readOnly': True}]}
     volumes = [{'name': 'workspace-volume', 'emptyDir': {'sizeLimit': f'{cfg["temporaryStorageGiB"]}Gi'}},
                {'name': 'build-trust', 'secret': {'secretName': 'xran-build-trust', 'optional': True}}]
     containers = [jnlp, builder]
@@ -322,7 +326,7 @@ def pod_template(cfg, kind):
     builder['imagePullPolicy'] = cfg.get('compilerImagePullPolicy', 'Always')
     return {'apiVersion': 'v1', 'kind': 'Pod', 'metadata': {'labels': {'xran-ci': 'build', 'xran-build': 'bXRAN_BUILD_NUMBER'}},
         'spec': {'automountServiceAccountToken': False,
-            'securityContext': {'runAsUser': 1000, 'runAsGroup': 1000, 'fsGroup': 1000},
+            'securityContext': {'runAsUser': build_uid, 'runAsGroup': build_uid, 'fsGroup': 1000},
             'activeDeadlineSeconds': int(cfg['buildTimeoutMinutes']) * 60,
             'containers': containers, 'initContainers': init, 'volumes': volumes,
             'imagePullSecrets': [{'name': name} for name in cfg.get('compilerImagePullSecrets', [])]}}
@@ -369,7 +373,8 @@ def render(args):
                   'tag': cfg['controllerImage'].rsplit(':', 1)[1], 'pullPolicy': 'Never' if cfg.get('offline') else 'IfNotPresent'},
         'numExecutors': 0, 'installPlugins': False, 'additionalPlugins': [],
         'podAnnotations': {'xran-ci/image-id': cfg['imageIds'].get(cfg['controllerImage'], 'unlocked'),
-                           'xran-ci/site-sha256': hashlib.sha256(runtime['site.json'].encode()).hexdigest()},
+                           'xran-ci/site-sha256': hashlib.sha256(runtime['site.json'].encode()).hexdigest(),
+                           'xran-ci/runtime-sha256': hashlib.sha256(json.dumps(runtime, sort_keys=True).encode()).hexdigest()},
         'sidecars': {'configAutoReload': {'enabled': False}}, 'initializeOnce': False,
         'testEnabled': False, 'agentListenerEnabled': False,
         'serviceType': 'NodePort', 'nodePort': int(cfg['nodePort']), 'jenkinsUrl': cfg['jenkinsUrl'],

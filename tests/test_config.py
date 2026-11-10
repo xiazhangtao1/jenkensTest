@@ -55,6 +55,46 @@ class ConfigurationTests(unittest.TestCase):
             self.assertTrue(all(c['imagePullPolicy'] == 'Never' for c in ci.pod_template(cfg, kind)['spec']['containers']))
             cfg['compilerImagePullPolicy'] = 'Always'
 
+    def test_only_xran_image_profile_runs_agent_and_builder_as_root(self):
+        cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.intranet.yaml', namespace=None, offline=True))
+        for kind, uid, home in [('service', 1000, '/home/jenkins'), ('image', 0, '/root'), ('xcn', 1000, '/home/jenkins')]:
+            with self.subTest(kind=kind):
+                pod = ci.pod_template(cfg, kind)
+                security = pod['spec']['securityContext']
+                self.assertEqual((security['runAsUser'], security['runAsGroup']), (uid, uid))
+                containers = {c['name']: c for c in pod['spec']['containers']}
+                for name in ['jnlp', 'builder']:
+                    effective = dict(security, **containers[name].get('securityContext', {}))
+                    self.assertEqual((effective['runAsUser'], effective['runAsGroup']), (uid, uid))
+                    self.assertFalse(effective.get('privileged', False))
+                self.assertFalse(containers['builder']['securityContext']['allowPrivilegeEscalation'])
+                trust = next(m for m in containers['builder']['volumeMounts'] if m['name'] == 'build-trust')
+                self.assertEqual(trust['mountPath'], home + '/.ssh')
+                self.assertTrue(trust['readOnly'])
+                self.assertFalse(pod['spec']['automountServiceAccountToken'])
+                self.assertTrue(all('hostPath' not in v for v in pod['spec']['volumes']))
+
+    def test_pod_template_change_rolls_controller_without_site_change(self):
+        args = SimpleNamespace(site=REPO / 'config/site.intranet.yaml', namespace=None, offline=True)
+        original = ci.pod_template
+
+        def changed(cfg, kind):
+            pod = original(cfg, kind)
+            if kind == 'image':
+                pod['spec']['securityContext']['runAsUser'] = 1234
+            return pod
+
+        with tempfile.TemporaryDirectory() as directory, patch.object(ci, 'state_dir', return_value=Path(directory)):
+            annotations = []
+            for template in [original, original, changed]:
+                with patch.object(ci, 'pod_template', side_effect=template):
+                    ci.render(args)
+                values = yaml.safe_load((Path(directory) / 'values.yaml').read_text())
+                annotations.append(values['controller']['podAnnotations'])
+            self.assertEqual(annotations[0], annotations[1])
+            self.assertEqual(annotations[0]['xran-ci/site-sha256'], annotations[2]['xran-ci/site-sha256'])
+            self.assertNotEqual(annotations[0]['xran-ci/runtime-sha256'], annotations[2]['xran-ci/runtime-sha256'])
+
     def test_compiler_image_override_and_secrets(self):
         args = SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False,
                                image_name='registry.local:5000/team/sdk', image_tag='26.11.05')

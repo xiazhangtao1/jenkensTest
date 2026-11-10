@@ -7,6 +7,35 @@ Controller 19 仅统一 xcn 与 X-RAN-CLOUD 的任务描述；已有部署须按
 已有 `26.11.08-compat-r2` / `26.11.08-sdk-r2` 编译镜像无需因本轮平台测试重新构建。
 初始化预算由部署脚本生成，更新代码后须执行 `make deploy` 更新模板；仅导入 Controller 或重启旧部署不会生成新模板。
 
+## 业务镜像脚本要求 root 的兼容修复（2026-11-10）
+
+出现 `Loaded image: ubuntu:22.04` 后紧接“请以 root 权限运行此脚本”，说明编译镜像已经启动，业务脚本被 UID 1000 拦住。
+随后“缺少镜像包，且本次 DinD 中找不到镜像”是脚本提前退出的结果。Harbor 拉取和编译依赖与这个权限错误无关。
+
+现在仅 X-RAN-CLOUD 镜像任务的 Agent、编译容器使用 UID/GID 0；服务包和 xcn 继续使用 1000。
+两容器保持相同 UID，兼容私钥临时文件、共享工作区及权限为 0600 的镜像包；SSH 信任 Secret 相应挂载到 `/root/.ssh`，严格校验不变。
+builder 不新增 privileged 或宿主机挂载，仍连接本次 Pod 的独立 DinD。
+
+**已有 Controller 19 和两套 r2 编译镜像不需要重建、导入或推送。** 本项只需更新 `02-code` 中代码，保留本地站点配置后执行：
+
+```bash
+sudo env "PATH=$PATH:$PWD/.cache/tools" \
+    make deploy SITE=config/site.local.yaml OFFLINE=1
+```
+
+部署会按完整运行配置的哈希自动滚动更新 Controller，再次提交镜像任务即可；无需卸载。
+升级前等待在运行的构建结束。更早的 Controller 若还未升级，仍按后文完成对应版本升级。
+
+不方便传文件时，可先在现有 `scripts/ci.py` 的 `pod_template(cfg, kind)` 中手动验证四处修改：
+
+1. 在 `shared = ...` 前增加 `build_uid = 0 if kind == 'image' else 1000`。
+2. builder 的 `securityContext` 中将 `runAsUser` 和 `runAsGroup` 的 `1000` 均改为 `build_uid`。
+3. 最后返回的 Pod `spec.securityContext` 中同样将两处 `1000` 改为 `build_uid`，`fsGroup` 保留 `1000`。
+4. builder 的 `build-trust` 挂载路径改为 `'/root/.ssh' if kind == 'image' else '/home/jenkins/.ssh'`。
+
+手动验证版没有新增运行配置哈希，部署后还需执行一次 `sudo kubectl -n jenkins rollout restart statefulset/jenkins`，
+再执行 `sudo kubectl -n jenkins rollout status statefulset/jenkins` 等待就绪。不要删除脚本的 root 检查或把所有任务都改成 root。
+
 ## DPDK 与内网构建目标更新（2026-11-09）
 
 本次在共享 DPDK 安装脚本中显式固定 `max_lcores=256`，并增加边界自检。

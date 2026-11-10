@@ -145,7 +145,11 @@ imageRepositories: {imageA: xnet/imagea, imageB: xnet/imageb, imageC: xnet/image
 
 这两个参数在 X-RAN-CLOUD 服务、镜像及 xcn 构建表单和历史 Parameters 页均显示，仅影响编译容器。
 `IMAGE_TAG` 仍表示产出的业务镜像标签。每次构建保存实际 Pod 返回的编译镜像 ID，不能仅凭可变 tag 判断版本。
-所选镜像须兼容 UID 1000，包含 `/bin/sh`、Python、Git、编译工具和本项目 `/opt/xran/run-build.py`；
+服务包与 xcn 的 Agent、编译容器使用 UID/GID 1000；X-RAN-CLOUD 镜像任务使用 UID/GID 0，兼容业务脚本的 root 检查。
+同一个 Pod 的 Agent 与编译容器保持相同 UID，确保共享工作区、SSH 凭据及仅属主可读的产物能正常处理。
+`xran-build-trust` 在镜像任务挂载到 `/root/.ssh`，其他任务仍挂载到 `/home/jenkins/.ssh`，继续严格校验 Git 主机。
+这由部署脚本生成的 Pod 模板控制，无需修改 Dockerfile 的 `USER`；builder 仍不使用 privileged，Docker 仍连接本次 Pod 的独立 DinD。
+所选镜像须包含 `/bin/sh`、Python、Git、编译工具和本项目 `/opt/xran/run-build.py`；
 业务镜像模式还需 Docker CLI 及 `/opt/xran/base-images.tar`；xcn 还需 Helm、PyYAML 和更新后的发布适配器。
 X-RAN-CLOUD 新任务会检查 `python3 /opt/xran/run-build.py capabilities` 返回的 `xranServiceCompatibility: 1`，
 旧镜像缺少此能力时明确提示重新制作。xcn 保留原适配器兼容逻辑。

@@ -1,3 +1,23 @@
+# X-RAN-CLOUD 镜像任务 root 兼容验收（2026-11-10）
+
+仅镜像任务的 Agent、编译容器改为 UID/GID 0，SSH 信任挂载到 `/root/.ssh`；服务包和 xcn 保持 1000。
+部署注解包含完整运行配置哈希，Pod 模板变化也会触发滚动更新。Controller、插件和编译镜像内容不变。
+
+- Python 回归 56 项通过，包含三类 Pod 的 UID/挂载/权限隔离和仅修改模板时的哈希变化。
+- 独立实例 `jenkins-reliability-verify` 的 #325 使用 UID 1000，成功通过 SSH 检出后复现“请以 root 权限运行此脚本”。
+- Helm 更新生成模板后 Controller 自动滚动重启，实际镜像 ID 不变。compat-r2 的 #326 和 sdk-r2 的 #327 均以 root 完成严格 SSH 检出及模拟业务镜像构建。
+  两个任务分别验证脚本产包、缺包从本次 DinD 自动导出；0600/root 属主的包正常归档，下载 SHA256 及导入后的断网运行通过。
+- 服务包 #328 和短负载 xcn #127 均成功，实际 Agent/builder 仍是 UID 1000；服务包及 xcn 四个产物下载校验通过。
+  首次 xcn 测试 #126 因测试 HTTP Registry 缺少对应 DinD 配置失败，修正测试流水线后通过，正式修复代码未改变。
+- 临时流水线、凭据、信任 Secret、SSH 服务及测试下载已清理；构建、Pod、锁及磁盘预留全部释放。
+  主 Jenkins 的 Pod/PVC、历史及配置快照一致，独立实例原网页设置和账号未变。
+
+证据见 [root 兼容报告](verification/image-root-compat.json)，内网步骤与临时手动修改见
+[root 兼容升级](formal-build-upgrade.md#业务镜像脚本要求-root-的兼容修复2026-11-10)。本次更新 `02-code` 后部署即可，无需重建镜像。
+X-RAN-CLOUD 使用受控模拟脚本；本轮未访问真实内网服务、重启宿主机或重复长期负载测试。
+
+---
+
 # xcn 描述及账号密码行为验收（2026-11-09）
 
 Controller `2.580.2-19` 仅统一 xcn 的任务描述，插件及编译镜像不变。
