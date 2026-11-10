@@ -7,31 +7,79 @@ Controller 19 仅统一 xcn 与 X-RAN-CLOUD 的任务描述；已有部署须按
 此前平台测试与 root 兼容修复无需重建编译镜像；业务使用 zstd 时须按下面章节更新编译镜像。
 初始化预算由部署脚本生成，更新代码后须执行 `make deploy` 更新模板；仅导入 Controller 或重启旧部署不会生成新模板。
 
+## 内网 APT 依赖冲突与小补包（2026-11-10）
+
+`apt update` 成功后，若出现 `libc6-dev` 要求 `2.35-0ubuntu3.8`、实际选中 `libc6 2.35-0ubuntu3.13`，
+以及 OpenSSL、Perl 等类似严格版本冲突，说明当前源、基础镜像与 APT 选中的包版本不能组成完整开发环境。
+`gcc is not installable` 需要检查 GCC 依赖链的候选版本；`held broken packages` 本身不能证明人为设置了 hold。
+不能用单纯重试安装来补齐缺失的配套版本；直接使用该源全新安装开发环境，需要先补齐一致的软件仓库或选择相容基础镜像。
+
+旧脚本在 `OFFLINE=0` 下切换源地址会重新准备全部 APT 依赖。现已修复：同基础镜像、同软件清单、所有文件校验通过时跨源复用缓存，
+不会因 URL 不同刷新整套依赖；新增包、更换基础镜像或损坏文件仍不会复用不匹配的缓存。APT 准备失败保留原缓存。
+仅临时手改旧脚本时，将 `scripts/compile-image.py` 中的 `matching_inputs = ...` 改为 `matching_inputs = same_packages` 即可；
+本项不替代新增 zstd 所需的 `.deb`。如果本地手动添加了 `openssh`，请核对清单；本仓库安装 SSH 客户端使用 `openssh-client`。
+
+**已有可用编译镜像，本次只需补 zstd 时，优先用约 400KB 的小补包。** 外网准备机已提供：
+
+```text
+dist/transfer/01-dependencies/optional-zstd-dev/
+```
+
+仅复制该小目录到内网，进入目录后执行。`COMPILER_IMAGE` 填之前成功使用或此次缺头文件任务实际使用的镜像，输出为新 tag：
+
+```bash
+sha256sum -c SHA256SUMS
+sudo docker build --network none --pull=false \
+    --build-arg COMPILER_IMAGE=192.168.10.35/xnet/xran-compile:latest \
+    -t 192.168.10.35/xnet/xran-compile:test-zstd .
+sudo docker push 192.168.10.35/xnet/xran-compile:test-zstd
+```
+
+该 Dockerfile 使用 `dpkg --install` 只安装本地 `libzstd-dev`；不访问 APT，不重新安装 GCC/libc 等包。
+包为 Ubuntu amd64 `1.4.8+dfsg-3build1`，要求现有镜像中的 `libzstd1` 同版本；不匹配时明确失败。
+构建内会编译、链接并运行 C 压缩解压检查；Jenkins 选择完整新 tag、`Always` 后重试，Controller 无需调整。
+该可选目录不替代通用离线依赖包，不属于全新基础 SDK 构建输入。
+
+若要从正式两个 SDK Dockerfile 重建，复制新版 `02-code` 和完整编译依赖，使用：
+
+```bash
+sudo make compile-image OFFLINE=1 \
+    APT_SOURCES=config/sources.intranet.list \
+    DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-zstd
+```
+
+原完整编译缓存已存在时，新增 zstd 可只同步 `.cache/compile-extra-apt/` 的完整新版目录及其 manifest，
+替换前将旧目录移走备份；不要把不同版本的 `.deb` 混在同一目录。其余依赖不变。
+已有内网源但没有完整缓存时，只有确认源与基础镜像能解析全部所需开发包，才使用 `OFFLINE=0` 准备。
+
+参考：[APT 选项](https://manpages.ubuntu.com/manpages/jammy/man8/apt-get.8.html)、
+[Ubuntu SSH 客户端包](https://packages.ubuntu.com/jammy/openssh-client)。
+
 ## 业务编译缺少 zstd.h（2026-11-10）
 
 `fatal error: zstd.h: No such file or directory` 表示编译环境缺少 `libzstd-dev`。
 此前两套 r2 镜像只有 `libzstd1` 运行库；公共额外依赖清单现已补上开发包，两套 Dockerfile 均会安装。
 自检新增 C 语言的头文件、链接、压缩解压验证。业务 Makefile 的 `Error 1 (ignored)` 表示忽略了错误，继续输出日志不代表编译成功。
 
-本项需更新编译镜像，Controller 和 Jenkins 部署无须调整。已有内网软件源且原依赖、基础镜像齐全时，
-同步代码后允许准备阶段访问内网 APT，Docker 编译阶段仍断网：
+本项需更新编译镜像，Controller 和 Jenkins 部署无须调整。完整编译依赖缓存齐全时，
+同步代码和缓存后使用断网重建：
 
 ```bash
-sudo make compile-image OFFLINE=0 \
+sudo make compile-image OFFLINE=1 \
     APT_SOURCES=config/sources.intranet.list \
     DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.10-compat-zstd
 sudo make push-compile-image IMAGE_TAG=26.11.10-compat-zstd
 ```
 
-`OFFLINE=0` 在这里允许从指定的内网源补充 `.deb`，并不要求访问外网；原有基础镜像、SDK 源码、工具缓存需已备齐。
+`OFFLINE=1` 不访问 APT；原有基础镜像、SDK 源码、工具缓存及更新后的额外 APT 缓存需已备齐。
 全套 SDK 版可改用 `DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-zstd`。
 在 Jenkins 的 `COMPILER_IMAGE` 选择实际推送的完整新 tag，策略选 `Always`，重新提交构建。
 
-严格使用 `OFFLINE=1` 时，应同步本次更新的 `01-dependencies/compiler-deps.tar.gz`、`MANIFEST.json` 和 `SHA256SUMS`，
+全套缓存还原可同步本次更新的 `01-dependencies/compiler-deps.tar.gz`、`MANIFEST.json` 和 `SHA256SUMS`，
 以及 `02-code`；其他依赖包未变。先校验、解包新版编译依赖，再执行上述构建命令并改为 `OFFLINE=1`。
 只更新代码、继续使用旧 `.deb` 缓存时，会因依赖清单不匹配被明确拒绝。
 
-不方便传文件时，可用现有镜像做临时补包验证。以下 `FROM` 应填写失败任务实际选择的编译镜像，使用新的输出 tag：
+内网源可正确解析 zstd 单包的依赖时，也可用现有镜像直接从源补包。以下 `FROM` 应填写失败任务实际选择的编译镜像，使用新的输出 tag：
 
 ```bash
 cat > /tmp/Dockerfile.zstd <<'EOF'

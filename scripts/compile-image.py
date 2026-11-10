@@ -110,10 +110,12 @@ def prepare_apt(args, base, cache_name='compile-apt', package_files=None):
     if lock_path.exists():
         lock = json.loads(lock_path.read_text())
         cached_inputs = lock.get('inputs', {})
-        same_packages = all(cached_inputs.get(key) == fingerprint[key] for key in ('baseImageId', 'packages'))
-        matching_inputs = same_packages and (args.offline or cached_inputs.get('sourcesSha256') == fingerprint['sourcesSha256'])
+        # The locked debs remain valid when only the mirror URL changes. Reuse
+        # verified inputs instead of resolving the entire SDK against a new mirror.
+        matching_inputs = all(cached_inputs.get(key) == fingerprint[key] for key in ('baseImageId', 'packages'))
         if matching_inputs and all((cache / name).exists() and sha256(cache / name) == digest
                                                    for name, digest in lock.get('debs', {}).items()) and lock.get('debs'):
+            print('复用已校验 APT 缓存：' + cache_name, flush=True)
             return
     if args.offline:
         raise RuntimeError('完整 APT 缓存缺失或与基础镜像/源/软件清单不符：' + cache_name +

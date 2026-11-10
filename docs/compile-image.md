@@ -51,6 +51,8 @@ protobuf、gRPC、Abseil、OpenTelemetry 和 spdlog 同时提供共享库与静�
 APT 包拆为通用工具、编译依赖、额外工具及兼容版 protobuf-c 清单；额外工具同时提供 `pkgconf`、xcn 发布需要的 PyYAML 和 `libzstd-dev`。
 `libzstd-dev` 提供业务代码使用的 `zstd.h` 及链接库。仅安装 `libzstd1` 运行库无法编译这些代码。
 公共缓存为 `.cache/compile-apt`、`.cache/compile-extra-apt`，兼容版专用缓存为 `.cache/compile-compat-apt`。
+同基础镜像、同软件清单且所有 `.deb` 校验通过时，联网和离线模式均复用缓存；只切换 APT 镜像地址不会重新解析整套 SDK 依赖。
+缓存清单保留实际下载来源的哈希。需要主动刷新时先将对应缓存目录移走备份，再准备；新增软件或更换基础镜像仍需匹配的新缓存。
 准备步骤会校验、准备两种 Dockerfile 所需的缓存，方便迁入后切换；两版自行选择安装内容。
 Helm 3.17.3 二进制及 SHA256 固定于 `config/helm.lock.json`，缓存随离线包交付。
 protobuf、gRPC、Boost 使用上述源码版本，避免再安装 APT 中不同版本的开发库。
@@ -93,6 +95,9 @@ docker run --rm --network none 192.168.10.35/xnet/xran-compile:latest bash /opt/
 
 `OFFLINE=1` 禁止准备步骤拉取基础镜像或更新 APT；缺少缓存或校验失败时直接报错。可同时指定内网 sources.list，
 已有完整缓存可以用于断网安装。需要新增或调整 APT 依赖时，应在能够访问所选软件源的准备机上重新制作缓存和离线包。
+内网源必须提供与基础镜像配套的开发包和运行库；`apt update` 成功只代表索引可下载。
+遇到 GCC 不可安装或 libc/OpenSSL 开发包严格版本不匹配时，优先使用已验证的完整缓存，或按
+[已有镜像小补包](formal-build-upgrade.md#内网-apt-依赖冲突与小补包2026-11-10) 为现有 SDK 只补 zstd。
 
 验证脚本以镜像默认 UID/GID 1000 执行 protobuf 代码生成、主要 SDK 的编译/链接/运行、ASN.1 工具和共享库加载检查。
 还会检查上述软件包的安装状态及实际文件校验值，并用标准 include/library 路径验证 protobuf-c 头文件与运行库一致。

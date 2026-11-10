@@ -1,0 +1,86 @@
+{
+  "status": "PASS",
+  "date": "2026-11-10",
+  "baselineCommit": "7dda91473cd495d335de36376217bd7dc18e4fe0",
+  "sourceFingerprint": "3d2311f351f3aafc1f9202ba15dc78f0dd2d51d0321b461e706fe314f43b964a",
+  "files": {
+    "scripts/compile-image.py": "854f6466d0b09f4059183b1a8bc745210555ae2b1b0294db9d1e822307b14f59",
+    "tests/test_compile_image.py": "ab5a361fae03467ba5c95034c7bb9e529846c60b5141b923c20addf7c29e1848"
+  },
+  "pythonRegression": {
+    "tests": 58,
+    "result": "OK",
+    "logSha256": "c95a5f923dbc0134e70f1acf8f213088b3a6f0649efe9656a1687495f738c10f"
+  },
+  "realCacheReuse": [
+    {
+      "cache": "compile-apt",
+      "sourceFile": "config/sources.intranet.list",
+      "offline": false,
+      "manifestUnchanged": true,
+      "manifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b"
+    },
+    {
+      "cache": "compile-extra-apt",
+      "sourceFile": "config/sources.intranet.list",
+      "offline": false,
+      "manifestUnchanged": true,
+      "manifestSha256": "05892a8053b5d3425f9245f112e7a0e7a43779b296bf56faf85cd057f6118406"
+    },
+    {
+      "cache": "compile-compat-apt",
+      "sourceFile": "config/sources.intranet.list",
+      "offline": false,
+      "manifestUnchanged": true,
+      "manifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1"
+    }
+  ],
+  "addon": {
+    "path": "dist/transfer/01-dependencies/optional-zstd-dev",
+    "bytes": 404369,
+    "files": {
+      "SHA256SUMS": "1d72cf3d7e03c313bd80020282b87177f2deab516c3ca6dc8799f65a06cdb0e8",
+      "README.md": "9df84453f59fd1793866030b2d113e2d05256e991e9b8f229b1fa279483c1e2c",
+      "Dockerfile": "b95e090839a78e1fdf8a9038ea24844edf421a91946a1af1cf120042c1e2f682",
+      "SOURCE.json": "449468c572951e9855598076c3fdfdcb3904509edb5f97d5a8fe7fb3a8c13b86",
+      "zstd-check.c": "9fdf6e4e8eae6a7321ca8d42311af4d686f4404f307e1a4d32c747090ac85853",
+      "libzstd-dev_1.4.8+dfsg-3build1_amd64.deb": "971297916405f1f184ec0ee5f18734b448a80b45813fe40ff2e00b77609689e7"
+    },
+    "dockerfile": "ARG COMPILER_IMAGE=192.168.10.35/xnet/xran-compile:latest\nFROM ${COMPILER_IMAGE}\nUSER 0:0\nCOPY libzstd-dev_*.deb zstd-check.c /tmp/zstd-deps/\nRUN dpkg --install /tmp/zstd-deps/*.deb \\\n    && gcc -Wall -Wextra -Werror /tmp/zstd-deps/zstd-check.c -lzstd -o /tmp/zstd-check \\\n    && /tmp/zstd-check \\\n    && dpkg-query -W > /opt/packages.lock \\\n    && rm -rf /tmp/zstd-deps /tmp/zstd-check\nUSER 1000:1000\n",
+    "checks": [
+      {
+        "base": "192.168.10.35/xnet/xran-compile:26.11.08-compat-r2",
+        "baseImageId": "sha256:7fcfcb7cffccfea8c911ac93d3de42f108257a7e3fbbce676291e9240a688ca4",
+        "image": "xran-ci/verify-zstd-addon-compat:1",
+        "imageId": "sha256:98e126f1ac692d251a6edb69af004c66dc2b3a777d8a64a185525a7f13ed4fe7",
+        "network": "none",
+        "defaultUid": 1000,
+        "onlyPackageChanges": {
+          "libzstd-dev:amd64": "1.4.8+dfsg-3build1"
+        },
+        "removedPackages": [],
+        "compressionRoundTrip": "PASS",
+        "buildLogSha256": "f0e8bcb79a23fa2e2b956881c7e11dcf0438f62fba730964aaad9cafa226bc40"
+      },
+      {
+        "base": "192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2",
+        "baseImageId": "sha256:452ecad8aea4cbc645599867d64b4e13697a6f38796a31d5162945ee89e226f8",
+        "image": "xran-ci/verify-zstd-addon-sdk:1",
+        "imageId": "sha256:470f45d52d6a6a0a976ae191dc4a403bd98bd2236a7ad75c86d12535096b89cf",
+        "network": "none",
+        "defaultUid": 1000,
+        "onlyPackageChanges": {
+          "libzstd-dev:amd64": "1.4.8+dfsg-3build1"
+        },
+        "removedPackages": [],
+        "compressionRoundTrip": "PASS",
+        "buildLogSha256": "4f13605240fb6bd03c6853910e8bd619501a21e66821cf637b943df89bbfe4f0"
+      }
+    ]
+  },
+  "limitations": [
+    "Intranet repository and private business compilation remain unavailable",
+    "No Jenkins deployment, Controller rebuild or source mirror repair in this change"
+  ],
+  "downloadInvocations": 0
+}

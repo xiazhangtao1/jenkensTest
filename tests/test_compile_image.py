@@ -98,7 +98,7 @@ class CompilerTests(unittest.TestCase):
             self.assertIn('非法镜像名称或 tag', result.stdout + result.stderr)
             self.assertFalse(sentinel.exists())
 
-    def test_offline_apt_cache_accepts_internal_source_without_network(self):
+    def test_verified_apt_cache_survives_mirror_change_in_both_modes(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             config = root / 'config'; config.mkdir()
@@ -114,10 +114,57 @@ class CompilerTests(unittest.TestCase):
             with patch.object(compiler, 'ROOT', root), patch.object(compiler, 'CACHE', root / '.cache'), \
                  patch.object(compiler, 'inspect', return_value={'Id': 'base-id'}), \
                  patch.object(compiler, 'run', side_effect=AssertionError('offline network invocation')):
-                compiler.prepare_apt(args, 'ubuntu:22.04')
+                original_manifest = (cache / 'manifest.json').read_bytes()
+                for offline in (True, False):
+                    args.offline = offline
+                    compiler.prepare_apt(args, 'ubuntu:22.04')
+                    self.assertEqual((cache / 'manifest.json').read_bytes(), original_manifest)
+                args.offline = True
                 deb.write_bytes(b'corrupt')
                 with self.assertRaisesRegex(RuntimeError, '完整 APT 缓存缺失'):
                     compiler.prepare_apt(args, 'ubuntu:22.04')
+
+    def test_apt_cache_input_changes_are_not_reused_offline(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            config = root / 'config'; config.mkdir()
+            (config / 'apt-packages.txt').write_text('gcc\n')
+            (config / 'compile-apt-packages.txt').write_text('meson\n')
+            (config / 'sources.list').write_text('deb http://192.168.10.36/ubuntu_22_04/ jammy main\n')
+            cache = root / '.cache/compile-apt'; cache.mkdir(parents=True)
+            deb = cache / 'gcc.deb'; deb.write_bytes(b'verified-deb')
+            lock = {'inputs': {'baseImageId': 'base-id', 'sourcesSha256': 'other-mirror',
+                              'packages': ['gcc', 'meson']}, 'debs': {deb.name: compiler.sha256(deb)}}
+            args = SimpleNamespace(offline=True, apt_sources='config/sources.list')
+            with patch.object(compiler, 'ROOT', root), patch.object(compiler, 'CACHE', root / '.cache'), \
+                 patch.object(compiler, 'inspect', return_value={'Id': 'base-id'}), \
+                 patch.object(compiler, 'run', side_effect=AssertionError('offline network invocation')):
+                for changes in [{'baseImageId': 'different-base'}, {'packages': ['gcc']}]:
+                    changed = dict(lock, inputs=dict(lock['inputs'], **changes))
+                    (cache / 'manifest.json').write_text(json.dumps(changed))
+                    with self.subTest(changes=changes), self.assertRaisesRegex(RuntimeError, '完整 APT 缓存缺失'):
+                        compiler.prepare_apt(args, 'ubuntu:22.04')
+
+    def test_failed_apt_preparation_preserves_previous_cache(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            config = root / 'config'; config.mkdir()
+            (config / 'packages.txt').write_text('libzstd-dev pkgconf python3-yaml\n')
+            (config / 'sources.list').write_text('deb http://192.168.10.36/ubuntu_22_04/ jammy main\n')
+            cache = root / '.cache/compile-extra-apt'; cache.mkdir(parents=True)
+            deb = cache / 'pkgconf.deb'; deb.write_bytes(b'verified-deb')
+            (cache / 'manifest.json').write_text(json.dumps({'inputs': {'baseImageId': 'base-id',
+                'sourcesSha256': 'old-mirror', 'packages': ['pkgconf', 'python3-yaml']},
+                'debs': {deb.name: compiler.sha256(deb)}}))
+            before = {p.name: p.read_bytes() for p in cache.iterdir()}
+            args = SimpleNamespace(offline=False, apt_sources='config/sources.list', prepare_network='host')
+            with patch.object(compiler, 'ROOT', root), patch.object(compiler, 'CACHE', root / '.cache'), \
+                 patch.object(compiler, 'inspect', return_value={'Id': 'base-id'}), \
+                 patch.object(compiler, 'run', side_effect=subprocess.CalledProcessError(100, ['apt-get'])) as execute:
+                with self.assertRaises(subprocess.CalledProcessError):
+                    compiler.prepare_apt(args, 'ubuntu:22.04', 'compile-extra-apt', ['config/packages.txt'])
+                self.assertEqual(execute.call_count, 1)  # A new package still requires preparation.
+                self.assertEqual({p.name: p.read_bytes() for p in cache.iterdir()}, before)
 
 
 if __name__ == '__main__':

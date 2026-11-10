@@ -13,6 +13,7 @@
 - `02-code`：完整的 `code.tar.gz`，以及 `CODE.json`、`DEPENDENCIES.json`、`SHA256SUMS`。全新目录不能只带 `code.patch`；外网执行 `make transfer-code` 生成完整包。
 
 `optional-verification-tools*` 仅供浏览器验收，可省略。`03-generated-images` 是可选成品，内网执行 `make images` 会制作 Controller、编译镜像和 xcn 基础镜像载体。
+`01-dependencies/optional-zstd-dev/` 是约 400KB 的可选小补包，只用于给已有 SDK 镜像补 zstd 开发文件；完整离线重建不需要它。
 全新安装无需旧 Jenkins HOME 备份、外网账号文件、模拟业务仓库或 `.git` 历史。
 目标机仍需先有 Kubernetes/containerd；本项目不提供集群安装离线包。Python/PyYAML、make、Git、Docker 等基础软件可从内网 apt 安装。
 站点 IP/存储、Gerrit 私钥与主机信任、Harbor 登录和实际需要的 CA/拉取 Secret 在目标环境另配，不包含在通用包中。
@@ -20,6 +21,7 @@
 | 分类 | 路径 | 内容 | 何时拷贝 |
 | --- | --- | --- | --- |
 | 外部依赖 | `01-dependencies/compiler-deps.tar.gz` | compileDep 整理的固定源码/分片、deb、Helm、Ubuntu 业务基础镜像 | 首次或编译依赖变化 |
+| 可选小补包 | `01-dependencies/optional-zstd-dev/` | 单个 zstd 开发包、校验值、断网增量 Dockerfile 和 C 自检 | 已有编译镜像仅缺 `zstd.h` 时；不替代完整依赖包 |
 | 外部依赖 | `01-dependencies/jenkins-deps.tar.gz` | 官方 Jenkins 插件、Maven 缓存、Helm chart、kubectl/helm/ctr | 首次或平台依赖变化 |
 | 外部基础镜像 | `01-dependencies/build-base-images.tar` | Ubuntu 22.04、Jenkins 官方基础镜像、Docker CLI、Maven/JDK | 首次或基础镜像版本变化 |
 | 外部运行镜像 | `01-dependencies/runtime-base-images.tar` | Agent、DinD、Registry、local-path、busybox | 首次或版本变化；已有镜像可复用 |
