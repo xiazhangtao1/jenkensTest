@@ -1,0 +1,142 @@
+{
+  "status": "PASS",
+  "date": "2026-11-10",
+  "baselineCommit": "7694a8762ae61c31f6c4852a27c7023103dc9648",
+  "sourceFingerprint": "a1f5e7a86ada65c68831a947378798b08396a5ecbb97e803399ca1f3a74a7e09",
+  "files": {
+    "config/compiler-extra-apt-packages.txt": "949c210df8e71de587f80afb3aded5a6ddbf94b632f0613ca522ab005beb6577",
+    "runtime/verify-compile.sh": "b16b8fadf23c3002053eccdd873ed9e7213c8a26872efa51f3943e099e07ee6d",
+    "runtime/compile-check/CMakeLists.txt": "03519e1bedb7614957dcce8d1b69fa4bfcffed34a19f8049ef12330ddb51608a",
+    "runtime/compile-check/readline-check.c": "0bc0a5525832bae7af2ff568fa5d19a4f37122cf44a08274024119daea12ecab"
+  },
+  "pythonRegression": {
+    "tests": 58,
+    "result": "OK",
+    "logSha256": "29cd85de2dfe64c7cd9f67a96215e19cb58b5f76a5660f7bf71001294dfee273"
+  },
+  "before": [
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.10-compat-hwloc",
+      "imageId": "sha256:5cc6b1118d7e7189e7202a76ab7d20ffef4dff8a241ea77fdbd497955856a2e5",
+      "exitCode": 1,
+      "stderr": "/tmp/readline-check.c:4:10: fatal error: readline/readline.h: No such file or directory\n    4 | #include <readline/readline.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n",
+      "user": "1000:1000"
+    },
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.10-sdk-hwloc",
+      "imageId": "sha256:20d8ab69616033d1935e4bc68aecc0561e874a937e7b79fdb589d8ba1085cea6",
+      "exitCode": 1,
+      "stderr": "/tmp/readline-check.c:4:10: fatal error: readline/readline.h: No such file or directory\n    4 | #include <readline/readline.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n",
+      "user": "1000:1000"
+    }
+  ],
+  "sdkImages": [
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.10-compat-readline",
+      "imageId": "sha256:7b5e268fdb63171e939b075ad7cd4675311987a764299f4ee79f2aaecd5e3237",
+      "originalImage": "192.168.10.35/xnet/xran-compile:26.11.10-compat-hwloc",
+      "originalImageId": "sha256:5cc6b1118d7e7189e7202a76ab7d20ffef4dff8a241ea77fdbd497955856a2e5",
+      "originalUnchanged": true,
+      "uid": 1000,
+      "gid": 1000,
+      "selectedPackages": {
+        "libhwloc-dev:amd64": "2.7.0-2ubuntu1",
+        "libncurses-dev:amd64": "6.3-2ubuntu0.3",
+        "libprotobuf-c-dev:amd64": "1.3.3-1ubuntu2.1",
+        "libreadline-dev:amd64": "8.1.2-1",
+        "libreadline8:amd64": "8.1.2-1",
+        "libtinfo6:amd64": "6.3-2ubuntu0.3",
+        "libzstd-dev:amd64": "1.4.8+dfsg-3build1"
+      },
+      "newOrChangedPackages": {
+        "libncurses-dev:amd64": "6.3-2ubuntu0.3",
+        "libncurses6:amd64": "6.3-2ubuntu0.3",
+        "libncursesw6:amd64": "6.3-2ubuntu0.3",
+        "libreadline-dev:amd64": "8.1.2-1",
+        "libtinfo6:amd64": "6.3-2ubuntu0.3"
+      },
+      "removedPackages": [],
+      "network": "none",
+      "ctestPassed": 8,
+      "buildAndVerificationLogSha256": "3d45e41ba9f1ef5dbbd7ecb7d5b312c7dfb4c3a1af4df8cae83194821314d5ba",
+      "validationDockerfile": "FROM 192.168.10.35/xnet/xran-compile:26.11.10-compat-hwloc\nUSER 0:0\nCOPY .cache/compile-extra-apt/ /tmp/extra-apt/\nRUN apt-get install -y --no-install-recommends /tmp/extra-apt/*.deb \\\n    && dpkg-query -W > /opt/packages.lock && rm -rf /tmp/extra-apt /var/lib/apt/lists/*\nCOPY runtime/compile-check/ /opt/xran/compile-check/\nCOPY runtime/verify-compile.sh /opt/xran/verify-compile.sh\nUSER 1000:1000\nWORKDIR /home/jenkins/agent\nCMD [\"sleep\", \"infinity\"]\n"
+    },
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.10-sdk-readline",
+      "imageId": "sha256:c25514c7d10f69e1d0eda074b052abb5193b49c8b9b933a06d63ba12ba020b8e",
+      "originalImage": "192.168.10.35/xnet/xran-compile:26.11.10-sdk-hwloc",
+      "originalImageId": "sha256:20d8ab69616033d1935e4bc68aecc0561e874a937e7b79fdb589d8ba1085cea6",
+      "originalUnchanged": true,
+      "uid": 1000,
+      "gid": 1000,
+      "selectedPackages": {
+        "libhwloc-dev:amd64": "2.7.0-2ubuntu1",
+        "libncurses-dev:amd64": "6.3-2ubuntu0.3",
+        "libprotobuf-c-dev": "1.5.2-1xran1",
+        "libreadline-dev:amd64": "8.1.2-1",
+        "libreadline8:amd64": "8.1.2-1",
+        "libtinfo6:amd64": "6.3-2ubuntu0.3",
+        "libzstd-dev:amd64": "1.4.8+dfsg-3build1"
+      },
+      "newOrChangedPackages": {
+        "libncurses-dev:amd64": "6.3-2ubuntu0.3",
+        "libncurses6:amd64": "6.3-2ubuntu0.3",
+        "libncursesw6:amd64": "6.3-2ubuntu0.3",
+        "libreadline-dev:amd64": "8.1.2-1",
+        "libtinfo6:amd64": "6.3-2ubuntu0.3"
+      },
+      "removedPackages": [],
+      "network": "none",
+      "ctestPassed": 8,
+      "buildAndVerificationLogSha256": "025508acbb3b92f3c460c68d3750a39a9565f55c061f4eb2f0c32e90b2d03122",
+      "validationDockerfile": "FROM 192.168.10.35/xnet/xran-compile:26.11.10-sdk-hwloc\nUSER 0:0\nCOPY .cache/compile-extra-apt/ /tmp/extra-apt/\nRUN apt-get install -y --no-install-recommends /tmp/extra-apt/*.deb \\\n    && dpkg-query -W > /opt/packages.lock && rm -rf /tmp/extra-apt /var/lib/apt/lists/*\nCOPY runtime/compile-check/ /opt/xran/compile-check/\nCOPY runtime/verify-compile.sh /opt/xran/verify-compile.sh\nUSER 1000:1000\nWORKDIR /home/jenkins/agent\nCMD [\"sleep\", \"infinity\"]\n"
+    }
+  ],
+  "method": "Reuse verified SDK images; build the identical extra-APT installation layer used by both production Dockerfiles and copy current SDK checks. Build and all eight SDK CTests use network none. SDK sources were not rebuilt end to end.",
+  "extraAptCache": {
+    "path": ".cache/compile-extra-apt",
+    "manifestSha256": "5c77e3c8ab54005d79a05c81f6e4d79cffb8e4c59d5b5a1ac9d1461ac425cb6c",
+    "packages": [
+      "libhwloc-dev",
+      "libreadline-dev",
+      "libzstd-dev",
+      "pkgconf",
+      "python3-yaml"
+    ],
+    "debCount": 62,
+    "bytes": 32016274,
+    "allDebChecksumsAndUniquePackageVersionsVerified": true,
+    "previous57DebsUnchanged": true,
+    "newDebs": {
+      "libncurses-dev_6.3-2ubuntu0.3_amd64.deb": "e51d55c365b957b442a1cef83256e4c3f71a66a743e5ba972a902f2da6b1123e",
+      "libncurses6_6.3-2ubuntu0.3_amd64.deb": "38f97a45931ab6f296be017344afc45e5ccbf83f24896f79625318691a9bebf8",
+      "libncursesw6_6.3-2ubuntu0.3_amd64.deb": "734107c126c2685508e4186f6be65f4edc0d393f1bc1cb4c307a76d1beb09496",
+      "libreadline-dev_8.1.2-1_amd64.deb": "c30b3af432e58094d33fdd852c13f3c96460b8d778dd1f8f155aa9fca5758b86",
+      "libtinfo6_6.3-2ubuntu0.3_amd64.deb": "3b8dff43a31168f5020928f2ab9a97324c5b47ae708311781f6bd01306c96214"
+    },
+    "newDebBytes": 909878
+  },
+  "dependencyDelivery": {
+    "changedPackages": [
+      "compiler-deps.tar.gz"
+    ],
+    "compilerPackageSha256": "82fe30c08073c60225c602f3c56959de171c78e4b22c26b42d7e3aeb55700a91",
+    "compilerPackageBytes": 557675245,
+    "extraAptArchiveFilesVerified": 63,
+    "otherComponentsUnchanged": true,
+    "changedCompilerFiles": [
+      ".cache/compile-extra-apt/libncurses-dev_6.3-2ubuntu0.3_amd64.deb",
+      ".cache/compile-extra-apt/libncurses6_6.3-2ubuntu0.3_amd64.deb",
+      ".cache/compile-extra-apt/libncursesw6_6.3-2ubuntu0.3_amd64.deb",
+      ".cache/compile-extra-apt/libreadline-dev_8.1.2-1_amd64.deb",
+      ".cache/compile-extra-apt/libtinfo6_6.3-2ubuntu0.3_amd64.deb",
+      ".cache/compile-extra-apt/manifest.json"
+    ]
+  },
+  "limitations": [
+    "Private intranet business compilation is unavailable; known SDK tests cannot establish all private application dependencies.",
+    "No access to intranet APT/Gerrit/Harbor.",
+    "No Controller rebuild or Jenkins deployment; existing SDK image tags were preserved.",
+    "Existing SDK layers were reused; SDK sources were not rebuilt end to end."
+  ]
+}

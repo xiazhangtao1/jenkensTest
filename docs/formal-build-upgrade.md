@@ -4,8 +4,44 @@
 Controller 19 仅统一 xcn 与 X-RAN-CLOUD 的任务描述；已有部署须按 [升级 Jenkins](#升级-jenkins) 更新 Controller，编译镜像不变。
 支持两个编译 Dockerfile，保留 `pkgconf`、DPDK 非交互输入、服务串行及取消 `all` 的修复；新增旧版业务镜像缺包自动导出和项目可见性开关。
 此前 Controller 18 关闭离线页面的 Jenkins 使用统计请求，固定 local-path helper 镜像 tag，并将 xcn 基础镜像复制初始化容器从 128MiB 调整为 1GiB，避免文件缓存触发 OOM；新增 [完整回归与持续构建验收](reliability.md)。
-此前平台测试与 root 兼容修复无需重建编译镜像；业务使用 zstd 或 hwloc 时须按下面章节更新编译镜像。
+此前平台测试与 root 兼容修复无需重建编译镜像；业务使用 zstd、hwloc 或 readline 时须按下面章节更新编译镜像。
 初始化预算由部署脚本生成，更新代码后须执行 `make deploy` 更新模板；仅导入 Controller 或重启旧部署不会生成新模板。
+
+## CLI 编译缺少 readline/readline.h（2026-11-10）
+
+`fatal error: readline/readline.h: No such file or directory` 需要补装 `libreadline-dev`。
+已有 `libreadline8` 运行库不包含开发头文件；`cli_client.o`、`cli` 缺失及后续复制失败都是此错误的结果。
+公共额外依赖清单已增加开发包，两套 Dockerfile 都会安装，完整缓存同时包含其 `libncurses-dev` 等依赖。
+镜像自检新增 readline 头文件编译、链接、从文件读取一行及历史记录 API 检查，不等待人工输入。
+
+已有完整内网环境，本次同步两项：
+
+1. 最新 `dist/transfer/02-code/`，校验并解包，保留内网 `config/site.local.yaml`。
+2. 外网项目中完整的 `.cache/compile-extra-apt/`，包括全部 `.deb` 和 `manifest.json`，
+   完整替换内网同名目录；将旧目录移走备份，不混合不同版本的包。
+
+此次缓存同时保留此前新增的 zstd、hwloc 和其他额外依赖，不是只提供 readline 单包。
+其他 APT 缓存、SDK 源码和基础镜像不变。全新部署用新版 `01-dependencies/` 和 `02-code/`；
+本轮只有 `compiler-deps.tar.gz` 及依赖清单变化，其他依赖包可继续复用。
+
+在内网项目根目录构建并推送新 tag：
+
+```bash
+sudo make compile-image OFFLINE=1 \
+    APT_SOURCES=config/sources.intranet.list \
+    DOCKERFILE=docker/builder-compat.Dockerfile \
+    IMAGE_TAG=26.11.10-compat-readline
+sudo make push-compile-image IMAGE_TAG=26.11.10-compat-readline
+```
+
+全套 SDK 版使用 `DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.10-sdk-readline`。
+Jenkins 的 `COMPILER_IMAGE` 选择实际推送的完整新地址，例如
+`192.168.10.35/xnet/xran-compile:26.11.10-compat-readline`，拉取策略选 `Always` 后重试。
+无需重建 Controller 或重新部署 Jenkins；仅更新代码和缓存不会改变已推送的镜像。
+
+本地 SDK 自检无法替代当前不可访问的私有业务编译。原 Makefile 的 `Error 1 (ignored)` 说明错误被忽略，
+继续打印链接命令不代表前一步成功；现有业务脚本在 CLI 文件缺失时停止制作镜像是正确行为。
+包说明见 [Ubuntu libreadline-dev](https://packages.ubuntu.com/jammy/libreadline-dev)。
 
 ## 业务编译缺少 hwloc.h（2026-11-10）
 

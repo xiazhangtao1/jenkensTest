@@ -4,8 +4,8 @@
 
 此前 DPDK 固定参数和内网目标列表更新只需新的 `02-code`；既有 r2 镜像已验证为 256，无需重复拷贝编译镜像。
 本次 xcn 描述随 Controller 19 更新；旧站点带入 `02-code` 后只需重建 Controller，也可另带其成品，见 [升级 Jenkins](formal-build-upgrade.md#升级-jenkins)。
-业务编译新增 `libhwloc-dev` 和 zstd 开发依赖时，已有完整环境需同步新版 `02-code` 和完整
-`.cache/compile-extra-apt/`，再重建、推送编译镜像；不能只带代码。具体见 [hwloc 更新](formal-build-upgrade.md#业务编译缺少-hwloch2026-11-10)。
+业务编译新增 readline、hwloc 和 zstd 开发依赖时，已有完整环境需同步新版 `02-code` 和完整
+`.cache/compile-extra-apt/`，再重建、推送编译镜像；不能只带代码。具体见 [readline 更新](formal-build-upgrade.md#cli-编译缺少-readlinereadlineh2026-11-10)。
 
 ## 全新服务器最少携带
 

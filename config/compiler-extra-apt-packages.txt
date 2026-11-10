@@ -2,3 +2,4 @@ python3-yaml
 pkgconf
 libzstd-dev
 libhwloc-dev
+libreadline-dev

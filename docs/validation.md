@@ -1,3 +1,17 @@
+# Readline 开发依赖补齐验收（2026-11-10）
+
+公共额外依赖新增 `libreadline-dev`，两套 Dockerfile 共用；缓存同时包含匹配的 ncurses 开发及运行依赖。
+
+- 两套 hwloc SDK 镜像均实际复现 `readline/readline.h` 缺失。安装新版额外依赖并复制当前自检后，断网构建及默认 UID/GID 1000 的完整 SDK 自检通过。
+- 每套 8 项 CTest 全部通过。新增 Readline 检查以 `-Wall -Wextra -Werror` 编译链接，从临时文件读取输入并验证历史 API，不需要终端或人工输入；设有 10 秒超时。
+- Python 回归 58 项通过。新版额外缓存包含 62 个 `.deb`，校验及单一包版本检查通过；此前 57 个包逐字节未变，仅新增下载约 910KB。
+
+本轮复用已有 SDK 层，未从头重编 SDK 源码或编译私有业务；未连接内网 APT/Gerrit/Harbor。
+Controller、Jenkins 部署和此前镜像 tag 未变。证据见 [Readline 报告](verification/readline.json)，
+操作见 [Readline 更新](formal-build-upgrade.md#cli-编译缺少-readlinereadlineh2026-11-10)。
+
+---
+
 # hwloc 开发依赖补齐验收（2026-11-10）
 
 公共额外依赖新增 `libhwloc-dev`，同时交付匹配的运行库；两套编译 Dockerfile 共享此清单。
