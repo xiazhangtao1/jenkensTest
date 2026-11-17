@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
@@ -20,6 +21,46 @@ def memory(value):
 
 
 class ConfigurationTests(unittest.TestCase):
+    def test_direct_node_admission_binds_both_pending_claims(self):
+        calls = []
+        def kubectl(*args, **kwargs):
+            calls.append(args)
+            if 'get' in args and 'pvc' in args:
+                bound = sum('annotate' in call for call in calls) >= 2
+                return json.dumps({'items': [{'metadata': {'name': name}, 'status': {'phase': 'Bound' if bound else 'Pending'}}
+                                            for name in ('jenkins', 'xran-git-cache')]})
+            if 'get' in args and 'pod' in args:
+                return json.dumps({'spec': {'nodeName': 'test-node'}})
+            return ''
+        cfg = {'namespace': 'test-only', 'release': 'jenkins', 'jenkinsUrl': 'http://test/'}
+        with tempfile.TemporaryDirectory() as folder, patch.object(ci, 'state_dir', return_value=Path(folder)), \
+             patch.object(ci, 'create_namespace'), patch.object(ci, 'users_secret'), patch.object(ci, 'run'), \
+             patch.object(ci, 'kubectl', side_effect=kubectl), patch.object(ci.time, 'sleep'):
+            ci.apply_deployment(cfg)
+        annotations = [call for call in calls if 'annotate' in call]
+        self.assertEqual({call[4] for call in annotations}, {'jenkins', 'xran-git-cache'})
+        self.assertTrue(all(call[-1] == 'volume.kubernetes.io/selected-node=test-node' for call in annotations))
+
+    def test_git_cache_delivery_and_persistence_do_not_change_build_resources(self):
+        args = SimpleNamespace(site=REPO/'config/site.intranet.yaml', namespace=None, offline=True)
+        with tempfile.TemporaryDirectory() as folder, patch.object(ci,'state_dir',return_value=Path(folder)):
+            cfg=ci.render(args)
+            resources=list(yaml.safe_load_all((Path(folder)/'resources.yaml').read_text()))
+            pvc=next(r for r in resources if r['kind']=='PersistentVolumeClaim' and r['metadata']['name']=='xran-git-cache')
+            self.assertEqual(pvc['spec']['resources']['requests']['storage'],'20Gi')
+            self.assertEqual(pvc['metadata']['annotations']['helm.sh/resource-policy'],'keep')
+            config=next(r for r in resources if r['kind']=='ConfigMap')['data']
+            self.assertEqual(config['git_checkout.py'],(REPO/'runtime/git_checkout.py').read_text())
+            values=yaml.safe_load((Path(folder)/'values.yaml').read_text())
+            self.assertTrue(any(v.get('persistentVolumeClaim',{}).get('claimName')=='xran-git-cache' for v in values['persistence']['volumes']))
+            init=values['controller']['customInitContainers'][0]
+            self.assertNotIn('-R',' '.join(init['command']))
+            for kind in ('service','image','xcn'):
+                pod=ci.pod_template(cfg,kind)
+                self.assertEqual(pod['spec']['securityContext']['fsGroupChangePolicy'],'OnRootMismatch')
+                builder=next(c for c in pod['spec']['containers'] if c['name']=='builder')
+                self.assertTrue(any(v['name']=='git-checkout' and v['readOnly'] for v in builder['volumeMounts']))
+
     def test_both_pod_profiles_enforce_total_resources(self):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False))
         self.assertEqual(cfg['concurrency'], 6)

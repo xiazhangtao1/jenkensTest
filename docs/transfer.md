@@ -2,6 +2,9 @@
 
 当前项目目录是构建工作区，`.cache` 中既有依赖也有构建时使用的镜像归档。日常搬运统一使用 `dist/transfer/`，无需反复复制整个项目或 `.cache`。
 
+Git 本地缓存升级只需新的 `02-code`；在内网单独重建 Controller 21 并部署，不必重建编译镜像或重传依赖。
+部署新增独立缓存 PVC，业务源码缓存不随离线包搬运。命令及回退见 [Git 缓存升级](git-cache.md#内网升级)。
+
 本次 APT 清单合并只需更新 `02-code`，无需重传依赖或重建镜像。覆盖解压代码不会移除旧文件，
 更新已有内网代码目录后，在项目根目录执行 `rm -f config/apt-packages.txt`；其内容已合入 `config/compile-apt-packages.txt`。
 

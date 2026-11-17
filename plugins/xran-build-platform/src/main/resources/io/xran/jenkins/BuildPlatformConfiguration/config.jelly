@@ -33,6 +33,25 @@
         <f:checkbox checked="${instance.form.xranServiceSerial}" />
         <div class="jenkins-help">适用于服务包及镜像任务中的服务编译。关闭后遵循业务脚本原有并行设置；不影响 Jenkins 全局并发。</div>
       </f:entry>
+      <f:entry title="启用 Git 本地缓存" field="gitCacheEnabled">
+        <f:checkbox checked="${instance.form.gitCacheEnabled}" />
+        <div class="jenkins-help">所有项目完整缓存分支和 tag，后续增量更新；每次构建使用独立源码副本。</div>
+      </f:entry>
+      <f:entry title="所有项目 Git 缓存合计预算（GiB）" field="gitCacheMaxGiB">
+        <f:number value="${instance.form.gitCacheMaxGiB}" min="1" max="1048576" step="1" />
+        <div class="jenkins-help">不是预占空间或 PVC 硬配额。超预算回收最久未使用的闲置缓存，忙碌缓存会暂时保留。磁盘压力先回收未保留历史产物，再回收缓存。</div>
+      </f:entry>
+      <f:entry title="Git 缓存状态">
+        <pre style="white-space:pre-wrap;max-height:18rem;overflow:auto">${instance.gitCacheStatus}</pre>
+      </f:entry>
+      <f:entry title="清空指定项目 Git 缓存">
+        <select name="gitCacheProject" class="jenkins-select">
+          <j:forEach var="name" items="${instance.managedProjectNames}">
+            <option value="${name}">${name}</option>
+          </j:forEach>
+        </select>
+        <f:validateButton title="清空缓存" progress="清理中…" method="clearGitCache" with="gitCacheProject" />
+      </f:entry>
       <f:entry title="服务包 Pod CPU 总上限（核）" field="serviceCpu">
         <f:number value="${instance.form.serviceCpu}" min="2" max="128" step="1" />
       </f:entry>

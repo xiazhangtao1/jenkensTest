@@ -47,7 +47,8 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
                     state.put("settings", PlatformSettings.validate(upgraded));
                     state.put("version", state.optLong("version") + 1);
                     state.put("applyError", "等待应用配置");
-                    audit(before, upgraded, before.containsKey("xranServiceSerial") ? "job-visibility-upgrade" : "build-compatibility-upgrade");
+                    audit(before, upgraded, !before.containsKey("gitCacheEnabled") ? "git-cache-upgrade" :
+                            (before.containsKey("xranServiceSerial") ? "job-visibility-upgrade" : "build-compatibility-upgrade"));
                     persist();
                 }
             }
@@ -96,6 +97,7 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
             state.put("projectCatalog", catalog);
             persist();
         }
+        GitCache.get().initialize(getManagedProjectNames());
         prune();
         apply();
     }
@@ -145,6 +147,36 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
     public synchronized Map<String, Object> effective(String profile) {
         admin();
         return PlatformSettings.runtime(settings(), profile);
+    }
+
+    public synchronized String getGitCacheStatus() {
+        admin();
+        try {
+            var status = GitCache.get().status(settings().getLong("gitCacheMaxGiB") * 1073741824L);
+            StringBuilder text = new StringBuilder("所有项目合计 " + status.get("bytes") + " 字节；预算 " + status.get("budgetBytes") + " 字节");
+            if (!Boolean.TRUE.equals(status.get("available"))) text.append("；缓存 PVC 未挂载");
+            if (Boolean.TRUE.equals(status.get("overBudget"))) text.append("；超预算，维护时回收闲置缓存；频繁重新下载时请调大预算");
+            for (Object item : (List<?>) status.get("entries")) {
+                Map<?, ?> entry = (Map<?, ?>) item;
+                String updated = entry.get("lastUpdatedAt").toString();
+                if (updated.matches("[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?")) updated = java.time.Instant.ofEpochMilli((long) (Double.parseDouble(updated) * 1000)).toString();
+                else updated = "尚未成功更新";
+                text.append("\n项目：").append(entry.get("project")).append("；占用：").append(entry.get("bytes"))
+                    .append(" 字节；最后成功更新：").append(updated).append("；状态：").append(entry.get("status"));
+                if (!entry.get("lastError").toString().isEmpty()) text.append("；错误：").append(entry.get("lastError"));
+            }
+            return text.toString();
+        } catch (IOException | RuntimeException e) { return "缓存状态读取失败：" + e.getMessage(); }
+    }
+
+    @RequirePOST public synchronized FormValidation doClearGitCache(StaplerRequest2 req) throws IOException {
+        admin();
+        String project = req.getParameter("gitCacheProject");
+        if (!getManagedProjectNames().contains(project)) return FormValidation.error("未知项目");
+        if (!GitCache.get().clear(project)) return FormValidation.warning("缓存正在更新或复制，请稍后重试");
+        audit(settings(), settings(), "git-cache-clear:" + project);
+        persist();
+        return FormValidation.ok("已清空 " + project + " 缓存，下次构建将重新下载；已检出的构建不受影响");
     }
 
     private JSONObject settings() {

@@ -98,12 +98,14 @@ class XranStorage {
         }
         long homeReserved = reserved[homeDev.toString()] as long
         long homeFloor = floor(cfg, home.totalSpace)
-        if (workspace && workspace.dev.toString() != homeDev.toString()) {
-            long required = floor(cfg, workspace.total as long) + (reserved[workspace.dev.toString()] as long)
-            if ((workspace.free as long) < required) {
-                throw new IllegalStateException("临时盘空间不足：available=${workspace.free}, required=${required}；数据盘回收无法释放该临时盘")
-            }
+        Map required = [(homeDev.toString()): homeFloor + homeReserved]
+        if (workspace) {
+            required[workspace.dev.toString()] = Math.max(required[workspace.dev.toString()] ?: 0L,
+                floor(cfg, workspace.total as long) + (reserved[workspace.dev.toString()] as long))
         }
+        def cache = io.xran.jenkins.GitCache.get()
+        if (cache.available()) required[cache.device().toString()] = Math.max(required[cache.device().toString()] ?: 0L,
+            floor(cfg, cache.totalSpace()) + (reserved[cache.device().toString()] as long))
         def deleted = []
         for (run in candidates()) {
             if (home.usableSpace >= homeFloor + homeReserved) break
@@ -126,9 +128,27 @@ class XranStorage {
                 ' 明细见 storage-maintenance 任务和 xran-storage/cleanup.jsonl。'
             publishNotice(notice)
         }
-        def result = [available: home.usableSpace, reserved: homeReserved, minimum: homeFloor, deleted: deleted]
+        // Disk pressure prioritizes historical artifacts. Cache budget eviction
+        // is independent and never deletes a project whose flock is held.
+        def current = io.xran.jenkins.BuildPlatformConfiguration.get().effective('service')
+        def cacheResult = cache.enforce((current.gitCacheMaxGiB as long) * 1073741824L, required)
+        if (cacheResult.deleted) {
+            cacheResult.deleted.each { event -> new File(directory(), 'git-cache-cleanup.jsonl').append(JsonOutput.toJson(event) + '\n', 'UTF-8') }
+            publishNotice("最近清理：Git 缓存回收 ${cacheResult.deleted.size()} 个条目；详情见 storage-maintenance 和 xran-storage/git-cache-cleanup.jsonl。")
+        }
+        def result = [available: home.usableSpace, reserved: homeReserved, minimum: homeFloor,
+            deleted: deleted, gitCache: cacheResult, spaceRequirements: required]
         if (home.usableSpace < homeFloor + homeReserved) {
             throw new IllegalStateException('空间不足，清理后仍无法满足安全余量及在途构建预留：' + JsonOutput.toJson(result))
+        }
+        if (cache.available() && cache.usableSpace() < (required[cache.device().toString()] as long)) {
+            throw new IllegalStateException('Git 缓存盘空间不足，回收后仍无法满足安全余量及在途预留')
+        }
+        if (workspace && workspace.dev.toString() != homeDev.toString()) {
+            long available = cache.available() && cache.device().toString() == workspace.dev.toString() ? cache.usableSpace() : workspace.free as long
+            if (available < (required[workspace.dev.toString()] as long)) {
+                throw new IllegalStateException("临时盘空间不足：available=${available}, required=${required[workspace.dev.toString()]}；其他磁盘回收无法释放该临时盘")
+            }
         }
         return result
     }

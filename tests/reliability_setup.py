@@ -102,7 +102,8 @@ def main():
     legacy = folder / 'legacy-context'; legacy.mkdir()
     (legacy / 'run-build.py').write_text((ROOT / 'runtime/run-build.py').read_text().replace(
         "'xranImageArchiveFallback': 1", "'xranImageArchiveFallback': 0"))
-    (legacy / 'Dockerfile').write_text('FROM ' + args.compat_image + '\nCOPY run-build.py /opt/xran/run-build.py\n')
+    shutil.copy2(ROOT / 'runtime/git_checkout.py', legacy / 'git_checkout.py')
+    (legacy / 'Dockerfile').write_text('FROM ' + args.compat_image + '\nCOPY run-build.py git_checkout.py /opt/xran/\n')
     run(['docker', 'build', '--network', 'none', '--pull=false', '-t', LEGACY_IMAGE, legacy], env=env)
     config = verification_config(yaml.safe_load(Path(args.base_site).read_text()), args.node_port)
     site.parent.mkdir(parents=True, exist_ok=True)

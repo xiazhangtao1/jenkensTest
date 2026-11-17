@@ -76,6 +76,12 @@ class XranCompiler {
         pod.metadata.labels['xran-job'] = job
         def builder = pod.spec.containers.find { it.name == 'builder' }
         if (builder == null) throw new IllegalArgumentException('Pod 模板缺少 builder 容器')
+        if (!(job ==~ /[a-z0-9][a-z0-9-]{0,61}/)) throw new IllegalArgumentException('非法缓存项目标识')
+        def cache = builder.volumeMounts.find { it.name == 'git-cache' }
+        if (snapshot.config?.gitCacheEnabled == false) {
+            builder.volumeMounts.removeAll { it.name == 'git-cache' }
+            pod.spec.volumes.removeAll { it.name == 'git-cache' }
+        } else if (cache != null) cache.subPath = job
         builder.image = image
         builder.imagePullPolicy = policy
         if (snapshot) {

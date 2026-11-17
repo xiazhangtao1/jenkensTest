@@ -14,6 +14,7 @@
 | 编译镜像 | `192.168.10.35/xnet/xran-compile:latest`，每次构建可填写其他版本 |
 | 编译镜像拉取策略 | `Always`，可选 `IfNotPresent` / `Never` |
 | 数据 PVC | 独立 local-path，声明 250Gi，Retain，卸载保留 |
+| Git 缓存 | 独立 PVC，完整分支/tag 增量更新；所有项目合计预算 20GiB，管理员网页可调 |
 | 历史产物 | 不按天数、次数或固定总容量淘汰 |
 | 清理 | 空间不足时删除最早完成、未标记保留的产物 |
 | 定时磁盘维护 | 每两小时一次；启动时及构建、归档前另检查 |
@@ -23,6 +24,8 @@
 local-path 的容量声明不是实际配额。20Gi 临时空间不会预先占满；源码、中间文件、Docker 层、
 导出 tar 和日志共同计入 Pod 上限，持久化归档另计。六个构建 Pod 总上限为 24 CPU/48GiB/120GiB，
 实际调度受节点资源约束。管理员在 **Manage Jenkins → 系统配置 → 构建平台设置** 调整并发、三类 Pod 资源、默认编译环境、超时和磁盘下限，保存后新入场构建立即生效。详情见 [构建平台设置](docs/platform-settings.md)；[config/site.yaml](config/site.yaml) 负责首次默认值及基础设施配置。
+
+Git 缓存的存储、清理、独立工作副本及内网升级见 [Git 本地缓存](docs/git-cache.md)。本功能只需升级 Controller 和部署配置，现有编译镜像可以继续使用。
 
 ## 当前环境安装
 

@@ -45,6 +45,8 @@ public final class PlatformSettings {
         s.put("xranServiceSerial", true);
         s.put("xranAdminOnly", false);
         s.put("xcnAdminOnly", false);
+        s.put("gitCacheEnabled", true);
+        s.put("gitCacheMaxGiB", 20);
         s.put("buildTimeoutMinutes", 240);
         s.put("agentStartupTimeoutMinutes", 15);
         s.put("minimumFreeGiB", 50);
@@ -59,6 +61,9 @@ public final class PlatformSettings {
         for (String key : List.of("xranAdminOnly", "xcnAdminOnly")) {
             if (!result.containsKey(key)) result.put(key, false);
         }
+        for (String key : List.of("gitCacheEnabled", "gitCacheMaxGiB")) {
+            if (!result.containsKey(key)) result.put(key, defaults().get(key));
+        }
         return result;
     }
 
@@ -66,7 +71,7 @@ public final class PlatformSettings {
         JSONObject s = defaults();
         for (String key : List.of("concurrency", "compilerImagePullPolicy", "buildTimeoutMinutes",
                 "agentStartupTimeoutMinutes", "minimumFreeGiB", "minimumFreePercent", "xranServiceSerial",
-                "xranAdminOnly", "xcnAdminOnly")) {
+                "xranAdminOnly", "xcnAdminOnly", "gitCacheEnabled", "gitCacheMaxGiB")) {
             if (site.containsKey(key)) s.put(key, site.get(key));
         }
         if (site.containsKey("builderImage")) s.put("compilerImage", site.get("builderImage"));
@@ -116,6 +121,7 @@ public final class PlatformSettings {
         range(s, "buildTimeoutMinutes", 1, 10080);
         range(s, "agentStartupTimeoutMinutes", 1, Math.min(120, s.getInt("buildTimeoutMinutes")));
         range(s, "minimumFreeGiB", 1, 1048576);
+        range(s, "gitCacheMaxGiB", 1, 1048576);
         range(s, "minimumFreePercent", 0, 79);
         String component = "[a-z0-9]+(?:(?:[._]|__|-+)[a-z0-9]+)*";
         String host = "[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*";
@@ -161,7 +167,8 @@ public final class PlatformSettings {
     public static Map<String, Object> runtime(JSONObject s, String p) {
         Map<String, Object> result = new LinkedHashMap<>();
         for (String key : List.of("concurrency", "buildTimeoutMinutes", "agentStartupTimeoutMinutes",
-                "minimumFreeGiB", "minimumFreePercent", "compilerImagePullPolicy", "innerBuildMemoryGiB", "buildJobs", "xranServiceSerial")) {
+                "minimumFreeGiB", "minimumFreePercent", "compilerImagePullPolicy", "innerBuildMemoryGiB", "buildJobs", "xranServiceSerial",
+                "gitCacheEnabled", "gitCacheMaxGiB")) {
             result.put(key, s.get(key));
         }
         result.put("builderImage", s.getString("compilerImage"));

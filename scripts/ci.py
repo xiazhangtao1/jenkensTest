@@ -74,6 +74,11 @@ def config(args):
     cfg.setdefault('compilerImagePullSecrets', [])
     cfg.setdefault('agentStartupTimeoutMinutes', 15)
     cfg.setdefault('dindMemoryGiB', 4)
+    cfg.setdefault('gitCacheEnabled', True)
+    cfg.setdefault('gitCacheMaxGiB', 20)
+    cfg.setdefault('gitCachePvcSize', '20Gi')
+    if not isinstance(cfg['gitCacheEnabled'], bool) or not 1 <= int(cfg['gitCacheMaxGiB']) <= 1048576:
+        raise ValueError('Git 缓存开关须为布尔值，合计预算须为正整数 GiB')
     assert 2 <= int(cfg['dindMemoryGiB']) < int(cfg['buildMemoryGiB']) - 1
     legacy = cfg.pop('open5gs', {})
     cfg.setdefault('xcn', legacy)
@@ -284,6 +289,12 @@ def pod_template(cfg, kind):
         'volumeMounts': [dict(shared), {'name': 'build-trust', 'mountPath': ssh_home + '/.ssh', 'readOnly': True}]}
     volumes = [{'name': 'workspace-volume', 'emptyDir': {'sizeLimit': f'{cfg["temporaryStorageGiB"]}Gi'}},
                {'name': 'build-trust', 'secret': {'secretName': 'xran-build-trust', 'optional': True}}]
+    builder['volumeMounts'] += [
+        {'name': 'git-checkout', 'mountPath': '/opt/xran-platform', 'readOnly': True},
+        {'name': 'git-cache', 'mountPath': '/var/xran-git-cache', 'subPath': 'XRAN_PROJECT'}]
+    volumes += [
+        {'name': 'git-checkout', 'configMap': {'name': 'xran-config', 'items': [{'key': 'git_checkout.py', 'path': 'git_checkout.py'}]}},
+        {'name': 'git-cache', 'persistentVolumeClaim': {'claimName': 'xran-git-cache'}}]
     containers = [jnlp, builder]
     if image:
         builder['volumeMounts'].append({'name': 'docker-run', 'mountPath': '/var/run/xran'})
@@ -332,7 +343,7 @@ def pod_template(cfg, kind):
     builder['imagePullPolicy'] = cfg.get('compilerImagePullPolicy', 'Always')
     return {'apiVersion': 'v1', 'kind': 'Pod', 'metadata': {'labels': {'xran-ci': 'build', 'xran-build': 'bXRAN_BUILD_NUMBER'}},
         'spec': {'automountServiceAccountToken': False,
-            'securityContext': {'runAsUser': build_uid, 'runAsGroup': build_uid, 'fsGroup': 1000},
+            'securityContext': {'runAsUser': build_uid, 'runAsGroup': build_uid, 'fsGroup': 1000, 'fsGroupChangePolicy': 'OnRootMismatch'},
             'activeDeadlineSeconds': int(cfg['buildTimeoutMinutes']) * 60,
             'containers': containers, 'initContainers': init, 'volumes': volumes,
             'imagePullSecrets': [{'name': name} for name in cfg.get('compilerImagePullSecrets', [])]}}
@@ -346,12 +357,17 @@ def render(args):
         'labels': {'pod-security.kubernetes.io/enforce': 'privileged'}}},
         {'apiVersion': 'storage.k8s.io/v1', 'kind': 'StorageClass',
          'metadata': {'name': cfg['storageClass']}, 'provisioner': 'rancher.io/local-path',
-         'reclaimPolicy': 'Retain', 'volumeBindingMode': 'WaitForFirstConsumer'}]
+         'reclaimPolicy': 'Retain', 'volumeBindingMode': 'WaitForFirstConsumer'},
+        {'apiVersion': 'v1', 'kind': 'PersistentVolumeClaim',
+         'metadata': {'name': 'xran-git-cache', 'namespace': namespace, 'annotations': {'helm.sh/resource-policy': 'keep'}},
+         'spec': {'accessModes': ['ReadWriteOnce'], 'storageClassName': cfg['storageClass'],
+                  'resources': {'requests': {'storage': cfg['gitCachePvcSize']}}}}]
     runtime = {'site.json': json.dumps(cfg, ensure_ascii=False, indent=2),
                'pod-service.json': json.dumps(pod_template(cfg, 'service')),
                'pod-image.json': json.dumps(pod_template(cfg, 'image')),
                'pod-xcn.json': json.dumps(pod_template(cfg, 'xcn')),
-               'dind-start.sh': (ROOT / 'runtime/dind-start.sh').read_text()}
+               'dind-start.sh': (ROOT / 'runtime/dind-start.sh').read_text(),
+               'git_checkout.py': (ROOT / 'runtime/git_checkout.py').read_text()}
     manifests.append({'apiVersion': 'v1', 'kind': 'ConfigMap',
         'metadata': {'name': 'xran-config', 'namespace': namespace}, 'data': runtime})
     if cfg.get('offline'):
@@ -388,7 +404,14 @@ def render(args):
         'javaOpts': '-Xms512m -Xmx2g -Djenkins.install.runSetupWizard=false -Duser.timezone=Asia/Shanghai',
         'admin': {'createSecret': False, 'existingSecret': 'xran-users', 'userKey': 'ADMIN_USER', 'passwordKey': 'ADMIN_PASSWORD'},
         'containerEnvFrom': [{'secretRef': {'name': 'xran-users'}}],
-        'containerEnv': [{'name': 'PLUGINS_FORCE_UPGRADE', 'value': 'true'}],
+        'containerEnv': [{'name': 'PLUGINS_FORCE_UPGRADE', 'value': 'true'},
+                         {'name': 'XRAN_GIT_CACHE_ROOT', 'value': '/var/xran-git-cache'}],
+        'customInitContainers': [{'name': 'git-cache-permissions', 'image': versions()['STORAGE_HELPER_IMAGE'],
+            'imagePullPolicy': 'Never' if cfg.get('offline') else 'IfNotPresent',
+            'command': ['sh', '-ec', 'chown 1000:1000 /cache; chmod 2775 /cache'],
+            'securityContext': {'runAsUser': 0, 'runAsGroup': 0, 'runAsNonRoot': False, 'allowPrivilegeEscalation': False},
+            'resources': {'requests': {'cpu': '10m', 'memory': '16Mi'}, 'limits': {'cpu': '100m', 'memory': '64Mi'}},
+            'volumeMounts': [{'name': 'git-cache', 'mountPath': '/cache'}]}],
         'JCasC': {'defaultConfig': True, 'securityRealm': yaml.safe_dump(realm),
             'authorizationStrategy': yaml.safe_dump(authorization), 'configScripts': {'xran': yaml.safe_dump({
                 'jenkins': {'systemMessage': ''},
@@ -397,8 +420,10 @@ def render(args):
                            hash_file(ROOT / 'jenkins/parameters.js')[:12]}}]}}})}}},
         'persistence': {'enabled': True, 'size': cfg['pvcSize'], 'storageClass': cfg['storageClass'],
             'annotations': {'helm.sh/resource-policy': 'keep'},
-            'volumes': [{'name': 'xran-config', 'configMap': {'name': 'xran-config'}}],
-            'mounts': [{'name': 'xran-config', 'mountPath': '/var/xran', 'readOnly': True}]},
+            'volumes': [{'name': 'xran-config', 'configMap': {'name': 'xran-config'}},
+                        {'name': 'git-cache', 'persistentVolumeClaim': {'claimName': 'xran-git-cache'}}],
+            'mounts': [{'name': 'xran-config', 'mountPath': '/var/xran', 'readOnly': True},
+                       {'name': 'git-cache', 'mountPath': '/var/xran-git-cache'}]},
         'agent': {'websocket': True, 'containerCap': int(cfg['concurrency']),
             'image': {'repository': cfg['agentImage'].split(':')[0], 'tag': cfg['agentImage'].rsplit(':', 1)[1]},
             'alwaysPullImage': False}, 'rbac': {'create': True}}
@@ -509,6 +534,11 @@ def users_secret(cfg):
 
 def deploy(args):
     cfg = render(args)
+    apply_deployment(cfg)
+
+
+def apply_deployment(cfg):
+    """Apply rendered values; isolated verifiers may first tune their own limits."""
     create_namespace(cfg)
     users_secret(cfg)
     directory = state_dir(cfg)
@@ -517,19 +547,21 @@ def deploy(args):
     run(['helm', 'upgrade', '--install', cfg['release'], chart, '-n', cfg['namespace'],
          '-f', directory / 'values.yaml', '--timeout', '12m'], env=kube_env())
     # 某些 CPU webhook 直接设置 nodeName，绕过 scheduler 的 WFFC 选节点阶段。
-    # 只为本次 Jenkins PVC 补齐其实际 Pod 节点，保持 PV 亲和性一致。
+    # 只为本次 Jenkins 的两个 PVC 补齐其实际 Pod 节点，保持 PV 亲和性一致。
     deadline = time.time() + 120
     while time.time() < deadline:
-        pvc = json.loads(kubectl('-n', cfg['namespace'], 'get', 'pvc', 'jenkins', '-o', 'json', capture=True))
-        if pvc['status'].get('phase') == 'Bound':
+        claims = json.loads(kubectl('-n', cfg['namespace'], 'get', 'pvc', 'jenkins', 'xran-git-cache', '-o', 'json', capture=True))['items']
+        pending = [pvc for pvc in claims if pvc['status'].get('phase') != 'Bound']
+        if not pending:
             break
         raw = kubectl('-n', cfg['namespace'], 'get', 'pod', 'jenkins-0', '--ignore-not-found', '-o', 'json', capture=True)
         if raw:
             pod = json.loads(raw)
             node = pod['spec'].get('nodeName')
-            chosen = pvc['metadata'].get('annotations', {}).get('volume.kubernetes.io/selected-node')
-            if node and not chosen:
-                kubectl('-n', cfg['namespace'], 'annotate', 'pvc', 'jenkins', 'volume.kubernetes.io/selected-node=' + node)
+            for pvc in pending:
+                chosen = pvc['metadata'].get('annotations', {}).get('volume.kubernetes.io/selected-node')
+                if node and not chosen:
+                    kubectl('-n', cfg['namespace'], 'annotate', 'pvc', pvc['metadata']['name'], 'volume.kubernetes.io/selected-node=' + node)
         time.sleep(2)
     kubectl('-n', cfg['namespace'], 'rollout', 'status', 'statefulset/jenkins', '--timeout=600s')
     if cfg.get('demo'):

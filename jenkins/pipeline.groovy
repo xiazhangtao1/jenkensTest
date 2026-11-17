@@ -91,6 +91,11 @@ def execute = {
                 def failure = null
                 def environment = [
                     "XRAN_GIT_URL=${cfg.gitUrl}", "XRAN_REF_TYPE=${sourceType}", "XRAN_REF=${ref}",
+                    "XRAN_PROJECT_ID=${project}", "XRAN_GIT_CREDENTIALS_ID=${cfg.gitCredentialsId ?: ''}",
+                    "XRAN_GIT_CACHE_ENABLED=${cfg.gitCacheEnabled != false}",
+                    'XRAN_GIT_CACHE_ROOT=/var/xran-git-cache',
+                    "XRAN_GIT_MINIMUM_FREE_GIB=${cfg.minimumFreeGiB}",
+                    "XRAN_GIT_MINIMUM_FREE_PERCENT=${cfg.minimumFreePercent}",
                     // Retain the adapter protocol accepted by existing compiler image tags.
                     "XRAN_KIND=${isXcn ? 'open5gs' : kind}", "XRAN_TARGET=${target}", "XRAN_IMAGE_TAG=${imageTag}",
                     "XRAN_REGISTRY=${cfg.registry}", "IMAGE_REGISTRY=${cfg.registry}",
@@ -128,10 +133,18 @@ def execute = {
                                 if (needsDocker) sh 'command -v docker >/dev/null && test -r /opt/xran/base-images.tar'
                                 if (isXcn) sh 'command -v helm >/dev/null && python3 -c "import yaml" && test -r /opt/xran/xcn-bases/images.tar'
                             }
-                            stage('磁盘检查') { echo groovy.json.JsonOutput.toJson(XranStorage.reserve(cfg,
-                                reservationKey, env.JOB_NAME, env.BUILD_NUMBER as int, workspaceStats())) }
+                            def gitSpaceRequirements = [:]
+                            stage('磁盘检查') {
+                                def storage = XranStorage.reserve(cfg, reservationKey, env.JOB_NAME, env.BUILD_NUMBER as int, workspaceStats())
+                                gitSpaceRequirements = storage.spaceRequirements ?: [:]
+                                echo groovy.json.JsonOutput.toJson(storage)
+                            }
                             stage('检出指定版本') {
-                                def checkoutCommand = { sh 'python3 /opt/xran/run-build.py checkout' }
+                                def checkoutCommand = {
+                                    withEnv(["XRAN_GIT_SPACE_REQUIREMENTS=${groovy.json.JsonOutput.toJson(gitSpaceRequirements)}"]) {
+                                        sh 'python3 /opt/xran-platform/git_checkout.py'
+                                    }
+                                }
                                 if (cfg.gitCredentialsId) {
                                     if (cfg.gitUrl.startsWith('http')) {
                                         withCredentials([gitUsernamePassword(credentialsId: cfg.gitCredentialsId, gitToolName: 'Default')]) { checkoutCommand() }
@@ -141,6 +154,7 @@ def execute = {
                                 } else checkoutCommand()
                                 def checkout = XranStorage.parseJson(readFile('checkout.json'))
                                 metadata.putAll(checkout)
+                                echo groovy.json.JsonOutput.toJson(XranStorage.sweep(cfg))
                                 currentBuild.displayName = "#${env.BUILD_NUMBER} ${target} ${checkout.commit.take(9)}"
                                 currentBuild.description = "${metadata.startedAt} | ${metadata.userId} | ${sourceType}:${ref} | commit=${checkout.commit} | compiler=${compilerImage} (${compilerPolicy})"
                                 if (isXcn) currentBuild.description += " | chart=${chartVersion} app=${imageTag} offline=${offline}"

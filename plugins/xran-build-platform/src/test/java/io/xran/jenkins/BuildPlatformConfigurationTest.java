@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import hudson.model.User;
 import hudson.security.ACL;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -119,6 +120,43 @@ public class BuildPlatformConfigurationTest {
         assertFalse(PlatformSettings.migrate(oldSite).getBoolean("xcnOffline"));
     }
 
+    @Test public void gitCacheSettingsUpgradeOnceWithoutChangingExistingSettings() throws Exception {
+        BuildPlatformConfiguration c=seed();
+        var file=j.jenkins.getRootDir().toPath().resolve("xran-platform/state.json");
+        JSONObject state=JSONObject.fromObject(Files.readString(file));
+        state.getJSONObject("settings").remove("gitCacheEnabled");
+        state.getJSONObject("settings").remove("gitCacheMaxGiB");
+        state.getJSONObject("settings").put("serviceMemoryGiB",16);
+        Files.writeString(file,state.toString());
+        BuildPlatformConfiguration migrated=new BuildPlatformConfiguration();
+        assertTrue(migrated.getForm().getBoolean("gitCacheEnabled"));
+        assertEquals(20,migrated.getForm().getInt("gitCacheMaxGiB"));
+        assertEquals(16,migrated.getForm().getInt("serviceMemoryGiB"));
+        assertEquals(2,migrated.getRevision());
+        assertEquals(2,new BuildPlatformConfiguration().getRevision());
+        assertTrue(Files.readString(file).contains("git-cache-upgrade"));
+        JSONObject bad=migrated.getForm();bad.put("gitCacheMaxGiB",0);
+        assertThrows(IllegalArgumentException.class,()->PlatformSettings.validate(bad));
+    }
+
+    @Test public void gitCacheStatusDisplaysSuccessfulEpochTimestamp() throws Exception {
+        BuildPlatformConfiguration c=seed();
+        var root=j.jenkins.getRootDir().toPath().resolve("git-cache-test");Files.createDirectory(root);
+        String previous=System.getProperty("xran.gitCacheRoot");
+        System.setProperty("xran.gitCacheRoot",root.toString());
+        try {
+            GitCache.get().initialize(List.of("xcn"));
+            Files.writeString(root.resolve("xcn").resolve("a".repeat(64)+".json"),
+                    "{\"status\":\"ready\",\"lastUpdatedAt\":1700000000.25}");
+            String status=c.getGitCacheStatus();
+            assertTrue(status,status.contains("2023-11-14T22:13:20.250Z"));
+            assertFalse(status.contains("尚未成功更新"));
+        } finally {
+            if (previous==null) System.clearProperty("xran.gitCacheRoot");
+            else System.setProperty("xran.gitCacheRoot",previous);
+        }
+    }
+
     @Test public void trustedPipelineParsesWithInstalledPlugin() throws Exception {
         seed();
         java.nio.file.Path root = java.nio.file.Path.of("../..");
@@ -150,6 +188,8 @@ public class BuildPlatformConfigurationTest {
         expected.put("xcnOffline", false);
         expected.put("compilerImagePullPolicy", "Never");
         expected.put("xranServiceSerial", false);
+        expected.put("gitCacheEnabled", false);
+        expected.put("gitCacheMaxGiB", 7);
         JSONObject submitted = JSONObject.fromObject(expected.toString());
         submitted.put("revision", c.getRevision());
         c.configure((org.kohsuke.stapler.StaplerRequest2) null, submitted);
@@ -182,6 +222,8 @@ public class BuildPlatformConfigurationTest {
             assertThrows(AccessDeniedException.class, c::getRevision);
             assertThrows(AccessDeniedException.class, c::getStatus);
             assertThrows(AccessDeniedException.class, c::getAuditText);
+            assertThrows(AccessDeniedException.class, c::getGitCacheStatus);
+            assertThrows(AccessDeniedException.class, () -> c.doClearGitCache(null));
             assertThrows(AccessDeniedException.class, c::doState);
             assertThrows(AccessDeniedException.class, c::doReapply);
             assertThrows(AccessDeniedException.class, c::doFillCompilerImagePullPolicyItems);

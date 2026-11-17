@@ -6,6 +6,9 @@ nodePort: 32080
 jenkinsUrl: http://JENKINS_NODE_IP:32080/
 storageClass: jenkins-local-path
 pvcSize: 250Gi
+gitCachePvcSize: 20Gi
+gitCacheEnabled: true
+gitCacheMaxGiB: 20
 offline: true
 demo: false
 # 下列默认值仅在首次启动时导入；恢复已有 HOME 后以网页保存的设置为准。

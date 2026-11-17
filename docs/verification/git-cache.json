@@ -1,0 +1,837 @@
+{
+  "namespace": "jenkins-git-cache-verify",
+  "url": "http://10.2.0.119:32190/",
+  "fixtureOnly": true,
+  "checks": [
+    {
+      "name": "冷/热缓存构建及产物 SHA256",
+      "status": "PASS",
+      "project": "x-ran-cloud",
+      "coldTransferBytes": 264407,
+      "warmTransferBytes": 247
+    },
+    {
+      "name": "冷/热缓存构建及产物 SHA256",
+      "status": "PASS",
+      "project": "xcn",
+      "coldTransferBytes": 264426,
+      "warmTransferBytes": 247
+    },
+    {
+      "name": "冷/热缓存构建及产物 SHA256",
+      "status": "PASS",
+      "project": "xtue-cloud",
+      "coldTransferBytes": 263863,
+      "warmTransferBytes": 247
+    },
+    {
+      "name": "tag/短 SHA，镜像 root 首次建立缓存后 UID1000 服务复用",
+      "status": "PASS"
+    },
+    {
+      "name": "六个实际 Pod 并发，项目 subPath 隔离，编译期间清空已复制缓存不影响产物",
+      "status": "PASS",
+      "peak": 6
+    },
+    {
+      "name": "管理员网页显示状态，普通用户清空接口拒绝",
+      "status": "PASS"
+    },
+    {
+      "name": "网页设置、两块 PVC 及 Git 缓存跨 Controller 重启保留，关闭后直接检出",
+      "status": "PASS"
+    },
+    {
+      "name": "Python/Java 跨进程锁互通，忙碌时拒绝清空，释放后可清空并重建",
+      "status": "PASS"
+    },
+    {
+      "name": "磁盘压力先清理历史产物，缓存保留且长期保留构建受保护",
+      "status": "PASS"
+    },
+    {
+      "name": "主 Jenkins Pod、镜像与重启次数未改变",
+      "status": "PASS"
+    }
+  ],
+  "builds": [
+    {
+      "project": "x-ran-cloud",
+      "number": 9,
+      "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+      "cache": {
+        "hit": false,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 166,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+      },
+      "artifacts": [
+        {
+          "name": "L2L3_1118002819_af60f94f6.tar.gz",
+          "size": 2358,
+          "sha256": "3ce066deb8fe67f4e4ae564579bfc8a4ad3731ee82c8df696eddee2364eab07b"
+        }
+      ]
+    },
+    {
+      "project": "x-ran-cloud",
+      "number": 10,
+      "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 105,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+      },
+      "artifacts": [
+        {
+          "name": "L2L3_1118002844_af60f94f6.tar.gz",
+          "size": 2358,
+          "sha256": "2f1d7319b4d732194c6a391a2c2cd9920558a5136900c78643777c741e27c141"
+        }
+      ]
+    },
+    {
+      "project": "xcn",
+      "number": 5,
+      "commit": "d6b7f07c6559f8d31027631ea5ee1058438ee817",
+      "cache": {
+        "hit": false,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 169,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "96bd9b139f689f49b114a93c8b2b0c7651bbc390df4d4642754fa49e9a247f3b"
+      },
+      "artifacts": [
+        {
+          "name": "xcn-runtime.tar",
+          "size": 80640512,
+          "sha256": "cbfba6c9395a445208e2081f1bfd0926f4b50719c9cd34d01eedc5d4551a3d83"
+        },
+        {
+          "name": "xcn-webui.tar",
+          "size": 80640512,
+          "sha256": "7bca85eff47394b3c437b3c3cf81cf9a003e35178d235841502433131b78fc90"
+        },
+        {
+          "name": "xcn-monitor.tar",
+          "size": 80640512,
+          "sha256": "94d7c60bde82ff2de76d6b63d5e8f61129dc46714c26870b78e9edab59a9e9a2"
+        },
+        {
+          "name": "xcn-26.11.17.tgz",
+          "size": 340,
+          "sha256": "da6e38183128365af842639db5dfd265cf4938d1d39abdc1192e160a2258e509"
+        }
+      ]
+    },
+    {
+      "project": "xcn",
+      "number": 6,
+      "commit": "d6b7f07c6559f8d31027631ea5ee1058438ee817",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 64,
+          "waitMillis": 0,
+          "fetchMillis": 106,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "96bd9b139f689f49b114a93c8b2b0c7651bbc390df4d4642754fa49e9a247f3b"
+      },
+      "artifacts": [
+        {
+          "name": "xcn-runtime.tar",
+          "size": 80640512,
+          "sha256": "131c9aed930535f597c74437e26dc98b9e293d2f0c77fcfa5e1666a85079038e"
+        },
+        {
+          "name": "xcn-webui.tar",
+          "size": 80640512,
+          "sha256": "6c28e28bfc445c16254b29a4c00548da120878827f4696f58b899d5914513729"
+        },
+        {
+          "name": "xcn-monitor.tar",
+          "size": 80640512,
+          "sha256": "78b4367a281ad4f6466adfd95b833dd3f17bb677944fdc871ead5934953a6bdc"
+        },
+        {
+          "name": "xcn-26.11.17.tgz",
+          "size": 341,
+          "sha256": "4789d24796194a7423f0ea4802ee8129f79fc82d7447efe5dfabfe4a6bcc4d36"
+        }
+      ]
+    },
+    {
+      "project": "xtue-cloud",
+      "number": 4,
+      "commit": "093a7ceb0d57e245e04de8893a8f3ecdee3d2034",
+      "cache": {
+        "hit": false,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 166,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "5f34be057a55eb1285edccc496795bfb987dfd75bf6b66dd99d66d255bd0b343"
+      },
+      "artifacts": [
+        {
+          "name": "tue.tar.gz",
+          "size": 2329,
+          "sha256": "c23dfcddd8086b378ced728dcade33aaac95683b93b1835c309b313030864d9e"
+        }
+      ]
+    },
+    {
+      "project": "xtue-cloud",
+      "number": 5,
+      "commit": "093a7ceb0d57e245e04de8893a8f3ecdee3d2034",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 105,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "5f34be057a55eb1285edccc496795bfb987dfd75bf6b66dd99d66d255bd0b343"
+      },
+      "artifacts": [
+        {
+          "name": "tue.tar.gz",
+          "size": 2328,
+          "sha256": "00c72439a39510f6dc6d79b2f45389bf3631ce7f6ac74b72ab8036b6d256b97b"
+        }
+      ]
+    },
+    {
+      "project": "xtue-cloud",
+      "number": 6,
+      "commit": "ed5cf5548bd82a15b563e096ce40114a9f534901",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 105,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "5f34be057a55eb1285edccc496795bfb987dfd75bf6b66dd99d66d255bd0b343"
+      },
+      "artifacts": [
+        {
+          "name": "tue_simuphy.tar.gz",
+          "size": 2338,
+          "sha256": "29c59d16ccaddcd698a4d2c13ac0f8f2bcb541e430ce0a9a5f8d04dbde62f790"
+        }
+      ]
+    },
+    {
+      "project": "x-ran-cloud",
+      "number": 11,
+      "commit": "c7314583328ec9cdac0a3d2022f62c8ab87bb558",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 106,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+      },
+      "artifacts": [
+        {
+          "name": "L2L3_1118003359_c73145833.tar.gz",
+          "size": 2357,
+          "sha256": "45787fdd389fb336ed4ee0b4fa68f3ed86d092d8dee67591490e04b028bbdfbd"
+        }
+      ]
+    },
+    {
+      "project": "x-ran-cloud",
+      "number": 12,
+      "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+      "cache": {
+        "hit": false,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 166,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+      },
+      "artifacts": [
+        {
+          "name": "imageA.tar",
+          "size": 80640512,
+          "sha256": "042e4c01461bc1c6ef4eff40abbf25523632b266d5ccb9f5281af999070dac0b"
+        }
+      ]
+    },
+    {
+      "project": "x-ran-cloud",
+      "number": 13,
+      "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 83,
+          "waitMillis": 0,
+          "fetchMillis": 105,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+      },
+      "artifacts": [
+        {
+          "name": "serviceA.tar.gz",
+          "size": 2336,
+          "sha256": "eabe83b004f4e67c45fb0759194d7da67cbe0f4443f912ca49bb9a26eef760b4"
+        }
+      ]
+    },
+    {
+      "project": "x-ran-cloud",
+      "number": 14,
+      "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 105,
+          "submoduleMillis": 21,
+          "checkoutMillis": 22
+        },
+        "enabled": true,
+        "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+      },
+      "artifacts": [
+        {
+          "name": "serviceA.tar.gz",
+          "size": 2337,
+          "sha256": "abb20142606c7692cf68ce80e210ff93c4b9b5968adbf9603bfd6403368d8b0f"
+        }
+      ]
+    },
+    {
+      "project": "xcn",
+      "number": 7,
+      "commit": "d6b7f07c6559f8d31027631ea5ee1058438ee817",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 86,
+          "waitMillis": 0,
+          "fetchMillis": 106,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "96bd9b139f689f49b114a93c8b2b0c7651bbc390df4d4642754fa49e9a247f3b"
+      },
+      "artifacts": [
+        {
+          "name": "xcn-runtime.tar",
+          "size": 80640512,
+          "sha256": "cf9fbbce2b6bbb580a7ef7240e7042fb9fad21f6c9080f5eb6025df7738df7ae"
+        },
+        {
+          "name": "xcn-webui.tar",
+          "size": 80640512,
+          "sha256": "d74cc495da8fc6bd4e506a2733f8b7edade5882d29412d7698f804a3bfdb49cb"
+        },
+        {
+          "name": "xcn-monitor.tar",
+          "size": 80640512,
+          "sha256": "21cf113cfa315cab4d412a11e29de4f7d968b7821d6bb82c8c2e19e36c444e98"
+        },
+        {
+          "name": "xcn-26.11.17.tgz",
+          "size": 349,
+          "sha256": "d58583c123da6100639ec40d506b21b0fbb28a697299cf40d8398849faa794ef"
+        }
+      ]
+    },
+    {
+      "project": "xtue-cloud",
+      "number": 7,
+      "commit": "093a7ceb0d57e245e04de8893a8f3ecdee3d2034",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 106,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "5f34be057a55eb1285edccc496795bfb987dfd75bf6b66dd99d66d255bd0b343"
+      },
+      "artifacts": [
+        {
+          "name": "tue.tar.gz",
+          "size": 2330,
+          "sha256": "8fa219be7fbca877a1057fed2ecb66e73957ccf720aed43d4825ddfc8632b01b"
+        }
+      ]
+    },
+    {
+      "project": "x-ran-cloud",
+      "number": 15,
+      "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 83,
+          "waitMillis": 0,
+          "fetchMillis": 105,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+      },
+      "artifacts": [
+        {
+          "name": "serviceB.tar.gz",
+          "size": 2336,
+          "sha256": "d309eb92a180381eebe4b630d7015089d3342c7afd15c6163469e44b7f9f96f8"
+        }
+      ]
+    },
+    {
+      "project": "xcn",
+      "number": 8,
+      "commit": "d6b7f07c6559f8d31027631ea5ee1058438ee817",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 109,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "96bd9b139f689f49b114a93c8b2b0c7651bbc390df4d4642754fa49e9a247f3b"
+      },
+      "artifacts": [
+        {
+          "name": "xcn-runtime.tar",
+          "size": 80640512,
+          "sha256": "f6f5e9183ead0e3ecace5829b0b00978230c9f4c401d0e01bc787c665c51fe0e"
+        },
+        {
+          "name": "xcn-webui.tar",
+          "size": 80640512,
+          "sha256": "4ad781eafab71f30a9d92cf2303bd74b926bb5c9b6f627eb839570aa19a614f6"
+        },
+        {
+          "name": "xcn-monitor.tar",
+          "size": 80640512,
+          "sha256": "052aecfb407530c3df734691827e89032b6e56f1c0347dd55b2f4d2f30f7c620"
+        },
+        {
+          "name": "xcn-26.11.17.tgz",
+          "size": 349,
+          "sha256": "b55adcdef4fcbfa5d0f84bde8219a1999e9bc97da5edae3b2ec23f24b11a6f7d"
+        }
+      ]
+    },
+    {
+      "project": "xtue-cloud",
+      "number": 8,
+      "commit": "093a7ceb0d57e245e04de8893a8f3ecdee3d2034",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 106,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "5f34be057a55eb1285edccc496795bfb987dfd75bf6b66dd99d66d255bd0b343"
+      },
+      "artifacts": [
+        {
+          "name": "tue_simuphy.tar.gz",
+          "size": 2339,
+          "sha256": "e647458084986b9e178821101720fd91ccf3070649774bd6d9c9683ebf1dd8f6"
+        }
+      ]
+    },
+    {
+      "project": "xtue-cloud",
+      "number": 9,
+      "commit": "093a7ceb0d57e245e04de8893a8f3ecdee3d2034",
+      "cache": {
+        "hit": false,
+        "timings": {
+          "fetchMillis": 61,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": false
+      },
+      "artifacts": [
+        {
+          "name": "tue.tar.gz",
+          "size": 2328,
+          "sha256": "23b6890cd5a31e44385d9be21673553a4cfbed9b94be22e482a220ebc35ea5b6"
+        }
+      ]
+    },
+    {
+      "project": "xtue-cloud",
+      "number": 10,
+      "commit": "093a7ceb0d57e245e04de8893a8f3ecdee3d2034",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 105,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "5f34be057a55eb1285edccc496795bfb987dfd75bf6b66dd99d66d255bd0b343"
+      },
+      "artifacts": [
+        {
+          "name": "tue.tar.gz",
+          "size": 2328,
+          "sha256": "bc69c645cfb595c4ce7796cda5de75bbcf5adc0f2f1b4a913e220c357ab477cc"
+        }
+      ]
+    },
+    {
+      "project": "xcn",
+      "number": 9,
+      "commit": "d6b7f07c6559f8d31027631ea5ee1058438ee817",
+      "cache": {
+        "hit": false,
+        "timings": {
+          "copyMillis": 67,
+          "waitMillis": 0,
+          "fetchMillis": 166,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "96bd9b139f689f49b114a93c8b2b0c7651bbc390df4d4642754fa49e9a247f3b"
+      },
+      "artifacts": [
+        {
+          "name": "xcn-runtime.tar",
+          "size": 80640512,
+          "sha256": "9c3c58b43cfa55d6cf36fb4b7125c63cd7b867d1cbb3f294a4ec3f57675d486b"
+        },
+        {
+          "name": "xcn-webui.tar",
+          "size": 80640512,
+          "sha256": "42a100e25c274a0544b9dde0862a65ba7354ca3c492d2696f496b8fc5e283cd1"
+        },
+        {
+          "name": "xcn-monitor.tar",
+          "size": 80640512,
+          "sha256": "93f15b21813c30d8a035ec48963fa5ba3fb981db712ebe8b43ada0b35b620c38"
+        },
+        {
+          "name": "xcn-26.11.17.tgz",
+          "size": 340,
+          "sha256": "a1b1be895ca01e8c8e9da16f86b8ece662889a58c379193e5e19e96ac01368be"
+        }
+      ]
+    }
+  ],
+  "sourceFingerprint": "2a3decb9486d59b784c0953dd7a5edac23af15e3857683d88675d319accccbbd",
+  "primaryBefore": {
+    "uid": "486a85ad-cb56-46c1-83e0-6ef3a7699a00",
+    "containers": [
+      {
+        "name": "jenkins",
+        "imageID": "localhost:5000/xran-ci-verification/controller@sha256:858cb0ba2abdccd58551980155977d012db959040ebaca0981b2263ee41fd886",
+        "restartCount": 0
+      }
+    ]
+  },
+  "checkoutDriverSha256": "3485b8d57ab4a2d395d997e31b33bc987fa03f7e383682d5f1f940414a38eff2",
+  "pluginSha256": "37c1d019268bac2c4e5cf6b8c351b5542fc7eb460b40b407c83cb23f2e41c1d2",
+  "controllerCpuLimit": "1500m",
+  "primaryAfter": {
+    "uid": "486a85ad-cb56-46c1-83e0-6ef3a7699a00",
+    "containers": [
+      {
+        "name": "jenkins",
+        "imageID": "localhost:5000/xran-ci-verification/controller@sha256:858cb0ba2abdccd58551980155977d012db959040ebaca0981b2263ee41fd886",
+        "restartCount": 0
+      }
+    ]
+  },
+  "status": "PASS",
+  "limitations": [
+    "仅验证模拟业务与平台流程，内网大型仓库提速需按日志实测",
+    "子模块/LFS 未新增专用缓存"
+  ],
+  "runtimeFollowUp": {
+    "namespace": "jenkins-git-cache-verify",
+    "url": "http://10.2.0.119:32190/",
+    "fixtureOnly": true,
+    "checks": [
+      {
+        "name": "最终打包限制及真实 root → UID1000 缓存复用",
+        "status": "PASS"
+      },
+      {
+        "name": "跨 UID 本地传输遇到损坏 blob，受锁保护重建并成功构建",
+        "status": "PASS"
+      },
+      {
+        "name": "独立工作树展开时发现损坏 blob，复查后重建且仅重试一次",
+        "status": "PASS"
+      }
+    ],
+    "builds": [
+      {
+        "project": "x-ran-cloud",
+        "number": 16,
+        "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+        "cache": {
+          "hit": false,
+          "timings": {
+            "copyMillis": 63,
+            "waitMillis": 0,
+            "fetchMillis": 166,
+            "submoduleMillis": 21,
+            "checkoutMillis": 21
+          },
+          "enabled": true,
+          "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+        },
+        "artifacts": [
+          {
+            "name": "imageA.tar",
+            "size": 80640512,
+            "sha256": "e85441f09be1a854240b37f3f0d497ad37897e14b7d2a8d378f7a90e41f754ed"
+          }
+        ]
+      },
+      {
+        "project": "x-ran-cloud",
+        "number": 17,
+        "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+        "cache": {
+          "hit": true,
+          "timings": {
+            "copyMillis": 63,
+            "waitMillis": 0,
+            "fetchMillis": 105,
+            "submoduleMillis": 21,
+            "checkoutMillis": 21
+          },
+          "enabled": true,
+          "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+        },
+        "artifacts": [
+          {
+            "name": "serviceA.tar.gz",
+            "size": 2336,
+            "sha256": "da31ffaf15f7f7618fd617e5d731069cb1f7d7d6b5ff00ee3b67253a1319bf6c"
+          }
+        ]
+      },
+      {
+        "project": "x-ran-cloud",
+        "number": 18,
+        "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+        "cache": {
+          "hit": false,
+          "timings": {
+            "copyMillis": 63,
+            "waitMillis": 0,
+            "fetchMillis": 335,
+            "submoduleMillis": 21,
+            "checkoutMillis": 21
+          },
+          "enabled": true,
+          "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+        },
+        "artifacts": [
+          {
+            "name": "serviceB.tar.gz",
+            "size": 2335,
+            "sha256": "add2d94862539df145475af3d487974228716b61a3a0edd2381f9c9e5e4b3d0e"
+          }
+        ]
+      },
+      {
+        "project": "x-ran-cloud",
+        "number": 19,
+        "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+        "cache": {
+          "hit": false,
+          "checkoutRetried": true,
+          "timings": {
+            "copyMillis": 63,
+            "waitMillis": 0,
+            "fetchMillis": 209,
+            "submoduleMillis": 21,
+            "checkoutMillis": 21
+          },
+          "enabled": true,
+          "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+        },
+        "artifacts": [
+          {
+            "name": "serviceA.tar.gz",
+            "size": 2336,
+            "sha256": "671bb269efc712ac4a1f6c944e58d80bd96ec4872f6376144c1cc2e239aacebf"
+          }
+        ]
+      }
+    ],
+    "sourceFingerprint": "e4a5925c12069e884f16d2082b4d2474edb11bef90e0bbd52b6cb0af054c829c",
+    "primaryBefore": {
+      "uid": "486a85ad-cb56-46c1-83e0-6ef3a7699a00",
+      "containers": [
+        {
+          "name": "jenkins",
+          "imageID": "localhost:5000/xran-ci-verification/controller@sha256:858cb0ba2abdccd58551980155977d012db959040ebaca0981b2263ee41fd886",
+          "restartCount": 0
+        }
+      ]
+    },
+    "checkoutDriverSha256": "546073908bd903a845538cb5db8a530d2c6e8b4e4f0b3e54873b36d30af8f856",
+    "pluginSha256": "37c1d019268bac2c4e5cf6b8c351b5542fc7eb460b40b407c83cb23f2e41c1d2",
+    "controllerCpuLimit": "1500m",
+    "primaryAfter": {
+      "uid": "486a85ad-cb56-46c1-83e0-6ef3a7699a00",
+      "containers": [
+        {
+          "name": "jenkins",
+          "imageID": "localhost:5000/xran-ci-verification/controller@sha256:858cb0ba2abdccd58551980155977d012db959040ebaca0981b2263ee41fd886",
+          "restartCount": 0
+        }
+      ]
+    },
+    "status": "PASS",
+    "finalIdleState": {
+      "leases": 0,
+      "locked": [],
+      "reservations": 0,
+      "queue": 0,
+      "cacheStatus": "所有项目合计 865044 字节；预算 21474836480 字节\n项目：xtue-cloud；占用：287970 字节；最后成功更新：尚未成功更新；状态：ready\n项目：xcn；占用：288534 字节；最后成功更新：尚未成功更新；状态：ready\n项目：x-ran-cloud；占用：288540 字节；最后成功更新：尚未成功更新；状态：ready"
+    }
+  },
+  "offlineInputs": {
+    "mavenFilesCompared": 5764,
+    "newMavenFiles": 0,
+    "changedMavenFiles": 0,
+    "dependenciesManifestSha256": "e436a0fbcff3744daad1652a81ca19b54c7f057c56f58ce33b6195ec972622f2",
+    "compilerImagesRebuilt": false,
+    "controllerImage": "xran-ci/controller:2.580.2-21",
+    "controllerImageId": "sha256:88521eb243c2d16bb89c02b960752ef3e1725c8bb4b4f225c319558db4b41530",
+    "controllerArchiveSha256": "e5b97b68528cffa9012d6cdbf04c9d793644a89eedcc9f5a969d0f933a97586d"
+  },
+  "unitVerification": {
+    "python": {
+      "total": 79,
+      "passed": 78,
+      "skipped": 1,
+      "skipReason": "真实 UID 切换由 root 编译容器单独执行"
+    },
+    "gitCacheInCompilerContainer": {
+      "total": 12,
+      "passed": 12,
+      "network": "none"
+    },
+    "platformPlugin": {
+      "total": 23,
+      "passed": 22,
+      "skipped": 1,
+      "spotbugsWarnings": 0,
+      "network": "none"
+    }
+  },
+  "controllerUiFollowUp": {
+    "status": "PASS",
+    "sourceFingerprint": "04242399c9ca29bd9352b278933b5dcde1f1ba7cac69feee15228ef143c8bd2f",
+    "pluginSha256": "e7ac6e1d24b03a69242f0e445441a169287307fe9058e2c62acdd005dc1976d4",
+    "controllerImageId": "sha256:88521eb243c2d16bb89c02b960752ef3e1725c8bb4b4f225c319558db4b41530",
+    "settingsAfterRestart": {
+      "status": "所有项目合计 865044 字节；预算 21474836480 字节\n项目：xtue-cloud；占用：287970 字节；最后成功更新：2026-11-17T16:40:17.421Z；状态：ready\n项目：xcn；占用：288534 字节；最后成功更新：2026-11-17T16:41:25.681Z；状态：ready\n项目：x-ran-cloud；占用：288540 字节；最后成功更新：2026-11-17T16:51:32.229Z；状态：ready",
+      "enabled": true,
+      "budget": 20
+    },
+    "checks": [
+      "科学计数法 epoch 正确显示更新时间",
+      "最终 Controller 重启保留设置与缓存",
+      "普通用户热缓存构建及产物 SHA256",
+      "主 Jenkins Pod、镜像、重启次数不变"
+    ],
+    "build": {
+      "project": "x-ran-cloud",
+      "number": 20,
+      "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb",
+      "cache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 106,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "d9866ed421ea99ce23d6095eba4016dc0f9a107306b5ed9259abd2be7cf10b33"
+      },
+      "artifacts": [
+        {
+          "name": "serviceA.tar.gz",
+          "size": 2335,
+          "sha256": "947938164ff48964001125b794651a9a1ae8003e6092a26dc0b764e1d337e4cd"
+        }
+      ]
+    }
+  }
+}

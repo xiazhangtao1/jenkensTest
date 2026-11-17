@@ -14,6 +14,7 @@ import tempfile
 import time
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from projects import relative
+from git_checkout import checkout as checkout_source
 
 ROOT = Path.cwd()
 SOURCE = ROOT / 'source'
@@ -50,46 +51,7 @@ def run(args, cwd=None, capture=False, input_text=None, env=None):
 
 
 def checkout():
-    kind, ref = os.environ['XRAN_REF_TYPE'], os.environ['XRAN_REF']
-    url = os.environ['XRAN_GIT_URL']
-    if not ref or ref.startswith('-') or '\x00' in ref or '\n' in ref:
-        raise ValueError('非法 Git 引用')
-    # 禁止 local helper / 自定义协议；仓库地址仅由管理员配置。
-    if not (url.startswith(('https://', 'http://', 'ssh://', 'git@'))):
-        raise ValueError('Git URL 仅支持 http(s)/ssh')
-    if SOURCE.exists():
-        shutil.rmtree(SOURCE)
-    PUBLISH.mkdir(exist_ok=True)
-    for old in PUBLISH.iterdir():
-        if old.is_dir():
-            shutil.rmtree(old)
-        else:
-            old.unlink()
-    run(['git', 'init', str(SOURCE)])
-    run(['git', 'remote', 'add', 'origin', url], SOURCE)
-    # 完整获取远端分支和 tag，支持历史 commit 及唯一短 SHA。
-    run(['git', 'fetch', '--no-recurse-submodules', '--prune', 'origin',
-         '+refs/heads/*:refs/remotes/origin/*', '+refs/tags/*:refs/tags/*'], SOURCE)
-    if kind in ('branch', 'tag'):
-        run(['git', 'check-ref-format', ('refs/heads/' if kind == 'branch' else 'refs/tags/') + ref])
-        revision = ('refs/remotes/origin/' if kind == 'branch' else 'refs/tags/') + ref
-    elif kind == 'commit':
-        if not re.fullmatch(r'[0-9a-fA-F]{7,40}', ref):
-            raise ValueError('commit 必须是 7–40 位十六进制 SHA')
-        if len(ref) == 40:
-            probe = subprocess.run(['git', 'cat-file', '-e', ref + '^{commit}'], cwd=SOURCE)
-            if probe.returncode:
-                run(['git', 'fetch', 'origin', ref], SOURCE)
-        revision = ref
-    else:
-        raise ValueError('未知引用类型')
-    sha = run(['git', 'rev-parse', '--verify', '--end-of-options', revision + '^{commit}'],
-              SOURCE, True).strip()
-    run(['git', '-c', 'advice.detachedHead=false', 'checkout', '--detach', sha], SOURCE)
-    # 历史真实项目可含 submodule；地址和依赖需可在内网访问。
-    run(['git', 'submodule', 'update', '--init', '--recursive'], SOURCE)
-    (ROOT / 'checkout.json').write_text(json.dumps({'commit': sha, 'ref': ref,
-        'refType': kind, 'repository': url}, ensure_ascii=False))
+    return checkout_source(ROOT, SOURCE, PUBLISH)
 
 
 def ensure_docker(archive):
