@@ -27,7 +27,7 @@
 // copying available through a synchronous, user-initiated browser copy command.
 (() => {
   "use strict";
-  if (window.isSecureContext || !/\/job\/(?:xcn|x-ran-cloud)\/[^/]+\/parameters\/?$/.test(location.pathname)) return;
+  if (window.isSecureContext || !/\/job\/[a-z0-9-]+\/[^/]+\/parameters\/?$/.test(location.pathname)) return;
 
   function start() {
     document.querySelectorAll('#main-panel .jenkins-quote .jenkins-copy-button:not([data-xran-http-copy])').forEach(original => {

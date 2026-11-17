@@ -3,3 +3,14 @@ pkgconf
 libzstd-dev
 libhwloc-dev
 libreadline-dev
+# XTUE-CLOUD（pkg-config 命令由 pkgconf 提供；SCTP 为已有 libsctp-dev）
+libxml++2.6-dev
+libnghttp2-dev
+libgoogle-perftools-dev
+liblapack-dev
+libatlas-base-dev
+libforms-dev
+libibverbs-dev
+libxslt1-dev
+ncurses-term
+unrar

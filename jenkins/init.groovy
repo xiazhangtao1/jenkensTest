@@ -29,49 +29,48 @@ def platform = io.xran.jenkins.BuildPlatformConfiguration.get()
 platform.initialize(cfg)
 cfg.putAll(platform.effective('service'))
 def support = new File('/opt/xran/storage.groovy').text
-def job = j.getItem('x-ran-cloud') ?: j.createProject(WorkflowJob, 'x-ran-cloud')
 def buildScript = support + '\n' + new File('/opt/xran/compiler.groovy').text + '\n' + new File('/opt/xran/pipeline.groovy').text
 ScriptApproval.get().preapprove(buildScript, GroovyLanguage.get())
-job.definition = new CpsFlowDefinition(buildScript, false)
-// 初始化脚本会在重启/升级时再次运行，先移除历史定义，避免表单和 Action 重复。
-while (job.getProperty(ParametersDefinitionProperty) != null) {
-    job.removeProperty(ParametersDefinitionProperty)
+// The catalog is supplied by the deployment ConfigMap, never by a business branch.
+cfg.projects.each { name, spec ->
+    def job = j.getItem(name) ?: j.createProject(WorkflowJob, name)
+    job.displayName = spec.displayName
+    job.setDisabled(spec.enabled != true)
+    job.definition = new CpsFlowDefinition(buildScript, false)
+    while (job.getProperty(ParametersDefinitionProperty) != null) job.removeProperty(ParametersDefinitionProperty)
+    def definitions = [
+        new StringParameterDefinition('COMPILER_IMAGE', cfg.builderImage as String, '编译环境'),
+        new ChoiceParameterDefinition('COMPILER_IMAGE_PULL_POLICY',
+            ([cfg.compilerImagePullPolicy ?: 'Always'] + ['Always', 'IfNotPresent', 'Never']).unique() as String[], '拉取策略')]
+    if (spec.adapter == 'xran') definitions.add(new ChoiceParameterDefinition('BUILD_KIND', ['service', 'image'] as String[], 'service=服务包；image=镜像'))
+    definitions.addAll([
+        new ChoiceParameterDefinition('REF_TYPE', ['branch', 'tag', 'commit'] as String[], '引用类型'),
+        new StringParameterDefinition('GIT_REF', spec.defaultRef as String, '分支名、tag 或 commit SHA')])
+    if (spec.adapter == 'xcn') {
+        definitions.addAll([
+            new StringParameterDefinition('CHART_VERSION', '', 'Chart 版本，默认当天日期'),
+            new StringParameterDefinition('APP_VERSION', '', '应用版本，默认当天日期')])
+    } else {
+        definitions.add(new ChoiceParameterDefinition('SERVICE_TARGET',
+            (spec.adapter == 'xran' ? ((spec.services - ['all']) + ['services_all']).unique() : spec.targets.keySet().toList()) as String[], '服务构建目标'))
+        if (spec.adapter == 'xran') definitions.addAll([
+            new ChoiceParameterDefinition('IMAGE_TARGET', spec.images as String[], '镜像构建目标'),
+            new StringParameterDefinition('IMAGE_TAG', 'latest', '镜像标签；同镜像同标签将串行执行')])
+    }
+    job.addProperty(new ParametersDefinitionProperty(definitions))
+    job.description = spec.displayName + ' 参数化构建。登录后提交构建；历史包持续保存，磁盘压力时按最早完成时间清理未标记保留产物。'
+    job.save()
 }
-job.addProperty(new ParametersDefinitionProperty([
-    new StringParameterDefinition('COMPILER_IMAGE', cfg.builderImage as String, '编译环境'),
-    new ChoiceParameterDefinition('COMPILER_IMAGE_PULL_POLICY',
-        ([cfg.compilerImagePullPolicy ?: 'Always'] + ['Always', 'IfNotPresent', 'Never']).unique() as String[],
-        '拉取策略'),
-    new ChoiceParameterDefinition('BUILD_KIND', ['service', 'image'] as String[], 'service=服务包；image=镜像'),
-    new ChoiceParameterDefinition('REF_TYPE', ['branch', 'tag', 'commit'] as String[], '引用类型'),
-    new StringParameterDefinition('GIT_REF', 'main', '分支名、tag 或 commit SHA'),
-    new ChoiceParameterDefinition('SERVICE_TARGET', ((cfg.services - ['all']) + ['services_all']).unique() as String[], '服务构建目标'),
-    new ChoiceParameterDefinition('IMAGE_TARGET', cfg.images as String[], '镜像构建目标'),
-    new StringParameterDefinition('IMAGE_TAG', 'latest', '镜像标签；同镜像同标签将串行执行')
-]))
-job.description = 'X-RAN-CLOUD 参数化构建。登录后提交构建；历史包持续保存，磁盘压力时按最早完成时间清理未标记保留产物。'
-job.save()
-def xcn = j.getItem('xcn') ?: j.createProject(WorkflowJob, 'xcn')
-xcn.definition = new CpsFlowDefinition(buildScript, false)
-while (xcn.getProperty(ParametersDefinitionProperty) != null) {
-    xcn.removeProperty(ParametersDefinitionProperty)
+platform.managedProjectNames.each { name ->
+    if (!cfg.projects.containsKey(name)) {
+        def previous = j.getItem(name)
+        if (previous != null) { previous.setDisabled(true); previous.save() }
+    }
 }
-xcn.addProperty(new ParametersDefinitionProperty([
-    new StringParameterDefinition('COMPILER_IMAGE', cfg.builderImage as String, '编译环境'),
-    new ChoiceParameterDefinition('COMPILER_IMAGE_PULL_POLICY',
-        ([cfg.compilerImagePullPolicy ?: 'Always'] + ['Always', 'IfNotPresent', 'Never']).unique() as String[], '拉取策略'),
-    new ChoiceParameterDefinition('REF_TYPE', ['branch', 'tag', 'commit'] as String[], '引用类型'),
-    new StringParameterDefinition('GIT_REF', 'main', '分支名、tag 或 commit SHA'),
-    new StringParameterDefinition('CHART_VERSION', '', 'Chart 版本，默认当天日期'),
-    new StringParameterDefinition('APP_VERSION', '', '应用版本，默认当天日期')
-]))
-xcn.description = 'xcn 参数化构建。登录后提交构建；历史包持续保存，磁盘压力时按最早完成时间清理未标记保留产物。'
-xcn.save()
-// Repair only empty historical versions, using that build's actual metadata.
-// Completed runs without metadata or with explicit values remain untouched.
+def xcn = j.getItem('xcn')
 def compiler = new GroovyShell(j.pluginManager.uberClassLoader).evaluate(
     support + '\n' + new File('/opt/xran/compiler.groovy').text + '\nreturn XranCompiler')
-println('xcn historical versions restored: ' + compiler.restoreVersions(xcn))
+if (xcn != null) println('xcn historical versions restored: ' + compiler.restoreVersions(xcn))
 def maintenance = j.getItem('storage-maintenance') ?: j.createProject(WorkflowJob, 'storage-maintenance')
 def maintenanceScript = support + '\n' + new File('/opt/xran/maintenance.groovy').text
 ScriptApproval.get().preapprove(maintenanceScript, GroovyLanguage.get())
@@ -84,7 +83,7 @@ maintenance.addProperty(new AuthorizationMatrixProperty([:], new NonInheritingSt
 // 每两小时一次，使用 Jenkins 哈希错开分钟与小时。
 maintenance.addTrigger(new TimerTrigger('H H/2 * * *'))
 def cleanupNotice = (maintenance.description ?: '').find(/(?s)最近清理：.*/)
-maintenance.description = 'X-RAN-CLOUD CI：历史包持续保存；同时管理 xcn。磁盘压力时回收最早未保留产物。清理明细见 storage-maintenance。' +
+maintenance.description = 'X-RAN-CLOUD CI：历史包持续保存；管理项目：' + cfg.projects.values().collect { it.displayName }.join('、') + '。磁盘压力时回收最早未保留产物。清理明细见 storage-maintenance。' +
     (cleanupNotice ? '\n' + cleanupNotice : '')
 maintenance.save()
 // systemMessage 对所有登录用户公开；管理员提示由受限任务提供。

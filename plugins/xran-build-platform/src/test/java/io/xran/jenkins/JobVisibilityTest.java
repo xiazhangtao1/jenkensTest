@@ -50,6 +50,22 @@ public class JobVisibilityTest {
         try (var ignored = ACL.as2(User.getById(user, true).impersonate2())) { return job.hasPermission(Item.READ); }
     }
 
+    @Test public void catalogProjectVisibilityAndRestart() throws Exception {
+        BuildPlatformConfiguration c = seed();
+        WorkflowJob xtue = j.jenkins.createProject(WorkflowJob.class, "xtue-cloud");
+        c.initialize(Map.of("projects", Map.of("x-ran-cloud", Map.of(), "xcn", Map.of(),
+                "xtue-cloud", Map.of("displayName", "XTUE-CLOUD"))));
+        assertTrue(readable(xtue, "builder"));
+        JSONObject edit = c.getForm(); edit.put("revision", c.getRevision()); edit.put("projectOnly_xtue-cloud", true);
+        c.configure((org.kohsuke.stapler.StaplerRequest2)null, edit);
+        assertFalse(readable(xtue, "builder")); assertTrue(readable(xtue, "admin"));
+        BuildPlatformConfiguration loaded = new BuildPlatformConfiguration();
+        assertTrue(loaded.getForm().getBoolean("projectOnly_xtue-cloud"));
+        assertTrue(loaded.getManagedProjectNames().contains("xtue-cloud"));
+        edit = c.getForm(); edit.put("revision", c.getRevision()); edit.put("projectOnly_xtue-cloud", false);
+        c.configure((org.kohsuke.stapler.StaplerRequest2)null, edit); assertTrue(readable(xtue, "builder"));
+    }
+
     @Test public void fourCombinationsAndRestartPersistence() throws Exception {
         BuildPlatformConfiguration c = seed();
         WorkflowJob xran = (WorkflowJob)j.jenkins.getItem("x-ran-cloud"), xcn = (WorkflowJob)j.jenkins.getItem("xcn");

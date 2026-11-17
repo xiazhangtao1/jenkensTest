@@ -1,12 +1,16 @@
 // 仅管理员可修改的受信流水线；被选择的业务分支只提供源码和原构建脚本。
 def cfg = XranStorage.parseJson(new File('/var/xran/site.json').text)
 def project = env.JOB_NAME as String
-def isXcn = project == 'xcn'
-if (!(project in ['x-ran-cloud', 'xcn'])) error('未知构建项目')
+def projectSpec = cfg.projects[project]
+if (projectSpec == null || projectSpec.enabled != true) error('未知或已禁用的构建项目')
+def isXcn = projectSpec.adapter == 'xcn'
+def genericProject = projectSpec.adapter == 'command'
+new File(currentBuild.rawBuild.rootDir, 'xran-project.json').text = groovy.json.JsonOutput.toJson(projectSpec)
 if (isXcn) cfg.putAll(cfg.xcn as Map)
+cfg.putAll(projectSpec.findAll { key, value -> key in ['gitUrl', 'gitCredentialsId', 'registry', 'registryCredentialsId', 'imageRepositories'] })
 def sourceType = params.REF_TYPE as String
 def ref = params.GIT_REF as String
-def kind = isXcn ? 'xcn' : params.BUILD_KIND as String
+def kind = isXcn ? 'xcn' : (genericProject ? 'service' : params.BUILD_KIND as String)
 def target = isXcn ? 'release' : (kind == 'service' ? params.SERVICE_TARGET : params.IMAGE_TARGET) as String
 def today = new Date(currentBuild.startTimeInMillis).format('yy.M.d', TimeZone.getTimeZone('Asia/Shanghai'))
 def chartVersion = isXcn ? ((params.CHART_VERSION as String)?.trim() ?: today) : ''
@@ -18,8 +22,8 @@ def compilerPolicy = (params.containsKey('COMPILER_IMAGE_PULL_POLICY') ? params.
     XranCompiler.defaults(kind).compilerImagePullPolicy) as String
 XranCompiler.validate(compilerImage, compilerPolicy)
 if (!(sourceType in ['branch', 'tag', 'commit']) || !(kind in ['service', 'image', 'xcn'])) error('非法构建类型或引用类型')
-if (kind == 'service' && target == 'all') error('服务目标 all 已取消，请选择单个服务或 services_all')
-if (!isXcn && !(target in (kind == 'service' ? cfg.services + ['services_all'] : cfg.images))) error('非法构建目标')
+if (!genericProject && kind == 'service' && target == 'all') error('服务目标 all 已取消，请选择单个服务或 services_all')
+if (!isXcn && !(target in (genericProject ? projectSpec.targets.keySet() : (kind == 'service' ? projectSpec.services + ['services_all'] : projectSpec.images)))) error('非法构建目标')
 if (!ref || ref.startsWith('-') || ref.contains('\n')) error('非法 Git 引用')
 if (needsDocker && !(imageTag ==~ /[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}/)) error('非法镜像标签')
 if (isXcn && !(chartVersion ==~ /(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?/)) error('非法 Chart 版本，请使用不带前导零的 SemVer')
@@ -28,7 +32,7 @@ def trigger = currentBuild.rawBuild.getCause(hudson.model.Cause.UserIdCause)
 def started = currentBuild.startTimeInMillis
 def metadata = [buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, job: env.JOB_NAME, project: project,
     userId: trigger?.userId ?: 'system', userName: trigger?.userName ?: 'system',
-    kind: kind, target: target, imageTag: kind == 'image' ? imageTag : null,
+    kind: kind, target: target, projectRulesSha256: projectSpec.rulesSha256, imageTag: kind == 'image' ? imageTag : null,
     builderImage: compilerImage, builderImagePullPolicy: compilerPolicy,
     startedAt: new Date(started).format("yyyy-MM-dd'T'HH:mm:ssXXX", TimeZone.getTimeZone('Asia/Shanghai'))]
 if (isXcn) metadata.putAll([chartVersion: chartVersion, appVersion: imageTag])
@@ -92,6 +96,7 @@ def execute = {
                     "XRAN_REGISTRY=${cfg.registry}", "IMAGE_REGISTRY=${cfg.registry}",
                     "XRAN_IMAGE_REFERENCE=${reference}", "XRAN_SERVICES=${groovy.json.JsonOutput.toJson(cfg.services)}",
                     "XRAN_CHART_VERSION=${chartVersion}", "XRAN_OFFLINE=${offline}",
+                    "XRAN_PROJECT_SPEC=${groovy.json.JsonOutput.toJson(projectSpec)}",
                     "XRAN_SERVICE_SERIAL=${cfg.containsKey('xranServiceSerial') ? cfg.xranServiceSerial : true}",
                     "BUILD_MEMORY=${cfg.innerBuildMemoryGiB ?: 3}g", "BUILD_JOBS=${cfg.buildJobs ?: 2}",
                     "XRAN_BUILD_DELAY_SECONDS=${cfg.demoBuildDelaySeconds ?: 0}",
@@ -100,7 +105,7 @@ def execute = {
                     'GIT_TERMINAL_PROMPT=0', 'GIT_CONFIG_NOSYSTEM=1',
                     'GIT_SSH_COMMAND=ssh -o BatchMode=yes -o StrictHostKeyChecking=yes'
                 ]
-                withEnv(environment) {
+                withEnv(environment + (projectSpec.env ?: [:]).collect { key, value -> key + '=' + value }) {
                     container('builder') {
                         try {
                             stage('检查编译环境') {
@@ -111,7 +116,7 @@ def execute = {
                                     done
                                     test -r /opt/xran/run-build.py || { echo '编译镜像缺少 /opt/xran/run-build.py，请使用本项目制作的兼容镜像' >&2; exit 1; }
                                 '''
-                                if (!isXcn) sh '''set -eu
+                                if (!isXcn && !genericProject) sh '''set -eu
                                     command -v pkgconf >/dev/null || { echo '编译镜像缺少工具：pkgconf' >&2; exit 1; }
                                     python3 /opt/xran/run-build.py capabilities > compiler-capabilities.json || {
                                         echo '编译镜像适配器版本过旧，请使用本项目 Dockerfile 重新制作编译镜像' >&2; exit 1;
@@ -119,6 +124,7 @@ def execute = {
                                     python3 -c 'import json,sys; s=json.load(open("compiler-capabilities.json")); sys.exit(0 if s.get("xranServiceCompatibility") == 1 else "编译镜像不支持当前服务适配，请重新制作编译镜像")'
                                 '''
                                 if (kind == 'image') sh '''python3 -c 'import json,sys; s=json.load(open("compiler-capabilities.json")); sys.exit(0 if s.get("xranImageArchiveFallback") == 1 else "编译镜像缺少镜像包自动导出能力，请更新本项目编译镜像")' '''
+                                sh '''python3 /opt/xran/run-build.py capabilities | python3 -c 'import json,sys; assert json.load(sys.stdin).get("projectRecipes") == 1, "请更新编译镜像以支持项目配置"' '''
                                 if (needsDocker) sh 'command -v docker >/dev/null && test -r /opt/xran/base-images.tar'
                                 if (isXcn) sh 'command -v helm >/dev/null && python3 -c "import yaml" && test -r /opt/xran/xcn-bases/images.tar'
                             }

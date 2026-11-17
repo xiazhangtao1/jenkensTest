@@ -89,11 +89,38 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
             audit(null, state.getJSONObject("settings"), "site-migration");
             persist();
         }
+        if (site.get("projects") instanceof Map<?, ?> projects) {
+            JSONObject catalog = state.optJSONObject("projectCatalog");
+            if (catalog == null) catalog = new JSONObject();
+            for (var entry : projects.entrySet()) catalog.put(entry.getKey().toString(), entry.getValue());
+            state.put("projectCatalog", catalog);
+            persist();
+        }
         prune();
         apply();
     }
 
-    public synchronized JSONObject getForm() { admin(); return copy(settings()); }
+    public synchronized JSONObject getForm() {
+        admin(); JSONObject form = copy(settings());
+        for (var project : getAdditionalProjects()) form.put("projectOnly_" + project.get("id"), adminOnly(project.get("id")));
+        return form;
+    }
+    public synchronized List<String> getManagedProjectNames() {
+        JSONObject catalog = state.optJSONObject("projectCatalog");
+        return catalog == null ? new ArrayList<>(List.of("x-ran-cloud", "xcn")) :
+            catalog.keySet().stream().map(Object::toString).toList();
+    }
+    public synchronized List<Map<String, String>> getAdditionalProjects() {
+        admin(); List<Map<String, String>> result = new ArrayList<>();
+        for (String name : getManagedProjectNames()) {
+            if (!List.of("x-ran-cloud", "xcn").contains(name)) result.add(Map.of("id", name,
+                "displayName", state.getJSONObject("projectCatalog").getJSONObject(name).optString("displayName", name)));
+        }
+        return result;
+    }
+    private List<String> accessJobs() {
+        List<String> names = new ArrayList<>(getManagedProjectNames()); names.add("storage-maintenance"); return names;
+    }
     public synchronized long getRevision() { admin(); return state.optLong("version", 0L); }
     public synchronized String getStatus() {
         admin();
@@ -137,10 +164,21 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
             if (expected != state.getLong("version")) throw new IllegalArgumentException("设置已被其他管理员更新，请刷新页面后重试");
             JSONObject candidate = PlatformSettings.validate(json);
             JSONObject before = copy(settings());
-            if (!before.equals(candidate)) {
+            JSONObject visibility = state.optJSONObject("projectVisibility");
+            if (visibility == null) visibility = new JSONObject();
+            JSONObject previousVisibility = copy(visibility);
+            for (var project : getAdditionalProjects()) {
+                String key = "projectOnly_" + project.get("id");
+                if (json.containsKey(key)) visibility.put(project.get("id"), json.getBoolean(key));
+            }
+            if (!before.equals(candidate) || !previousVisibility.equals(visibility)) {
+                state.put("projectVisibility", visibility);
                 state.put("settings", candidate);
                 state.put("version", state.getLong("version") + 1);
                 audit(before, candidate, "web-save");
+                JSONObject event = state.getJSONArray("audit").getJSONObject(state.getJSONArray("audit").size() - 1);
+                event.put("projectVisibilityBefore", previousVisibility);
+                event.put("projectVisibilityAfter", copy(visibility));
                 // Save desired configuration before side effects. A failed apply blocks admission.
                 state.put("applyError", "等待应用配置");
                 persist();
@@ -240,7 +278,11 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
     }
 
     private boolean adminOnly(String job) {
-        return job.equals("storage-maintenance") || settings().getBoolean(job.equals("xcn") ? "xcnAdminOnly" : "xranAdminOnly");
+        if (job.equals("storage-maintenance")) return true;
+        if (job.equals("x-ran-cloud")) return settings().getBoolean("xranAdminOnly");
+        if (job.equals("xcn")) return settings().getBoolean("xcnAdminOnly");
+        JSONObject values = state.optJSONObject("projectVisibility");
+        return values != null && values.optBoolean(job, false);
     }
 
     private static boolean restricted(WorkflowJob job) {
@@ -251,7 +293,7 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
 
     private void updateVisibility() throws IOException {
         JSONObject backups = authorizationBackups();
-        for (String name : List.of("x-ran-cloud", "xcn", "storage-maintenance")) {
+        for (String name : accessJobs()) {
             WorkflowJob job = Jenkins.get().getItemByFullName(name, WorkflowJob.class);
             if (job == null) continue;
             var property = job.getProperty(AuthorizationMatrixProperty.class);
@@ -286,7 +328,7 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
     }
 
     private void updateDefaults() throws IOException {
-        for (String name : List.of("x-ran-cloud", "xcn")) {
+        for (String name : getManagedProjectNames()) {
             WorkflowJob job = Jenkins.get().getItemByFullName(name, WorkflowJob.class);
             if (job == null) continue;
             ParametersDefinitionProperty previous = job.getProperty(ParametersDefinitionProperty.class);
@@ -378,7 +420,7 @@ public final class BuildPlatformConfiguration extends GlobalConfiguration {
                 }
             }
         }
-        for (String name : List.of("x-ran-cloud", "xcn", "storage-maintenance")) {
+        for (String name : accessJobs()) {
             WorkflowJob job = Jenkins.get().getItemByFullName(name, WorkflowJob.class);
             if (job != null) drift |= adminOnly(name) ? !restricted(job) ||
                     (!name.equals("storage-maintenance") && !authorizationBackups().containsKey(name))

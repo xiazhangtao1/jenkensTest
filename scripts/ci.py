@@ -94,6 +94,9 @@ def config(args):
                demoImage=v['DEMO_IMAGE'], registryImage=v['REGISTRY_IMAGE'], xcnBasesImage=v['XCN_BASES_IMAGE'])
     image_lock = ROOT / 'config/images.lock.json'
     cfg['imageIds'] = json.loads(image_lock.read_text()) if image_lock.exists() else {}
+    sys.path.insert(0, str(ROOT / 'runtime'))
+    from projects import load_registry
+    cfg['projects'] = load_registry(cfg, ROOT / cfg.get('projectsFile', 'config/projects.yaml'))
     return cfg
 
 

@@ -54,7 +54,7 @@ kubectl get pv "$(kubectl -n jenkins get pvc jenkins -o jsonpath='{.spec.volumeN
 管理员打开 **Manage Jenkins → Users → Create User（管理 Jenkins → 用户 → 新建用户）**，
 为每位同事设置独立用户名、姓名、密码和邮箱。当前使用 Jenkins 本地用户数据库，自助注册关闭，不依赖外网或邮件激活。
 
-新账号登录后自动继承 authenticated 的构建权限，可查看两个业务任务、发起/取消构建及下载产物；
+新账号登录后自动继承 authenticated 的构建权限，可查看已启用且获授权的业务任务、发起/取消构建及下载产物；
 构建元数据记录本人的 Jenkins 用户名。无需逐人修改流水线或配置 Git 私钥。
 普通账号不能管理系统、修改流水线、使用脚本控制台或查看 storage-maintenance。
 业务仓库统一使用管理员配置的 SSH 凭据，Jenkins 登录账号与 Gerrit 账号分开管理。

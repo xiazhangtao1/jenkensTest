@@ -1,15 +1,15 @@
-# X-RAN-CLOUD / xcn Jenkins 构建平台
+# X-RAN-CLOUD / xcn / XTUE-CLOUD Jenkins 构建平台
 
 使用官方 Jenkins Helm chart 部署 Controller，按需创建 Ubuntu 22.04 编译 Pod。
-支持 X-RAN-CLOUD 服务包、镜像及 xcn 发布包、分支/tag/commit、实名构建记录和下载，并交付可搬入内网的离线目录。
+支持 X-RAN-CLOUD 服务包、镜像、xcn 发布包及 XTUE-CLOUD 服务包，支持分支/tag/commit、实名构建记录和下载，并交付可搬入内网的离线目录。
 
 ## 默认行为
 
 | 项目 | 默认值 |
 |---|---|
-| 构建入口 | Jenkins → x-ran-cloud / xcn → Build with Parameters |
+| 构建入口 | Jenkins → x-ran-cloud / xcn / XTUE-CLOUD → Build with Parameters |
 | 登录 | 个人本地账号，匿名不可查看和下载 |
-| 并发 | 两项目合计最多 6 个；同镜像同标签 / xcn 同 app 版本先等待标签锁，再申请槽位 |
+| 并发 | 全部项目合计最多 6 个；同镜像同标签 / xcn 同 app 版本先等待标签锁，再申请槽位 |
 | 每个构建 Pod 总上限 | 4 CPU、8GiB 内存、20GiB 临时存储 |
 | 编译镜像 | `192.168.10.35/xnet/xran-compile:latest`，每次构建可填写其他版本 |
 | 编译镜像拉取策略 | `Always`，可选 `IfNotPresent` / `Never` |
@@ -57,8 +57,8 @@ make push-compile-image IMAGE_NAME=192.168.10.35/xnet/xran-compile IMAGE_TAG=26.
 默认入口 `http://10.2.0.119:32080/`，可通过 jenkinsUrl 修改。初始账号为 admin、builder1、builder2，
 随机密码保存于 `.state/jenkins/users.json`（0600）。通过 **Manage Jenkins → Users → Create User** 创建正式个人账号，登录后自动获得普通构建权限；
 验收账号可在交付后停用。普通账号没有任务配置、脚本控制台和流水线重放权限。
-`storage-maintenance` 及首页 CI/清理提示仅管理员可见；普通账号使用 `x-ran-cloud` 和 `xcn`，自动磁盘维护照常运行。
-管理员可在“构建平台设置”分别限制两个业务项目为仅管理员可见，取消时恢复原项目授权。
+`storage-maintenance` 及首页 CI/清理提示仅管理员可见；普通账号默认可使用三个业务项目，自动磁盘维护照常运行。
+管理员可在“构建平台设置”分别限制业务项目为仅管理员可见，取消时恢复原项目授权。
 
 ## 使用
 
@@ -122,3 +122,5 @@ X-RAN-CLOUD 的真实服务清单、依赖、FROM 镜像和 Registry 路径须�
 [官方 Helm chart](https://github.com/jenkinsci/helm-charts)、
 [离线安装](https://www.jenkins.io/doc/book/installing/offline/)、
 [local-path 容量说明](https://github.com/rancher/local-path-provisioner#cons)。
+
+XTUE-CLOUD 的两个服务目标、统一项目规则、依赖维护和升级说明见 [XTUE 与项目扩展](docs/xtue.md)。

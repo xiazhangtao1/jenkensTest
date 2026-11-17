@@ -1,0 +1,112 @@
+{
+  "date": "2026-11-17",
+  "status": "PASS",
+  "controller": {
+    "image": "xran-ci/controller:2.580.2-20",
+    "imageId": "sha256:92977fe9ac540ae5949f2122a54826dff89f1a0c743bfa25c79c695c76dc0598",
+    "plugin": "1.0.6"
+  },
+  "pythonTests": {
+    "passed": 64,
+    "failed": 0
+  },
+  "pluginTests": {
+    "tests": 17,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 1
+  },
+  "images": [
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.17-compat-xtue",
+      "imageId": "sha256:5361379b3bbe657d34cb079df633774e9588ddaa5c02793e38cd6bf6ae07a1b6",
+      "dockerfile": "docker/builder-compat.Dockerfile",
+      "ctest": {
+        "passed": 10,
+        "failed": 0
+      },
+      "asn1RoundTrips": [
+        "DER/BER",
+        "UPER"
+      ],
+      "defaultUid": 1000,
+      "network": "none",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.3.3",
+        "pkgconf": "1.8.0"
+      },
+      "archiveSha256": "ae56ffb7453b06ea5c3c5bbb097331f132bb4805ce8ce89dc42cba4821cf0126",
+      "archiveBytes": 3746000896
+    },
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.17-sdk-xtue",
+      "imageId": "sha256:78903d7ed118c4d9656da9db119dd7a541ac80cd609dba56c7e76c73dfee7e3e",
+      "dockerfile": "docker/builder.Dockerfile",
+      "ctest": {
+        "passed": 10,
+        "failed": 0
+      },
+      "asn1RoundTrips": [
+        "DER/BER",
+        "UPER"
+      ],
+      "defaultUid": 1000,
+      "network": "none",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.5.2",
+        "pkgconf": "1.8.0"
+      },
+      "archiveSha256": "6e3bcf6fb0429bb831ae18e88712a1a7645451e20d861b2b251b4290721147b5",
+      "archiveBytes": 3745051648
+    }
+  ],
+  "apt": {
+    "addedPackages": [
+      "libxml++2.6-dev",
+      "libnghttp2-dev",
+      "libgoogle-perftools-dev",
+      "liblapack-dev",
+      "libatlas-base-dev",
+      "libforms-dev",
+      "libibverbs-dev",
+      "libxslt1-dev",
+      "ncurses-term",
+      "unrar"
+    ],
+    "extraDebCount": 148,
+    "coreAndExtraFreshUbuntuInstall": "PASS; network none",
+    "cacheManifestSha256": "00b4fbff2015ff7aacd74f1086553b895dc8f8106c71926487f07dad114a21a8",
+    "pinnedVersionMatch": "PASS",
+    "pinnedVersionMismatch": "REJECTED"
+  },
+  "asn1c": {
+    "version": "0.9.29",
+    "providedArchiveBytes": 20697300,
+    "providedArchiveSha256": "bb9b423fff6d73d00ebc420e5d64be7359be0e1309cc0ff2a3cc5e02cca76911",
+    "providedGitCommit": "f12568d617dbf48497588f8e227d70388fa217c9",
+    "canonicalArchiveSha256": "bf1a92975ceefd3b2170659b12d84409c989aeb2c7057aeac146b72d08f4dba4",
+    "comparison": "All authored C/H except generated config.h, Autotools inputs and ASN.1 files match; canonical source reused"
+  },
+  "dependencyDelta": {
+    "package": "dist/transfer/01-dependencies/updates/dependencies-delta.tar.gz",
+    "bytes": 62995918,
+    "sha256": "3121e5beb7e18742cfa39f3b501b736b35e47360a2e3eeb43291326b67c04dbf",
+    "changedOrAdded": 90,
+    "removed": 3,
+    "actualBaselineApply": "PASS",
+    "allFiveComponentsMatchTarget": true
+  },
+  "projectVerificationReport": "xtue-projects.json",
+  "functionalRuntimeSha256": "2b3d5889adaf04e12aa48b3b42f52c4f18541f6a17a0a8875bf024587888d292",
+  "finalImageRuntimeMatchesWorkflowTestedRuntime": true,
+  "productionJenkinsPodUnchanged": true,
+  "limitations": [
+    "Private XTUE source unavailable: platform workflows use a temporary fixture, not a real XTUE compilation.",
+    "Intranet Gerrit/APT/Harbor were not accessed.",
+    "No host reboot performed; isolated Controller restart verified."
+  ]
+}

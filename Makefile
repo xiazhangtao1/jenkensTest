@@ -9,16 +9,18 @@ BUILD_JOBS ?= 4
 APT_SOURCES ?= config/sources.online.list
 OFFLINE ?= 0
 BASE_COMMIT ?=
+BASE_MANIFEST ?=
+DELTA_PACKAGE ?= dist/transfer/01-dependencies/updates/dependencies-delta.tar.gz
 TRANSFER_MANIFEST ?= dist/transfer/01-dependencies/MANIFEST.json
 SOAK_MINUTES ?= 30
-COMPAT_IMAGE ?= 192.168.10.35/xnet/xran-compile:26.11.08-compat-r2
-SDK_IMAGE ?= 192.168.10.35/xnet/xran-compile:26.11.08-sdk-r2
+COMPAT_IMAGE ?= 192.168.10.35/xnet/xran-compile:26.11.17-compat-xtue
+SDK_IMAGE ?= 192.168.10.35/xnet/xran-compile:26.11.17-sdk-xtue
 VERIFY_APT_MIRROR ?=
 VERIFY_XCN_NUMBER ?=
 VERIFY_RESUME ?= 0
 shell_quote = '$(subst ','"'"',$(1))'
 COMPILE_FLAGS = --image-name $(call shell_quote,$(IMAGE_NAME)) --image-tag $(call shell_quote,$(IMAGE_TAG)) --dockerfile $(call shell_quote,$(DOCKERFILE)) --jobs $(call shell_quote,$(BUILD_JOBS)) --apt-sources $(call shell_quote,$(APT_SOURCES)) $(if $(filter 1,$(OFFLINE)),--offline)
-.PHONY: prepare images render import-images deploy bundle test verify verify-release backup compile-image push-compile-image platform-plugin transfer transfer-deps transfer-code transfer-check transfer-git
+.PHONY: prepare images render import-images deploy bundle test verify verify-release backup compile-image push-compile-image platform-plugin transfer transfer-deps transfer-code transfer-check transfer-git transfer-delta apply-dependency-delta
 transfer: transfer-deps transfer-code
 transfer-deps:
 	$(PYTHON) scripts/transfer.py deps
@@ -26,6 +28,10 @@ transfer-code:
 	$(PYTHON) scripts/transfer.py code --base-commit $(call shell_quote,$(BASE_COMMIT))
 transfer-check:
 	$(PYTHON) scripts/transfer.py check --manifest $(call shell_quote,$(TRANSFER_MANIFEST))
+transfer-delta:
+	$(PYTHON) scripts/transfer.py delta --base-manifest $(call shell_quote,$(BASE_MANIFEST)) --manifest $(call shell_quote,$(TRANSFER_MANIFEST))
+apply-dependency-delta:
+	$(PYTHON) scripts/transfer.py apply-delta --package $(call shell_quote,$(DELTA_PACKAGE))
 transfer-git:
 	$(PYTHON) scripts/transfer.py git
 platform-plugin:

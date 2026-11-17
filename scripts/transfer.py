@@ -243,6 +243,98 @@ def check(manifest, workspace, docker=False):
     return missing
 
 
+def dependency_files(data):
+    if data.get('format') != 1 or data.get('kind') != 'offline-dependencies':
+        raise ValueError('不是分类依赖清单')
+    files = {}
+    for component in data['components']:
+        for name, record in component['files'].items():
+            dependency_path(ROOT, name)
+            if name in files and files[name] != record:
+                raise ValueError('依赖清单包含冲突文件')
+            files[name] = record
+    return files
+
+
+def dependency_path(root, name):
+    if not isinstance(name, str) or not name.startswith(('.cache/', 'vendor/compile/')) or '\\' in name:
+        raise ValueError('差量仅允许依赖目录')
+    p = Path(name)
+    root = Path(root).resolve()
+    if p.is_absolute() or '..' in p.parts or not (root / p).resolve().is_relative_to(root):
+        raise ValueError('依赖路径越界')
+    current = root
+    for part in p.parts:
+        current /= part
+        if current.is_symlink(): raise ValueError('依赖路径不能包含符号链接')
+    return root / p
+
+
+def verify_dependency(path, record):
+    if not path.is_file() or path.stat().st_size != record['bytes'] or sha(path) != record['sha256']:
+        raise RuntimeError('依赖缺失或校验失败: ' + str(path))
+
+
+def delta(base_manifest, target_manifest):
+    base = json.loads(Path(base_manifest).read_text())
+    target = json.loads(Path(target_manifest).read_text())
+    old, new = dependency_files(base), dependency_files(target)
+    changed = {n: r for n, r in new.items() if old.get(n) != r}
+    for name, record in changed.items(): verify_dependency(dependency_path(ROOT, name), record)
+    folder = transfer_root() / '01-dependencies/updates'
+    folder.mkdir(parents=True, exist_ok=True)
+    description = {'format': 1, 'kind': 'offline-dependency-delta', 'base': base, 'target': target,
+                   'changed': changed, 'removed': sorted(old.keys() - new.keys())}
+    path = folder / 'dependencies-delta.tar.gz'
+    write_tar(path, changed, {'DELTA.json': json.dumps(description, ensure_ascii=False).encode()})
+    (folder / 'TARGET_MANIFEST.json').write_text(json.dumps(target, ensure_ascii=False, indent=2) + '\n')
+    (folder / 'SHA256SUMS').write_text(sha(path) + '  ' + path.name + '\n' + sha(folder / 'TARGET_MANIFEST.json') + '  TARGET_MANIFEST.json\n')
+    print(f'差量包: {path}; 新增/变化 {len(changed)} 个文件，移除 {len(description["removed"])} 个旧依赖文件')
+    return path
+
+
+def apply_delta(package, workspace):
+    root = Path(workspace).resolve()
+    with tarfile.open(package) as archive:
+        members = archive.getmembers()
+        if len({m.name for m in members}) != len(members): raise ValueError('重复差量归档成员')
+        item = archive.getmember('DELTA.json')
+        if not item.isfile() or item.size > 32 * 1024 * 1024: raise ValueError('非法差量清单')
+        data = json.load(archive.extractfile(item))
+        if data.get('format') != 1 or data.get('kind') != 'offline-dependency-delta': raise ValueError('差量格式错误')
+        old, new = dependency_files(data['base']), dependency_files(data['target'])
+        expected = {n:r for n,r in new.items() if old.get(n) != r}
+        if data['changed'] != expected or data['removed'] != sorted(old.keys() - new.keys()): raise ValueError('差量规则与清单不符')
+        if set(archive.getnames()) != set(expected) | {'DELTA.json'}: raise ValueError('差量包成员不符')
+        # Validate the entire baseline before touching anything, including removed files.
+        for name, record in old.items(): verify_dependency(dependency_path(root, name), record)
+        for name in new.keys() - old.keys():
+            if dependency_path(root, name).exists(): raise RuntimeError('新增依赖路径已存在，请核对基线: ' + name)
+        with tempfile.TemporaryDirectory(prefix='dependency-delta-') as staging:
+            staged = Path(staging)
+            for name, record in expected.items():
+                member = archive.getmember(name)
+                if not member.isfile() or member.size != record['bytes']: raise ValueError('非法依赖成员: ' + name)
+                path = staged / name; path.parent.mkdir(parents=True, exist_ok=True)
+                with archive.extractfile(member) as incoming, path.open('wb') as outgoing: shutil.copyfileobj(incoming, outgoing)
+                verify_dependency(path, record)
+            for name, record in expected.items():
+                path = dependency_path(root, name); path.parent.mkdir(parents=True, exist_ok=True)
+                descriptor, temporary_name = tempfile.mkstemp(prefix=path.name + '.delta-', dir=path.parent)
+                temporary = Path(temporary_name)
+                try:
+                    with os.fdopen(descriptor, 'wb') as output, (staged / name).open('rb') as incoming:
+                        shutil.copyfileobj(incoming, output)
+                    temporary.chmod(record.get('mode', 0o644)); temporary.replace(path)
+                finally:
+                    temporary.unlink(missing_ok=True)
+            for name in data['removed']: dependency_path(root, name).unlink()
+    for name, record in new.items(): verify_dependency(dependency_path(root, name), record)
+    manifest = root / 'DEPENDENCIES_APPLIED.json'
+    manifest.write_text(json.dumps(data['target'], ensure_ascii=False, indent=2) + '\n')
+    print('差量应用并校验通过；下次使用 DEPENDENCIES_APPLIED.json 作为内网基线。')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
@@ -250,8 +342,14 @@ def main():
     c = commands.add_parser('code'); c.add_argument('--base-commit', default='')
     c = commands.add_parser('check'); c.add_argument('--manifest', required=True); c.add_argument('--workspace', default=str(ROOT)); c.add_argument('--docker', action='store_true')
     commands.add_parser('git')
+    c = commands.add_parser('delta'); c.add_argument('--base-manifest', required=True); c.add_argument('--manifest', default=str(ROOT / 'dist/transfer/01-dependencies/MANIFEST.json'))
+    c = commands.add_parser('apply-delta'); c.add_argument('--package', required=True); c.add_argument('--workspace', default=str(ROOT))
     args = parser.parse_args()
-    if args.command == 'deps':
+    if args.command == 'delta':
+        delta(args.base_manifest, args.manifest)
+    elif args.command == 'apply-delta':
+        apply_delta(args.package, args.workspace)
+    elif args.command == 'deps':
         dependencies()
     elif args.command == 'code':
         code(args.base_commit)

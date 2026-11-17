@@ -52,9 +52,11 @@ COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
 COPY --from=dockercli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/local/libexec/docker/cli-plugins/docker-buildx
 COPY --chown=1000:1000 .cache/base-images.tar /opt/xran/base-images.tar
 COPY runtime/run-build.py /opt/xran/run-build.py
+COPY runtime/projects.py /opt/xran/projects.py
 COPY runtime/demo-server.py /opt/xran/demo-server.py
 COPY runtime/compile-check/ /opt/xran/compile-check/
 COPY runtime/verify-compile.sh /opt/xran/verify-compile.sh
+COPY config/compiler-extra-apt-packages.txt /opt/xran/extra-apt-packages.txt
 COPY docker/package-protobuf-c.sh /opt/xran/package-protobuf-c.sh
 RUN bash /opt/xran/package-protobuf-c.sh
 ENV XRAN_PROTOBUF_C_VERSION=1.5.2

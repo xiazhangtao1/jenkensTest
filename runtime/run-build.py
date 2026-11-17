@@ -12,16 +12,41 @@ import sys
 import tarfile
 import tempfile
 import time
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from projects import relative
 
 ROOT = Path.cwd()
 SOURCE = ROOT / 'source'
 PUBLISH = ROOT / 'publish'
 
 
-def run(args, cwd=None, capture=False, input_text=None):
+def project_spec():
+    return json.loads(os.environ.get('XRAN_PROJECT_SPEC', '{}'))
+
+
+def project_recipe(kind):
+    return project_spec().get('builds', {}).get(kind, {})
+
+
+def inside_source(name):
+    path = SOURCE / relative(name)
+    if not path.resolve().is_relative_to(SOURCE.resolve()):
+        raise ValueError('项目路径越界: ' + name)
+    return path
+
+
+def recipe_command(recipe, **values):
+    return [part.format(**values) for part in recipe['command']]
+
+
+def command_recipe():
+    return project_spec()['targets'][os.environ['XRAN_TARGET']]
+
+
+def run(args, cwd=None, capture=False, input_text=None, env=None):
     return subprocess.run(args, cwd=cwd, check=True, text=True,
                           input=input_text,
-                          stdout=subprocess.PIPE if capture else None).stdout
+                          stdout=subprocess.PIPE if capture else None, **({'env': env} if env is not None else {})).stdout
 
 
 def checkout():
@@ -79,7 +104,9 @@ def ensure_docker(archive):
 
 
 def release_build():
-    script = SOURCE / 'helm/build-release.sh'
+    spec = project_recipe('xcn')
+    directory = inside_source(spec.get('workdir', 'helm'))
+    script = directory / spec.get('command', ['./build-release.sh'])[0]
     if not script.is_file():
         raise RuntimeError('当前 Git 引用缺少 helm/build-release.sh，请选择具备发布入口的分支/tag/commit')
     chart, app = os.environ['XRAN_CHART_VERSION'], os.environ['XRAN_IMAGE_TAG']
@@ -89,12 +116,12 @@ def release_build():
     ensure_docker(archive)
     # The upstream script keeps old outputs on failure; remove only this run's
     # expected files in the isolated checkout to prevent stale publication.
-    for name in ['xcn-runtime.tar', 'xcn-webui.tar', 'xcn-monitor.tar', f'xcn-{chart}.tgz']:
-        (SOURCE / 'helm' / name).unlink(missing_ok=True)
-    command = ['./build-release.sh'] + (['--offline'] if os.environ['XRAN_OFFLINE'] == 'true' else []) + [chart, app]
+    for name in spec.get('images', ['xcn-runtime.tar', 'xcn-webui.tar', 'xcn-monitor.tar']) + [spec.get('chart', 'xcn-{chartVersion}.tgz').format(chartVersion=chart)]:
+        (directory / relative(name)).unlink(missing_ok=True)
+    command = spec.get('command', ['./build-release.sh']) + (['--offline'] if os.environ['XRAN_OFFLINE'] == 'true' else []) + [chart, app]
     pushes = {}
     with (ROOT / 'release-build.log').open('w') as log:
-        process = subprocess.Popen(command, cwd=SOURCE / 'helm', stdout=subprocess.PIPE,
+        process = subprocess.Popen(command, cwd=directory, stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT, text=True)
         for line in process.stdout:
             log.write(line)
@@ -109,14 +136,14 @@ def release_build():
 
 
 def capabilities():
-    print(json.dumps({'xranServiceCompatibility': 1, 'xranImageArchiveFallback': 1}))
+    print(json.dumps({'xranServiceCompatibility': 1, 'xranImageArchiveFallback': 1, 'projectRecipes': 1}))
 
 
 def prepare_xran():
     value = os.environ.get('XRAN_SERVICE_SERIAL', 'true')
     if value not in ('true', 'false'):
         raise ValueError('XRAN_SERVICE_SERIAL 必须为 true 或 false')
-    makefile = SOURCE / 'services/makefile'
+    makefile = inside_source(project_recipe('service').get('workdir', 'services')) / 'makefile'
     if value == 'true' and makefile.exists():
         if makefile.is_symlink() or not makefile.resolve().is_relative_to(SOURCE.resolve()):
             raise ValueError('服务 Makefile 必须位于本次检出的源码目录内')
@@ -133,19 +160,30 @@ def prepare_xran():
 def build():
     target = os.environ['XRAN_TARGET']
     kind = os.environ['XRAN_KIND']
+    if project_spec().get('adapter') == 'command':
+        spec = command_recipe()
+        for name in spec['artifacts']:
+            inside_source(name).unlink(missing_ok=True)
+        environment = {**os.environ, **project_spec().get('env', {}), **spec.get('env', {})}
+        run(recipe_command(spec, target=target), inside_source(spec['workdir']), input_text='', env=environment)
+        return
     if kind == 'open5gs':  # previous compiler adapter protocol
         kind = 'xcn'
     if kind == 'service':
         if target == 'all':
             raise ValueError('服务目标 all 已取消，请选择单个服务或 services_all')
         prepare_xran()
-        run(['./build.sh', '-c', '-m', target], SOURCE / 'services', input_text='/opt/dpdk-22.03\n')
+        spec = project_recipe('service')
+        run(recipe_command(spec, target=target) if spec else ['./build.sh', '-c', '-m', target],
+            inside_source(spec.get('workdir', 'services')), input_text='/opt/dpdk-22.03\n')
     elif kind == 'image':
         prepare_xran()
         ensure_docker('/opt/xran/base-images.tar')
         image_archive_path().unlink(missing_ok=True)
-        run(['./images-build.sh', target, os.environ['XRAN_IMAGE_TAG']],
-            SOURCE / 'platform/k8s/images-build', input_text='/opt/dpdk-22.03\n')
+        spec = project_recipe('image')
+        run(recipe_command(spec, target=target, imageTag=os.environ['XRAN_IMAGE_TAG']) if spec else
+            ['./images-build.sh', target, os.environ['XRAN_IMAGE_TAG']],
+            inside_source(spec.get('workdir', 'platform/k8s/images-build')), input_text='/opt/dpdk-22.03\n')
     elif kind == 'xcn':
         release_build()
     else:
@@ -163,7 +201,7 @@ def image_archive_path():
     target = os.environ['XRAN_TARGET']
     if not re.fullmatch(r'[A-Za-z0-9_.-]+', target) or target in ('.', '..'):
         raise ValueError('非法镜像目标')
-    directory = SOURCE / 'platform/k8s/images-build'
+    directory = inside_source(project_recipe('image').get('artifactDirectory', 'platform/k8s/images-build'))
     if not directory.resolve().is_relative_to(SOURCE.resolve()):
         raise ValueError('镜像产物目录必须位于本次检出的源码内')
     return directory / (target + '.tar')
@@ -237,9 +275,11 @@ def collect_release():
     registry = os.environ['XRAN_REGISTRY']
     pushes = json.loads((ROOT / 'release-push.json').read_text()) if (ROOT / 'release-push.json').exists() else {}
     collected, errors, images = [], [], []
-    names = ['xcn-runtime.tar', 'xcn-webui.tar', 'xcn-monitor.tar', f'xcn-{chart}.tgz']
+    spec = project_recipe('xcn')
+    directory = inside_source(spec.get('workdir', 'helm'))
+    names = spec.get('images', ['xcn-runtime.tar', 'xcn-webui.tar', 'xcn-monitor.tar']) + [spec.get('chart', 'xcn-{chartVersion}.tgz').format(chartVersion=chart)]
     for name in names:
-        path = SOURCE / 'helm' / name
+        path = directory / relative(name)
         if not path.exists():
             if meta.get('result') == 'SUCCESS': errors.append('缺少产物: ' + name)
             continue
@@ -297,8 +337,12 @@ def collect():
     meta = json.loads((ROOT / 'checkout.json').read_text()) if (ROOT / 'checkout.json').exists() else {}
     meta.update(json.loads(os.environ['XRAN_BUILD_METADATA']))
     kind, target = os.environ['XRAN_KIND'], os.environ['XRAN_TARGET']
-    directory = SOURCE / ('JDBG/Release/services' if kind == 'service' else 'platform/k8s/images-build')
-    files = sorted(directory.glob('*.tar.gz')) if kind == 'service' and directory.exists() else []
+    generic = project_spec().get('adapter') == 'command'
+    spec = project_recipe(kind)
+    directory = inside_source(spec.get('artifactDirectory', 'JDBG/Release/services' if kind == 'service' else 'platform/k8s/images-build'))
+    files = ([inside_source(name) for name in command_recipe()['artifacts']] if generic else
+        sorted(directory.glob(spec.get('bundlePattern', 'L2L3_*.tar.gz') if target == 'services_all' else spec.get('artifact', '{target}.tar.gz').format(target=target)))
+        if kind == 'service' and directory.exists() else [])
     collected = []
     errors = []
     if kind == 'image':
@@ -310,6 +354,7 @@ def collect():
             errors.append('镜像产物: ' + str(error))
     for path in files:
         if not path.is_file():
+            if generic and meta.get('result') == 'SUCCESS': errors.append('缺少预期产物: ' + path.name)
             continue
         if path.is_symlink() or not re.fullmatch(r'[A-Za-z0-9_.-]+', path.name):
             errors.append('非法产物路径: ' + path.name)
@@ -318,10 +363,14 @@ def collect():
             if kind == 'service':
                 with tarfile.open(path, 'r:*') as archive:
                     # 不提取内容，逐个读取验证压缩流完整性。
+                    content_files = 0
                     for entry in archive:
                         if entry.isfile():
+                            content_files += 1
                             with archive.extractfile(entry) as data:
                                 while data.read(1024 * 1024): pass
+                    if generic and not content_files:
+                        raise tarfile.ReadError('服务包不能为空')
         except (tarfile.TarError, EOFError, OSError) as error:
             errors.append(f'{path.name}: {error}')
             continue
@@ -332,15 +381,17 @@ def collect():
             for chunk in iter(lambda: data.read(1024 * 1024), b''):
                 sha.update(chunk)
         collected.append({'name': out.name, 'size': out.stat().st_size, 'sha256': sha.hexdigest()})
-    if kind == 'service' and meta.get('result') == 'SUCCESS':
+    if generic and meta.get('result') == 'SUCCESS' and len(collected) != len(command_recipe()['artifacts']):
+        errors.append('服务产物数量不符合配置')
+    if kind == 'service' and not generic and meta.get('result') == 'SUCCESS':
         if target == 'all':
             errors.append('服务目标 all 已取消，请选择单个服务或 services_all')
-        expected = {target} if target != 'services_all' else None
+        expected = {spec.get('artifact', '{target}.tar.gz').format(target=target).removesuffix('.tar.gz')} if target != 'services_all' else None
         actual = {x['name'].removesuffix('.tar.gz') for x in collected}
         if expected is not None and expected != actual:
             errors.append('服务产物集合不符合目标')
-        if target == 'services_all' and (len(collected) != 1 or not re.fullmatch(
-                r'L2L3_\d{10}_' + meta['commit'][:9] + r'\.tar\.gz', collected[0]['name'])):
+        pattern = spec.get('bundleNameRegex', r'L2L3_\d{10}_{commit9}\.tar\.gz').replace('{commit9}', meta.get('commit', '')[:9])
+        if target == 'services_all' and (len(collected) != 1 or not re.fullmatch(pattern, collected[0]['name'])):
             errors.append('services_all 产物名称或数量不符合约定')
     if meta.get('result') == 'SUCCESS' and not collected:
         errors.append('构建没有产生有效产物')

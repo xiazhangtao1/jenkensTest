@@ -9,6 +9,8 @@ import re
 import subprocess
 import sys
 import tarfile
+import tempfile
+import shutil
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -104,7 +106,10 @@ def prepare_apt(args, base, cache_name='compile-apt', package_files=None):
     cache.mkdir(parents=True, exist_ok=True)
     source = (ROOT / args.apt_sources).resolve()
     package_files = package_files or ['config/apt-packages.txt', 'config/compile-apt-packages.txt']
-    packages = sorted({package for name in package_files for package in (ROOT / name).read_text().split()})
+    packages = sorted({package for name in package_files for line in (ROOT / name).read_text().splitlines()
+                       for package in line.split('#', 1)[0].split()})
+    if not packages or any(not re.fullmatch(r'[a-z0-9][a-z0-9+.-]*(?::[a-z0-9]+)?(?:=[A-Za-z0-9.+:~_-]+)?', p) for p in packages):
+        raise ValueError('APT 软件清单为空或含非法包名')
     fingerprint = {'baseImageId': inspect(base)['Id'], 'sourcesSha256': sha256(source), 'packages': packages}
     lock_path = cache / 'manifest.json'
     if lock_path.exists():
@@ -118,32 +123,50 @@ def prepare_apt(args, base, cache_name='compile-apt', package_files=None):
             print('复用已校验 APT 缓存：' + cache_name, flush=True)
             return
     if args.offline:
-        raise RuntimeError('完整 APT 缓存缺失或与基础镜像/源/软件清单不符：' + cache_name +
+        raise RuntimeError('完整 APT 缓存缺失或与基础镜像/软件清单不符：' + cache_name +
                            '；请在联网环境先执行同配置的 compile-image')
     # Download the complete dependency closure from a fresh instance of the pinned base.
     # A temporary directory avoids mixing multiple revisions of a deb on subsequent preparations.
-    staging = CACHE / (cache_name + '-staging')
-    staging.mkdir(exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=cache_name + '-staging-', dir=CACHE))
     proxy = []
     for name in ('HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'NO_PROXY', 'no_proxy'):
         if name in os.environ:
             proxy += ['-e', name]
-    run(['docker', 'run', '--rm', '--network', args.prepare_network, *proxy,
+    try:
+        run(['docker', 'run', '--rm', '--network', args.prepare_network, *proxy,
          '-v', f'{source}:/etc/apt/sources.list:ro', '-v', f'{staging}:/var/cache/apt/archives',
-         '-e', 'DEBIAN_FRONTEND=noninteractive', base, 'bash', '-euc',
+         '-e', 'DEBIAN_FRONTEND=noninteractive', '-e', f'CACHE_UID={os.getuid()}', '-e', f'CACHE_GID={os.getgid()}', base, 'bash', '-euc',
+         "trap 'chown -R \"$CACHE_UID:$CACHE_GID\" /var/cache/apt/archives; chmod -R u+rwX /var/cache/apt/archives' EXIT; "
          'rm -f /etc/apt/apt.conf.d/docker-clean; '
          'apt-get -o Acquire::Retries=3 -o Acquire::http::Pipeline-Depth=0 update; '
          'apt-get -o Acquire::Retries=3 -o Acquire::http::Pipeline-Depth=0 '
          '--download-only -y --no-install-recommends install "$@"', 'apt-cache', *packages])
+        # Trial-install the exact local closure with no network before publishing it.
+        # Extra packages must also remain compatible with the already locked core.
+        mounts = ['-v', f'{staging}:/new-debs:ro']
+        trial = ''
+        core = CACHE / 'compile-apt'
+        if cache_name != 'compile-apt' and (core / 'manifest.json').is_file():
+            mounts += ['-v', f'{core}:/core-debs:ro']
+            trial = 'apt-get install -y --no-install-recommends /core-debs/*.deb; '
+        run(['docker', 'run', '--rm', '--network', 'none', *mounts,
+             '-e', 'DEBIAN_FRONTEND=noninteractive', base, 'bash', '-euc',
+             "printf '#!/bin/sh\\nexit 101\\n' > /usr/sbin/policy-rc.d; chmod +x /usr/sbin/policy-rc.d; " +
+             trial + 'apt-get install -y --no-install-recommends /new-debs/*.deb'])
+    except Exception:
+        shutil.rmtree(staging)
+        raise
     # Old cache revisions are replaced only after successful preparation.
+    debs = {path.name: sha256(path) for path in sorted(staging.glob('*.deb'))}
+    if not debs:
+        shutil.rmtree(staging)
+        raise RuntimeError('APT 未下载任何依赖')
     for path in cache.glob('*.deb'):
         path.unlink()
     for path in staging.glob('*.deb'):
         path.replace(cache / path.name)
-    debs = {path.name: sha256(path) for path in sorted(cache.glob('*.deb'))}
-    if not debs:
-        raise RuntimeError('APT 未下载任何依赖')
     lock_path.write_text(json.dumps({'inputs': fingerprint, 'debs': debs}, indent=2) + '\n')
+    shutil.rmtree(staging)
 
 
 def prepare_helm(offline):

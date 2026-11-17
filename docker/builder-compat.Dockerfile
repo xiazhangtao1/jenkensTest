@@ -52,9 +52,11 @@ COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
 COPY --from=dockercli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/local/libexec/docker/cli-plugins/docker-buildx
 COPY --chown=1000:1000 .cache/base-images.tar /opt/xran/base-images.tar
 COPY runtime/run-build.py /opt/xran/run-build.py
+COPY runtime/projects.py /opt/xran/projects.py
 COPY runtime/demo-server.py /opt/xran/demo-server.py
 COPY runtime/compile-check/ /opt/xran/compile-check/
 COPY runtime/verify-compile.sh /opt/xran/verify-compile.sh
+COPY config/compiler-extra-apt-packages.txt /opt/xran/extra-apt-packages.txt
 # Keep the source-built 1.5.2 generator and use Ubuntu's 1.3.3 development library.
 COPY .cache/compile-compat-apt/ /tmp/compat-apt/
 RUN apt-get install -y --no-install-recommends /tmp/compat-apt/*.deb \

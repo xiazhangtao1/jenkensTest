@@ -1,11 +1,11 @@
 {
   "id": "xran-build-platform",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "jenkinsVersion": "2.580.2",
   "buildImage": "maven:3.9.9-eclipse-temurin-21-jammy",
   "buildImageId": "sha256:68040fabda675295f5fc7be086c1cfb5af560720af6d1794c434496471e0e8c6",
-  "sourceSha256": "8358b179a93251312c303736795b185d5fefb66fd465ca7cbbbce960649a09b3",
-  "sha256": "9df00204cd0c7182efa7e398d75a317de0e4d7bdd01ad3024b6168271ce319ec",
+  "sourceSha256": "fa0db74615a2b5a55602ab46c3c2055b75fa376d9af919c38f6824e66192055d",
+  "sha256": "4c96e2d13256da860c163a0c819112e5236d6f67a996faec22b312b4dbb44b69",
   "classMajor": 65,
   "dependencies": "lockable-resources:1582.v54e3b_a_8eda_3a_,kubernetes:4560.vc25b_83890c34,workflow-job:1622.vc41c189cb_e5f,matrix-auth:3.3"
 }

@@ -1,0 +1,244 @@
+{
+  "namespace": "jenkins-reliability-verify",
+  "fixtureOnly": true,
+  "checks": [
+    {
+      "name": "XTUE 专用五参数，无镜像/Chart 字段",
+      "status": "PASS"
+    },
+    {
+      "name": "管理员系统表单动态渲染 XTUE 权限开关",
+      "status": "PASS"
+    },
+    {
+      "name": "精确引用构建及普通用户下载",
+      "status": "PASS",
+      "number": 1,
+      "refType": "branch",
+      "target": "nrUE"
+    },
+    {
+      "name": "精确引用构建及普通用户下载",
+      "status": "PASS",
+      "number": 2,
+      "refType": "branch",
+      "target": "tuePhy"
+    },
+    {
+      "name": "精确引用构建及普通用户下载",
+      "status": "PASS",
+      "number": 3,
+      "refType": "tag",
+      "target": "nrUE"
+    },
+    {
+      "name": "精确引用构建及普通用户下载",
+      "status": "PASS",
+      "number": 4,
+      "refType": "tag",
+      "target": "tuePhy"
+    },
+    {
+      "name": "精确引用构建及普通用户下载",
+      "status": "PASS",
+      "number": 5,
+      "refType": "commit",
+      "target": "nrUE"
+    },
+    {
+      "name": "精确引用构建及普通用户下载",
+      "status": "PASS",
+      "number": 6,
+      "refType": "commit",
+      "target": "tuePhy"
+    },
+    {
+      "name": "精确引用构建及普通用户下载",
+      "status": "PASS",
+      "number": 7,
+      "refType": "commit",
+      "target": "nrUE"
+    },
+    {
+      "name": "精确引用构建及普通用户下载",
+      "status": "PASS",
+      "number": 8,
+      "refType": "commit",
+      "target": "tuePhy"
+    },
+    {
+      "name": "异常产物拒绝且旧包不发布",
+      "status": "PASS",
+      "number": 9,
+      "branch": "missing-output"
+    },
+    {
+      "name": "异常产物拒绝且旧包不发布",
+      "status": "PASS",
+      "number": 10,
+      "branch": "corrupt-output"
+    },
+    {
+      "name": "异常产物拒绝且旧包不发布",
+      "status": "PASS",
+      "number": 11,
+      "branch": "script-failure"
+    },
+    {
+      "name": "XTUE 总超时释放共享槽位，等待中的 X-RAN 服务随后成功",
+      "status": "PASS",
+      "xtue": 12,
+      "xran": 329
+    },
+    {
+      "name": "新项目历史加入磁盘压力清理候选",
+      "status": "PASS"
+    },
+    {
+      "name": "仅管理员可见，重启后 ACL 及构建历史保留",
+      "status": "PASS"
+    },
+    {
+      "name": "关闭开关恢复普通用户授权",
+      "status": "PASS"
+    }
+  ],
+  "builds": [
+    {
+      "number": 1,
+      "refType": "branch",
+      "target": "nrUE",
+      "commit": "a40c40d963d89dbdb5235dce0d59f22ac968a750",
+      "sha256": "ab93ccdb6e08b1aab42406d63d3afdc60ad33588a69f920e9281f4031ad32031"
+    },
+    {
+      "number": 2,
+      "refType": "branch",
+      "target": "tuePhy",
+      "commit": "a40c40d963d89dbdb5235dce0d59f22ac968a750",
+      "sha256": "7889557cf6deba9bb6b5275ae172c44ae91cccf4622be34d7f622db9866ef5d5"
+    },
+    {
+      "number": 3,
+      "refType": "tag",
+      "target": "nrUE",
+      "commit": "45bd05748682f03216407244b5ffee982f3725b1",
+      "sha256": "446e06758b8166c170035b35a39aba6687ba1d868eb0442c38f81d9c94a0d2db"
+    },
+    {
+      "number": 4,
+      "refType": "tag",
+      "target": "tuePhy",
+      "commit": "45bd05748682f03216407244b5ffee982f3725b1",
+      "sha256": "6588ee5b4846ef2075087584ac1aa8848777fe8a670b342311ef4391aab59fdc"
+    },
+    {
+      "number": 5,
+      "refType": "commit",
+      "target": "nrUE",
+      "commit": "45bd05748682f03216407244b5ffee982f3725b1",
+      "sha256": "5af9a20eaba510c21affca3cab230fbb851ea2b27a550efabd7be7bc2bd0f58c"
+    },
+    {
+      "number": 6,
+      "refType": "commit",
+      "target": "tuePhy",
+      "commit": "45bd05748682f03216407244b5ffee982f3725b1",
+      "sha256": "657c2462dafc8c4fc27e1ac393f7f21059eb55ea3a6c3fa046cbc97f05ee3007"
+    },
+    {
+      "number": 7,
+      "refType": "commit",
+      "target": "nrUE",
+      "commit": "a40c40d963d89dbdb5235dce0d59f22ac968a750",
+      "sha256": "36155a646d38855c61ed1c5eb5fcdb2914dce068737ea974fc0371fc979c4485"
+    },
+    {
+      "number": 8,
+      "refType": "commit",
+      "target": "tuePhy",
+      "commit": "a40c40d963d89dbdb5235dce0d59f22ac968a750",
+      "sha256": "1c238429ad8929fb80298c0e25c3535222e16a3cc767f395df94e99f3506ca5f"
+    }
+  ],
+  "status": "PASS",
+  "limitations": [
+    "XTUE 私有源码不可见；此报告验证平台流程，不代表真实业务编译通过"
+  ],
+  "existingProjectRegressions": [
+    {
+      "job": "x-ran-cloud",
+      "number": 330,
+      "result": "SUCCESS",
+      "files": [
+        {
+          "name": "imageA.tar",
+          "size": 80658944,
+          "sha256": "ed0e276f21979a1195dfffd10f609852263381d58f7301b1e657f2a31851f1cf"
+        }
+      ],
+      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2"
+    },
+    {
+      "job": "xcn",
+      "number": 128,
+      "result": "SUCCESS",
+      "files": [
+        {
+          "name": "xcn-runtime.tar",
+          "size": 80640512,
+          "sha256": "703cb331814c9182f8cfe2ff2d69117d53f9157e870f183146ce9d0997916b7e"
+        },
+        {
+          "name": "xcn-webui.tar",
+          "size": 80640512,
+          "sha256": "71a007dd87db345e587fef3764da7671b62d57f04506c78e55183fe1edc6838d"
+        },
+        {
+          "name": "xcn-monitor.tar",
+          "size": 80640512,
+          "sha256": "37451c4224983d6e041077ceb50a7bb52f5fbb57c3941136390d03b4924c3dd3"
+        },
+        {
+          "name": "xcn-26.11.17.tgz",
+          "size": 378,
+          "sha256": "deb092bb63da0e2e47e72ef8628bf0aacc4c484b25fa8e72011116837df80064"
+        }
+      ],
+      "commit": "98d80321f24ae65f9912401c0d9f0acc873b2d75"
+    }
+  ],
+  "finalImageSmoke": {
+    "checks": [
+      {
+        "target": "nrUE",
+        "number": 13,
+        "result": "SUCCESS",
+        "compilerImage": "localhost:5000/xran-ci-verification/compiler:xtuecompat-final",
+        "files": [
+          {
+            "name": "tue.tar.gz",
+            "size": 177,
+            "sha256": "7238c9582970efd06cbc2cf85dbcbaedfa00257caa2999543c325c09b39009b2"
+          }
+        ]
+      },
+      {
+        "target": "tuePhy",
+        "number": 14,
+        "result": "SUCCESS",
+        "compilerImage": "localhost:5000/xran-ci-verification/compiler:xtuecompat-final",
+        "files": [
+          {
+            "name": "tue_simuphy.tar.gz",
+            "size": 185,
+            "sha256": "cf3424e6f162f8a44bffe38b671c55a2bbb49f8cef732ca02c31820ff1b75579"
+          }
+        ]
+      }
+    ],
+    "targetEnvironmentOverridesProject": true,
+    "temporaryRecipeRestored": true,
+    "testedImageId": "sha256:2bdfc181b73169f6d539ac755290e022e9c8f4745ad13c02ef410c983c11edaa"
+  }
+}

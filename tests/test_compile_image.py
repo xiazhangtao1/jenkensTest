@@ -14,6 +14,32 @@ spec.loader.exec_module(compiler)
 
 
 class CompilerTests(unittest.TestCase):
+    def test_comments_dedup_and_pinned_versions_reuse_cache(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'config').mkdir();cache=root/'.cache/compile-extra-apt';cache.mkdir(parents=True)
+            (root/'config/packages').write_text('# documented\npkgconf pkgconf\nlibx=1:2.3-4 # pinned\n')
+            (root/'config/sources').write_text('deb http://mirror jammy main\n')
+            deb=cache/'pkg.deb';deb.write_bytes(b'locked')
+            (cache/'manifest.json').write_text(json.dumps({'inputs':{'baseImageId':'base','packages':['libx=1:2.3-4','pkgconf']},'debs':{deb.name:compiler.sha256(deb)}}))
+            with patch.object(compiler,'ROOT',root),patch.object(compiler,'CACHE',root/'.cache'),patch.object(compiler,'inspect',return_value={'Id':'base'}),patch.object(compiler,'run',side_effect=AssertionError('network')):
+                compiler.prepare_apt(SimpleNamespace(offline=True,apt_sources='config/sources'),'ubuntu','compile-extra-apt',['config/packages'])
+
+    def test_failed_offline_trial_does_not_publish_downloaded_debs(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'config').mkdir();cache=root/'.cache/compile-extra-apt';cache.mkdir(parents=True)
+            (root/'config/packages').write_text('new-package\n');(root/'config/sources').write_text('deb http://mirror jammy main\n')
+            (cache/'old.deb').write_bytes(b'previous');(cache/'manifest.json').write_text('{}')
+            before={p.name:p.read_bytes() for p in cache.iterdir()}
+            def execute(command):
+                if 'none' in command:
+                    raise subprocess.CalledProcessError(100,command)
+                mount=next(str(v) for v in command if str(v).endswith(':/var/cache/apt/archives'))
+                (Path(mount.rsplit(':',1)[0])/'new.deb').write_bytes(b'downloaded')
+            with patch.object(compiler,'ROOT',root),patch.object(compiler,'CACHE',root/'.cache'),patch.object(compiler,'inspect',return_value={'Id':'base'}),patch.object(compiler,'run',side_effect=execute) as run:
+                with self.assertRaises(subprocess.CalledProcessError):
+                    compiler.prepare_apt(SimpleNamespace(offline=False,apt_sources='config/sources',prepare_network='host'),'ubuntu','compile-extra-apt',['config/packages'])
+                self.assertEqual(run.call_count,2)
+            self.assertEqual({p.name:p.read_bytes() for p in cache.iterdir()},before)
     def test_reference_options(self):
         args = compiler.parser().parse_args([])
         self.assertEqual(compiler.image_reference(args.image_name, args.image_tag),

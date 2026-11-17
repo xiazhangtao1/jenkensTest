@@ -4,6 +4,18 @@ sdk_check_dir=$(mktemp -d)
 trap 'rm -rf "$sdk_check_dir"' EXIT
 command -v pkgconf
 pkgconf --version
+while read -r line; do
+    for package in ${line%%#*}; do
+        package_name=${package%%=*}
+        test "$(dpkg-query -W -f='${Status}' "$package_name")" = 'install ok installed'
+        if [[ "$package" == *=* ]]; then
+            test "$(dpkg-query -W -f='${Version}' "$package_name")" = "${package#*=}"
+        fi
+    done
+done < /opt/xran/extra-apt-packages.txt
+pkg-config --exists libxml++-2.6 libnghttp2 libxslt libibverbs
+command -v unrar
+infocmp xterm-256color >/dev/null
 test -d /opt/dpdk-22.03/build
 python3 - <<'PY'
 import json
@@ -25,7 +37,7 @@ PY
 test "$(pkg-config --modversion libprotobuf-c)" = "$XRAN_PROTOBUF_C_VERSION"
 protoc-c --version | grep -qx 'protobuf-c 1.5.2'
 python3 /opt/xran/run-build.py capabilities | python3 -c \
-    'import json,sys; c=json.load(sys.stdin); assert c["xranServiceCompatibility"] == c["xranImageArchiveFallback"] == 1'
+    'import json,sys; c=json.load(sys.stdin); assert c["xranServiceCompatibility"] == c["xranImageArchiveFallback"] == c["projectRecipes"] == 1'
 for package in protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1 uuid-dev libzstd-dev libhwloc-dev libreadline-dev; do
     test "$(dpkg-query -W -f='${Status}' "$package")" = 'install ok installed'
 done
@@ -57,8 +69,35 @@ gcc "$sdk_check_dir/protobuf-c-runtime.c" -lprotobuf-c -o "$sdk_check_dir/protob
 "$sdk_check_dir/protobuf-c-runtime"
 mkdir "$sdk_check_dir/asn1"
 printf 'Check DEFINITIONS ::= BEGIN Value ::= INTEGER END\n' > "$sdk_check_dir/asn1/check.asn1"
-(cd "$sdk_check_dir/asn1" && asn1c -pdu=all -fcompound-names check.asn1 > generation.log 2>&1)
+(cd "$sdk_check_dir/asn1" && asn1c -pdu=all -fcompound-names -no-gen-OER -no-gen-example check.asn1 > generation.log 2>&1)
 test -s "$sdk_check_dir/asn1/Value.c"
+cat > "$sdk_check_dir/asn1/roundtrip.c" <<'C'
+#include "Value.h"
+#include "der_encoder.h"
+#include "ber_decoder.h"
+#include "per_encoder.h"
+#include "per_decoder.h"
+int main(void) {
+    Value_t input = 42, *output = 0;
+    unsigned char buffer[64];
+    asn_enc_rval_t encoded = der_encode_to_buffer(&asn_DEF_Value, &input, buffer, sizeof(buffer));
+    if (encoded.encoded < 0) return 1;
+    asn_dec_rval_t decoded = ber_decode(0, &asn_DEF_Value, (void **)&output, buffer, encoded.encoded);
+    int failed = decoded.code != RC_OK || !output || *output != input;
+    ASN_STRUCT_FREE(asn_DEF_Value, output);
+    if (failed) return failed;
+    output = 0;
+    encoded = uper_encode_to_buffer(&asn_DEF_Value, 0, &input, buffer, sizeof(buffer));
+    if (encoded.encoded < 0) return 1;
+    decoded = uper_decode_complete(0, &asn_DEF_Value, (void **)&output, buffer, (encoded.encoded + 7) / 8);
+    failed = decoded.code != RC_OK || !output || *output != input;
+    ASN_STRUCT_FREE(asn_DEF_Value, output);
+    return failed;
+}
+C
+find "$sdk_check_dir/asn1" -name '*.c' ! -name 'converter-*.c' -print0 | \
+    xargs -0 gcc -DASN_DISABLE_OER_SUPPORT -I"$sdk_check_dir/asn1" -o "$sdk_check_dir/asn1/roundtrip"
+"$sdk_check_dir/asn1/roundtrip"
 pkg-config --modversion libdpdk rohc protobuf libprotobuf-c libwebsockets libzstd hwloc readline
 docker --version
 python3 - <<'PY'

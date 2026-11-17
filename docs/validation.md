@@ -1,3 +1,19 @@
+# XTUE-CLOUD 与配置化项目验收（2026-11-17）
+
+- Python 64 项回归通过；内部插件 16 项通过、1 项跳过，离线 Maven 构建成功。
+- Compat、SDK 两套 Dockerfile 均从当前源码断网构建成功，每套 10 项 CTest 全部通过；另通过 ASN.1 代码生成、DER/BER 和 UPER 编解码回环及动态库加载检查。
+- 隔离命名空间完成两个 XTUE 目标 × 分支/tag/完整 SHA/唯一短 SHA 共 8 次成功构建，并由普通用户下载核对 SHA256。
+- 缺失产物、损坏归档和业务脚本失败均被拒绝；源码内的旧包不发布。总超时释放共享槽位，随后等待的 X-RAN 服务构建成功。
+- 新项目加入历史清理候选；管理员可见开关实际生效，Controller 重启后权限和历史保留，关闭后恢复普通用户访问。
+- 原 X-RAN 镜像完成下载、加载和运行，xcn 三镜像包及 Chart 全部校验，Chart 通过 Helm lint/template。
+- 全新 Ubuntu 容器在无网络环境成功安装锁定核心和新增依赖；60MiB 差量包从旧依赖基线实际应用，五组依赖均与目标清单匹配。
+
+本次验收在 `jenkins-reliability-verify` 中完成，主 Jenkins Pod 标识、镜像与重启次数均未变。
+私有 XTUE 源码和内网 APT/Gerrit/Harbor 不可达；模拟源码验证平台行为，不能代替真实业务的编译验收。
+证据见 [项目验收](verification/xtue-projects.json)、[镜像及依赖验收](verification/xtue.json)，操作见 [XTUE 与项目扩展](xtue.md)。
+
+---
+
 # Harbor token 客户端 CA 信任验收（2026-11-10）
 
 配置了 `caSecret` 的编译容器新增 `SSL_CERT_DIR`，补齐 Buildx 的 Go 客户端信任；DinD、Git/curl 的既有 CA 配置保留。

@@ -73,3 +73,5 @@ python3 tests/verify-platform.py --site /路径/独立验收站点.yaml
 ```
 
 该脚本会临时替换两项任务的构建主体并重启 Controller，要求站点显式设置 `verificationInstance: true`，禁止在主 namespace `jenkins` 执行。
+
+从 1.0.6 起，统一项目注册表中的新增项目自动生成“仅管理员可见”开关，默认关闭。XTUE 共用服务包资源，参与同一套并发、超时及磁盘预算。

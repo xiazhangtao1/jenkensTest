@@ -9,6 +9,8 @@ pvcSize: 250Gi
 offline: true
 demo: false
 # 下列默认值仅在首次启动时导入；恢复已有 HOME 后以网页保存的设置为准。
+projectsFile: config/projects.yaml
+# 可选：projects.xtue-cloud.gitUrl / gitCredentialsId 覆盖项目连接配置。
 concurrency: 6
 xranServiceSerial: true
 xranAdminOnly: false

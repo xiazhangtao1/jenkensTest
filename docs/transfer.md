@@ -130,10 +130,38 @@ sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml 
 只重建编译镜像时：
 
 ```bash
-sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.08-compat-r2
-sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.08-sdk-r2
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.17-compat-xtue
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.17-sdk-xtue
 ```
 
 成品在 `dist/transfer/03-generated-images/compiler/`。两个目录是不同编译环境，均是当前版本。
 `.cache/k8s-images.tar` 是本地构建后用于导入节点的工作归档，可能包含定制镜像；它不属于默认外部依赖交付。
 `make bundle` 保留为兼容的完整快照命令，需要所有成品一起搬运时才使用；日常更新采用分类包。
+
+## 按文件搬运依赖差量
+
+先保管内网当前使用的 `DEPENDENCIES.json`、`MANIFEST.json` 或上次应用后的 `DEPENDENCIES_APPLIED.json`，作为基线。
+准备机更新依赖后生成最新完整包（仍只保留当前版本），再计算差量；日常实际搬运只需代码与差量目录：
+
+```bash
+make transfer-deps
+make transfer-delta BASE_MANIFEST=/路径/内网旧MANIFEST.json
+```
+
+输出 `01-dependencies/updates/`，包含 `dependencies-delta.tar.gz`、目标清单和校验值。
+包内只有新增/变化文件及清单，记录旧依赖文件的移除；不会复制未变 SDK，也不含成品镜像、凭据和 Jenkins HOME。
+
+先在内网更新 `02-code`，再执行：
+
+```bash
+cd /搬运路径/updates
+sha256sum -c SHA256SUMS
+cd /内网项目目录
+sudo make apply-dependency-delta DELTA_PACKAGE=/搬运路径/updates/dependencies-delta.tar.gz
+sudo python3 scripts/transfer.py check --manifest DEPENDENCIES_APPLIED.json
+```
+
+应用前校验整个基线和包内每个文件，基线不符、损坏或符号链接路径时停止，不边拷贝边猜测版本。
+依赖只能写入 `.cache/` 和 `vendor/compile/`，不会覆盖本地站点、Secret 或运行数据。
+中途系统故障后先核对目录并从完整包恢复，不将文件复制步骤视为数据库事务。
+下一次用生成的 `DEPENDENCIES_APPLIED.json` 作为基线。基线缺失时先按完整清单补齐，不跳过检查。

@@ -3,6 +3,7 @@ import io
 import json
 from pathlib import Path
 import subprocess
+import shutil
 import tarfile
 import tempfile
 from types import SimpleNamespace
@@ -17,6 +18,33 @@ ci = importlib.util.module_from_spec(spec); spec.loader.exec_module(ci)
 
 
 class TransferTests(unittest.TestCase):
+    def test_dependency_delta_apply_validate_baseline_and_remove_old_deb(self):
+        with tempfile.TemporaryDirectory() as folder, patch.object(transfer,'ROOT',Path(folder)):
+            root=Path(folder);(root/'docs').mkdir();(root/'docs/transfer.md').write_text('docs')
+            (root/'.cache/compile-extra-apt').mkdir(parents=True)
+            old=root/'.cache/compile-extra-apt/old.deb';old.write_bytes(b'old')
+            def manifest():
+                return {'format':1,'kind':'offline-dependencies','components':[{'name':'compiler','package':'compiler-deps.tar.gz',
+                        'files':transfer.files_under(['.cache/compile-extra-apt'])}]}
+            baseline=manifest();base=root/'base.json';base.write_text(json.dumps(baseline))
+            targetroot=root/'intranet';(targetroot/'.cache/compile-extra-apt').mkdir(parents=True)
+            shutil.copy2(old,targetroot/'.cache/compile-extra-apt/old.deb')
+            old.unlink();(old.parent/'new.deb').write_bytes(b'new')
+            target=root/'target.json';target.write_text(json.dumps(manifest()))
+            package=transfer.delta(base,target)
+            with tarfile.open(package) as archive:self.assertEqual(set(archive.getnames()),{'DELTA.json','.cache/compile-extra-apt/new.deb'})
+            (targetroot/'.cache/compile-extra-apt/old.deb').write_bytes(b'wrong')
+            with self.assertRaises(RuntimeError):transfer.apply_delta(package,targetroot)
+            self.assertFalse((targetroot/'.cache/compile-extra-apt/new.deb').exists())
+            (targetroot/'.cache/compile-extra-apt/old.deb').write_bytes(b'old')
+            sentinel=targetroot/'.cache/compile-extra-apt/new.deb.delta-tmp';sentinel.write_bytes(b'other-operation')
+            transfer.apply_delta(package,targetroot)
+            self.assertEqual(sentinel.read_bytes(),b'other-operation')
+            self.assertFalse((targetroot/'.cache/compile-extra-apt/old.deb').exists())
+            self.assertEqual((targetroot/'.cache/compile-extra-apt/new.deb').read_bytes(),b'new')
+            self.assertEqual(json.loads((targetroot/'DEPENDENCIES_APPLIED.json').read_text()),json.loads(target.read_text()))
+            for name in ('.state/users.json','.cache/../.state/users.json','/tmp/a'):
+                with self.assertRaises(ValueError):transfer.dependency_path(targetroot,name)
     def test_selected_archive_loads_only_upstream_images_and_rejects_wrong_id(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name); source, target = root/'all.tar', root/'upstream.tar'

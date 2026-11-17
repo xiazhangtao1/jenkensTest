@@ -1,0 +1,43 @@
+# 平台维护的构建规则；Git 地址/凭据可在 site.local.yaml 的 projects.<任务名> 覆盖。
+format: 1
+projects:
+  x-ran-cloud:
+    displayName: X-RAN-CLOUD
+    adapter: xran
+    defaultRef: main
+    builds:
+      service:
+        workdir: services
+        command: [./build.sh, '-c', '-m', '{target}']
+        artifactDirectory: JDBG/Release/services
+        artifact: '{target}.tar.gz'
+        bundlePattern: L2L3_*.tar.gz
+      image:
+        workdir: platform/k8s/images-build
+        command: [./images-build.sh, '{target}', '{imageTag}']
+        artifactDirectory: platform/k8s/images-build
+  xcn:
+    displayName: xcn
+    adapter: xcn
+    defaultRef: main
+    builds:
+      xcn:
+        workdir: helm
+        command: [./build-release.sh]
+        images: [xcn-runtime.tar, xcn-webui.tar, xcn-monitor.tar]
+        chart: 'xcn-{chartVersion}.tgz'
+  xtue-cloud:
+    displayName: XTUE-CLOUD
+    adapter: command
+    defaultRef: main
+    gitUrl: ssh://xiazhangtao@192.168.10.82:29418/XTUE-CLOUD
+    gitCredentialsId: intranet-gerrit-ssh
+    targets:
+      nrUE:
+        workdir: cmake_targets
+        command: [./build_oai, '-k', --nrUE]
+        artifacts: [cmake_targets/tue.tar.gz]
+      tuePhy:
+        workdir: cmake_targets
+        command: [./build_oai, '-k', --tuePhy]
+        artifacts: [cmake_targets/tue_simuphy.tar.gz]

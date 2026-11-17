@@ -12,6 +12,11 @@
         <f:checkbox checked="${instance.form.xcnAdminOnly}" />
         <div class="jenkins-help">未开启时沿用原项目权限。storage-maintenance 始终仅管理员可见。</div>
       </f:entry>
+      <j:forEach var="project" items="${instance.additionalProjects}">
+        <f:entry title="${project.displayName} 仅管理员可见" field="projectOnly_${project.id}">
+          <f:checkbox checked="${instance.form['projectOnly_' + project.id]}" />
+        </f:entry>
+      </j:forEach>
       <f:entry title="全局并发上限" field="concurrency">
         <f:number value="${instance.form.concurrency}" min="1" max="32" step="1" />
       </f:entry>
