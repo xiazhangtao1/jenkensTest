@@ -105,7 +105,7 @@ def prepare_apt(args, base, cache_name='compile-apt', package_files=None):
     cache = CACHE / cache_name
     cache.mkdir(parents=True, exist_ok=True)
     source = (ROOT / args.apt_sources).resolve()
-    package_files = package_files or ['config/apt-packages.txt', 'config/compile-apt-packages.txt']
+    package_files = package_files or ['config/compile-apt-packages.txt']
     packages = sorted({package for name in package_files for line in (ROOT / name).read_text().splitlines()
                        for package in line.split('#', 1)[0].split()})
     if not packages or any(not re.fullmatch(r'[a-z0-9][a-z0-9+.-]*(?::[a-z0-9]+)?(?:=[A-Za-z0-9.+:~_-]+)?', p) for p in packages):

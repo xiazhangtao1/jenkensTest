@@ -1,3 +1,22 @@
+# 基础工具与编译依赖：在源码 SDK 编译前安装，两种 Dockerfile 共用。
+build-essential
+cmake
+ninja-build
+pkg-config
+autoconf
+automake
+libtool
+git
+openssh-client
+ca-certificates
+curl
+python3
+jq
+rsync
+zip
+unzip
+file
+tzdata
 meson
 python3-pyelftools
 python3-pip

@@ -2,6 +2,9 @@
 
 当前项目目录是构建工作区，`.cache` 中既有依赖也有构建时使用的镜像归档。日常搬运统一使用 `dist/transfer/`，无需反复复制整个项目或 `.cache`。
 
+本次 APT 清单合并只需更新 `02-code`，无需重传依赖或重建镜像。覆盖解压代码不会移除旧文件，
+更新已有内网代码目录后，在项目根目录执行 `rm -f config/apt-packages.txt`；其内容已合入 `config/compile-apt-packages.txt`。
+
 此前 DPDK 固定参数和内网目标列表更新只需新的 `02-code`；既有 r2 镜像已验证为 256，无需重复拷贝编译镜像。
 本次 xcn 描述随 Controller 19 更新；旧站点带入 `02-code` 后只需重建 Controller，也可另带其成品，见 [升级 Jenkins](formal-build-upgrade.md#升级-jenkins)。
 业务编译新增 readline、hwloc 和 zstd 开发依赖时，已有完整环境需同步新版 `02-code` 和完整

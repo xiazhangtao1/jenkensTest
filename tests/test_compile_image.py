@@ -124,12 +124,11 @@ class CompilerTests(unittest.TestCase):
             self.assertIn('非法镜像名称或 tag', result.stdout + result.stderr)
             self.assertFalse(sentinel.exists())
 
-    def test_verified_apt_cache_survives_mirror_change_in_both_modes(self):
+    def test_merged_apt_list_reuses_verified_cache_across_mirrors_in_both_modes(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             config = root / 'config'; config.mkdir()
-            (config / 'apt-packages.txt').write_text('gcc\n')
-            (config / 'compile-apt-packages.txt').write_text('meson\n')
+            (config / 'compile-apt-packages.txt').write_text('# merged core dependencies\ngcc\nmeson\n')
             (config / 'sources.intranet.list').write_text('deb http://192.168.10.36/ubuntu_22_04/ jammy main\n')
             cache = root / '.cache/compile-apt'; cache.mkdir(parents=True)
             deb = cache / 'gcc.deb'; deb.write_bytes(b'cached-deb')
@@ -154,8 +153,7 @@ class CompilerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             config = root / 'config'; config.mkdir()
-            (config / 'apt-packages.txt').write_text('gcc\n')
-            (config / 'compile-apt-packages.txt').write_text('meson\n')
+            (config / 'compile-apt-packages.txt').write_text('gcc\nmeson\n')
             (config / 'sources.list').write_text('deb http://192.168.10.36/ubuntu_22_04/ jammy main\n')
             cache = root / '.cache/compile-apt'; cache.mkdir(parents=True)
             deb = cache / 'gcc.deb'; deb.write_bytes(b'verified-deb')

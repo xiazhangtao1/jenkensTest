@@ -48,7 +48,18 @@ asn1c 0.9.29 和资料中的 x86-64 `libairtracer.so`。该二进制没有随附
 gRPC 所需外部 proto 源码也已锁定提交并入库。`wls_mod.tar` 和 Intel oneAPI 不参与构建。
 protobuf、gRPC、Abseil、OpenTelemetry 和 spdlog 同时提供共享库与静态归档，兼容原装机资料中直接链接 `.a` 的用法；CMake 默认使用共享版本。
 
-APT 包拆为通用工具、编译依赖、额外工具及兼容版 protobuf-c 清单；额外工具同时提供 `pkgconf`、xcn 发布需要的 PyYAML、`libzstd-dev`、`libhwloc-dev` 和 `libreadline-dev`。
+APT 包只维护以下三份清单：
+
+| 清单 | 安装阶段和用途 | 缓存 |
+| --- | --- | --- |
+| `config/compile-apt-packages.txt` | 基础工具与编译依赖，在源码 SDK 编译前安装，两种 Dockerfile 共用 | `.cache/compile-apt` |
+| `config/compiler-extra-apt-packages.txt` | 补充软件，在源码 SDK 编译后安装，两种 Dockerfile 共用 | `.cache/compile-extra-apt` |
+| `config/compiler-compat-apt-packages.txt` | 固定版本的 Ubuntu protobuf-c 软件包，仅 compat Dockerfile 安装 | `.cache/compile-compat-apt` |
+
+日常新增业务编译软件（例如 `tcpdump`）通常只改补充清单，避免让 Docker 重编整条 SDK；
+编译 SDK 本身需要的软件应放入基础清单。清单支持注释和 `包名=版本`。
+原通用工具清单已合入基础清单，软件集合、安装顺序和缓存目录不变，已有完整缓存可继续用于 `OFFLINE=1`。
+补充清单同时提供 `pkgconf`、xcn 发布需要的 PyYAML、`libzstd-dev`、`libhwloc-dev` 和 `libreadline-dev`。
 `libzstd-dev` 提供业务代码使用的 `zstd.h` 及链接库。仅安装 `libzstd1` 运行库无法编译这些代码。
 `libhwloc-dev` 提供 `hwloc.h`、拓扑 API 的链接库和 pkg-config 元数据，连同运行依赖一起冻结到额外 APT 缓存。
 `libreadline-dev` 提供 CLI 使用的 `readline/readline.h`、`readline/history.h` 和链接库，同时缓存 `libncurses-dev` 等依赖。
