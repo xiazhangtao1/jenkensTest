@@ -95,6 +95,21 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual(annotations[0]['xran-ci/site-sha256'], annotations[2]['xran-ci/site-sha256'])
             self.assertNotEqual(annotations[0]['xran-ci/runtime-sha256'], annotations[2]['xran-ci/runtime-sha256'])
 
+    def test_controller_registry_survives_deployment_render(self):
+        with tempfile.TemporaryDirectory() as directory, patch.object(ci, 'state_dir', return_value=Path(directory)):
+            site = Path(directory) / 'site.yaml'
+            source = yaml.safe_load((REPO / 'config/site.yaml').read_text())
+            args = SimpleNamespace(site=site, namespace=None, offline=False)
+            for registry in [None, 'localhost:5000']:
+                if registry is not None:
+                    source['controllerRegistry'] = registry
+                site.write_text(yaml.safe_dump(source))
+                ci.render(args)
+                values = yaml.safe_load((Path(directory) / 'values.yaml').read_text())
+                self.assertEqual(values['controller']['image']['registry'], registry or 'docker.io')
+                self.assertEqual(values['controller']['image']['repository'], 'xran-ci/controller')
+                self.assertEqual(values['controller']['image']['tag'], ci.versions()['CONTROLLER_IMAGE'].rsplit(':', 1)[1])
+
     def test_private_registry_ca_covers_buildx_token_client_and_dind(self):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.intranet.yaml', namespace=None, offline=True))
         cfg.update(caSecret='test-registry-ca', registryInsecure=False)

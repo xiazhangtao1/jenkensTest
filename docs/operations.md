@@ -2,6 +2,14 @@
 
 管理员通过 **Manage Jenkins → 系统配置 → 构建平台设置** 修改并发、三类 Pod 资源、默认编译环境、xcn 离线模式、超时和磁盘下限，无需重新部署。生效时机、缩容与恢复规则见 [构建平台设置](platform-settings.md)。
 
+Controller 成品镜像通过其他 Registry 分发时，在实际站点 YAML 配置 `controllerRegistry: localhost:5000`
+（换成实际仓库地址，不含协议），镜像仓库路径和 tag 仍由 `config/versions.env` 指定。省略时为 `docker.io`。
+后续 `make deploy SITE=config/site.local.yaml` 会保留该选择；编译环境仍在网页“构建平台设置”中配置。
+
+当前外网演示主实例已升级至 Controller `2.580.2-20`、平台插件 `1.0.6`，使用本机 Registry 分发镜像，
+XTUE 使用独立只读模拟仓库；内网项目默认地址不变。原 PVC、账号及全部历史保留，四次实际构建及下载验证通过，
+见 [2026-11-17 主实例升级记录](verification/current-upgrade.json)。
+
 ## 历史回收
 
 `storage-maintenance` 每两小时执行一次，Cron 为 `H H/2 * * *`，分钟和小时由 Jenkins 哈希错开。
@@ -10,7 +18,7 @@ Jenkins 启动时另执行一次；每次构建及归档前也检查实际空间
 临时盘与数据盘不同且临时盘不足时，不会通过删除另一块盘的产物误处理。
 
 压力时按完成时间删除最早的未保留归档。使用 Jenkins ArtifactManager API，保留轻量构建信息和清理标记。
-运行中及 Keep forever 构建不参与回收，只处理 x-ran-cloud 和 xcn，不清理宿主机其他目录。
+运行中及 Keep forever 构建不参与回收，只处理平台注册项目，不清理宿主机其他目录。
 
 清理提示在首页、触发任务日志、storage-maintenance 和数据卷 xran-storage/cleanup.jsonl 中，
 记录构建号、commit 摘要、字节数和前后余量。无法满足安全空间时拒绝继续构建。

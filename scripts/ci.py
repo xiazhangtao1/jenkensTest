@@ -375,7 +375,7 @@ def render(args):
         {'group': {'name': 'authenticated', 'permissions': ['Overall/Read', 'Job/Read', 'Job/Build', 'Job/Cancel', 'View/Read']}}
     ]}}
     values = {'fullnameOverride': 'jenkins', 'controller': {
-        'image': {'registry': 'docker.io', 'repository': cfg['controllerImage'].split(':')[0],
+        'image': {'registry': cfg.get('controllerRegistry', 'docker.io'), 'repository': cfg['controllerImage'].split(':')[0],
                   'tag': cfg['controllerImage'].rsplit(':', 1)[1], 'pullPolicy': 'Never' if cfg.get('offline') else 'IfNotPresent'},
         'numExecutors': 0, 'installPlugins': False, 'additionalPlugins': [],
         'podAnnotations': {'xran-ci/image-id': cfg['imageIds'].get(cfg['controllerImage'], 'unlocked'),
