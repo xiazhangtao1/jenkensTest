@@ -2,11 +2,16 @@
 
 当前项目目录是构建工作区，`.cache` 中既有依赖也有构建时使用的镜像归档。日常搬运统一使用 `dist/transfer/`，无需反复复制整个项目或 `.cache`。
 
+内网 APT 源暂不能更新时，本次 XCN 基础镜像适配需最新 `02-code` 和
+`01-dependencies/optional-xcn-ubuntu/`。代码将载体版本升到 `xran-ci/xcn-bases:2`，
+部署前先 `make xcn-bases`、导入新载体，再 `make deploy`；不重做 Controller 或公共编译镜像。
+补包只有官方历史 Ubuntu，不覆盖目标机的 VPP；完整步骤及预检范围见 [冻结 APT 源适配](xcn.md#内网-apt-源冻结时的基础镜像更新)。
+
 XTUE 新增 `xxd`/`liblapacke-dev` 的本次补包使用最新 `02-code` 和 `01-dependencies/updates/`，
 随后重建、推送编译镜像。差量限定为补充 APT 缓存，不校验无关的 xcn 镜像归档；
 适用于此前 XTUE 依赖已同步的环境。具体命令见 [XTUE 工具补齐](xtue.md#补齐-xxd-与-lapacke2026-11-18)。
 
-已完成 Controller 22 升级的环境，本次 cgroup v2 DinD 修复只需覆盖 `runtime/dind-start.sh`（或新的 `02-code`），
+已完成 Controller 22 升级的环境，单独取得此前 cgroup v2 DinD 修复时只需覆盖 `runtime/dind-start.sh`，
 然后 `make deploy SITE=config/site.local.yaml OFFLINE=1`。不重传依赖或重做任何镜像；对新构建 Pod 生效。
 原因、复测命令及验证范围见 [cgroup v2 DinD](xcn.md#cgroup-v2-节点上的-dind)。
 
@@ -42,6 +47,7 @@ Harbor token 请求的 CA 信任修复只需新的 `02-code`，在内网配置�
 | --- | --- | --- | --- |
 | 外部依赖 | `01-dependencies/compiler-deps.tar.gz` | compileDep 整理的固定源码/分片、deb、Helm、Ubuntu 业务基础镜像 | 首次或编译依赖变化 |
 | 可选小补包 | `01-dependencies/optional-zstd-dev/` | 单个 zstd 开发包、校验值、断网增量 Dockerfile 和 C 自检 | 已有编译镜像仅缺 `zstd.h` 时；不替代完整依赖包 |
+| 可选基础镜像补包 | `01-dependencies/optional-xcn-ubuntu/` | 官方历史 Ubuntu 22.04、锁文件和校验值 | 内网 APT 源冻结且 XCN 业务镜像发生版本冲突时 |
 | 外部依赖 | `01-dependencies/jenkins-deps.tar.gz` | 官方 Jenkins 插件、Maven 缓存、Helm chart、kubectl/helm/ctr | 首次或平台依赖变化 |
 | 外部基础镜像 | `01-dependencies/build-base-images.tar` | Ubuntu 22.04、Jenkins 官方基础镜像、Docker CLI、Maven/JDK | 首次或基础镜像版本变化 |
 | 外部运行镜像 | `01-dependencies/runtime-base-images.tar` | Agent、DinD、Registry、local-path、busybox | 首次或版本变化；已有镜像可复用 |

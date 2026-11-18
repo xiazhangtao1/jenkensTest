@@ -7,6 +7,7 @@ IMAGE_TAG ?= latest
 DOCKERFILE ?= docker/builder-compat.Dockerfile
 BUILD_JOBS ?= 4
 APT_SOURCES ?= config/sources.online.list
+XCN_UBUNTU_ARCHIVE ?=
 OFFLINE ?= 0
 BASE_COMMIT ?=
 BASE_MANIFEST ?=
@@ -20,7 +21,7 @@ VERIFY_XCN_NUMBER ?=
 VERIFY_RESUME ?= 0
 shell_quote = '$(subst ','"'"',$(1))'
 COMPILE_FLAGS = --image-name $(call shell_quote,$(IMAGE_NAME)) --image-tag $(call shell_quote,$(IMAGE_TAG)) --dockerfile $(call shell_quote,$(DOCKERFILE)) --jobs $(call shell_quote,$(BUILD_JOBS)) --apt-sources $(call shell_quote,$(APT_SOURCES)) $(if $(filter 1,$(OFFLINE)),--offline)
-.PHONY: prepare images render import-images deploy bundle test verify verify-release backup compile-image push-compile-image platform-plugin transfer transfer-deps transfer-code transfer-check transfer-git transfer-delta apply-dependency-delta
+.PHONY: prepare images xcn-bases render import-images deploy bundle test verify verify-release backup compile-image push-compile-image platform-plugin transfer transfer-deps transfer-code transfer-check transfer-git transfer-delta apply-dependency-delta
 transfer: transfer-deps transfer-code
 transfer-deps:
 	$(PYTHON) scripts/transfer.py deps
@@ -40,6 +41,8 @@ compile-image:
 	$(PYTHON) scripts/compile-image.py build $(COMPILE_FLAGS)
 push-compile-image:
 	$(PYTHON) scripts/compile-image.py push --image-name $(call shell_quote,$(IMAGE_NAME)) --image-tag $(call shell_quote,$(IMAGE_TAG))
+xcn-bases:
+	$(PYTHON) scripts/ci.py xcn-bases --site $(call shell_quote,$(SITE)) $(COMPILE_FLAGS) $(if $(XCN_UBUNTU_ARCHIVE),--xcn-ubuntu-archive $(call shell_quote,$(XCN_UBUNTU_ARCHIVE)))
 prepare images render import-images deploy bundle backup:
 	$(PYTHON) scripts/ci.py $@ --site $(call shell_quote,$(SITE)) --source $(call shell_quote,$(SOURCE)) --xcn-source $(call shell_quote,$(XCN_SOURCE)) $(COMPILE_FLAGS)
 test:

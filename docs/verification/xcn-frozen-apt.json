@@ -1,0 +1,51 @@
+{
+  "ubuntuSource": {
+    "image": "ubuntu:jammy-20240111",
+    "manifestDigest": "sha256:cb2af41f42b9c9bc9bcdc7cf1735e3c4b3d95b2137be86fd940373471a34c8b0",
+    "imageId": "sha256:e34e831650c1bb0be9b6f61c6755749cb8ea2053ba91c6cda27fded9e089811f",
+    "platform": "linux/amd64",
+    "packages": {
+      "libc6": "2.35-0ubuntu3.6",
+      "libssl3": "3.0.2-0ubuntu1.12",
+      "gcc-12-base": "12.3.0-1ubuntu1~22.04",
+      "perl-base": "5.34.0-3ubuntu1.3",
+      "libgcrypt20": "1.9.4-3ubuntu3",
+      "libgnutls30": "3.7.3-4ubuntu1.3"
+    }
+  },
+  "before": {
+    "192.168.10.35/xnet/ubuntu:22.04": "sha256:b8e6b596a32475661d9fcaf4a212fcc7736e0d8d1494973aefdbcc71c442d890",
+    "192.168.10.35/xcn/vpp:26.06": "sha256:c6905634e001db54e9920644265f7d3ebb29b9dd6a7c171ebb0ae2c7e4e4541c"
+  },
+  "after": {
+    "192.168.10.35/xnet/ubuntu:22.04": "sha256:e34e831650c1bb0be9b6f61c6755749cb8ea2053ba91c6cda27fded9e089811f",
+    "192.168.10.35/xcn/vpp:26.06": "sha256:c6905634e001db54e9920644265f7d3ebb29b9dd6a7c171ebb0ae2c7e4e4541c"
+  },
+  "carrierImageId": "sha256:f3345cd3dbb09c3a74736b1d4388994d966eaf776f633dc19819f58378f4fa7b",
+  "carrierCopySha256": "a195cd59b20b3c1c8407a44b42f12c50264a664b9dd9ccd4b743a6bf486be512",
+  "checks": [
+    "official Ubuntu SHA256 checked during download",
+    "representative dependency simulation passed against online Ubuntu sources",
+    "VPP image ID unchanged",
+    "public ubuntu:22.04 ID unchanged",
+    "carrier default UID 1000 copied archive while network disabled",
+    "copied archive contains exactly expected Ubuntu and VPP image IDs",
+    "carrier-only rebuild passed with network none"
+  ],
+  "limitations": [
+    "actual intranet APT source inaccessible; target preflight required",
+    "not a complete private XCN release verification",
+    "current Jenkins deployment and public compiler image unchanged"
+  ],
+  "delivery": {
+    "archive": "dist/transfer/01-dependencies/optional-xcn-ubuntu/ubuntu-jammy-20240111.tar.gz",
+    "bytes": 29549077,
+    "sha256": "c9bb9047273aeb9f24f2dd6dcd4de6015189724dbedf9a024b27d5113fa276d8"
+  },
+  "unitTests": {
+    "total": 100,
+    "passed": 99,
+    "skipped": 1,
+    "command": "python3 -m unittest discover -s tests -p 'test_*.py' -v"
+  }
+}

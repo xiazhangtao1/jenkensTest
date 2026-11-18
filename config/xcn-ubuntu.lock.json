@@ -1,0 +1,14 @@
+{
+  "image": "ubuntu:jammy-20240111",
+  "manifestDigest": "sha256:cb2af41f42b9c9bc9bcdc7cf1735e3c4b3d95b2137be86fd940373471a34c8b0",
+  "imageId": "sha256:e34e831650c1bb0be9b6f61c6755749cb8ea2053ba91c6cda27fded9e089811f",
+  "platform": "linux/amd64",
+  "packages": {
+    "libc6": "2.35-0ubuntu3.6",
+    "libssl3": "3.0.2-0ubuntu1.12",
+    "gcc-12-base": "12.3.0-1ubuntu1~22.04",
+    "perl-base": "5.34.0-3ubuntu1.3",
+    "libgcrypt20": "1.9.4-3ubuntu3",
+    "libgnutls30": "3.7.3-4ubuntu1.3"
+  }
+}

@@ -105,3 +105,50 @@ v2 日志中的父路径应以 `/xran-builds` 结束，Docker 应报告 `2` 和 
 若提示 `controller is not delegated`，需检查节点是否给该容器层级开放了 cpu/memory 控制器。
 当前准备机仅有 v1：已执行带 CPU/内存限额的真实嵌套 run/build 回归，v2 的宿主/私有命名空间有脚本测试，
 v2 内核及真实内网业务构建仍需在目标节点复测。
+
+## 内网 APT 源冻结时的基础镜像更新
+
+如果 `libc6-dev` 要求 `2.35-0ubuntu3.8`，而基础镜像已安装 `libc6 2.35-0ubuntu3.13`，
+说明基础镜像与软件源的版本不匹配。公共 `xran-compile` 是三个项目共用的编译环境；
+XCN 的业务 Dockerfile 还会从自己的 Ubuntu/VPP 基础镜像开始安装依赖，这一层与公共编译镜像分别维护。
+
+无法更新内网源时，本次提供官方 `ubuntu:jammy-20240111` 的独立离线归档，
+其 linux/amd64 manifest、镜像 ID 和核心库版本记录在 `config/xcn-ubuntu.lock.json`。
+该镜像的核心库版本不高于本次日志中的依赖要求，最终安装版本由内网源解析。
+它是适配冻结源的候选基础镜像；准备机无法访问实际内网源，因此替换前必须在目标机预检。
+
+只拷贝最新 `02-code` 和 `01-dependencies/optional-xcn-ubuntu/`。
+先校验补包目录的 `SHA256SUMS`，更新代码时保留本地 `config/site.local.yaml`。
+在已有 Jenkins 项目根目录执行（归档路径按实际拷贝位置替换）：
+
+```bash
+sudo make xcn-bases SITE=config/site.local.yaml OFFLINE=1 \
+  APT_SOURCES=config/sources.intranet.list \
+  XCN_UBUNTU_ARCHIVE=/data/jenkins-update/optional-xcn-ubuntu/ubuntu-jammy-20240111.tar.gz
+
+sudo docker save -o /tmp/xcn-bases-2.tar xran-ci/xcn-bases:2
+sudo ctr -n k8s.io images import /tmp/xcn-bases-2.tar
+
+sudo env "PATH=$PATH:$PWD/.cache/tools" \
+  make deploy SITE=config/site.local.yaml OFFLINE=1
+```
+
+`make xcn-bases` 只制作基础镜像载体。指定 `XCN_UBUNTU_ARCHIVE` 时先核对镜像 ID/架构，
+再启动一次性容器读取指定软件源，执行 `apt-get update` 和代表性基础依赖的模拟安装。
+`OFFLINE=1` 的预检直接访问内网源，不访问外网；这不是 `--network none`，也不在宿主机安装软件。
+预检失败时停止，不替换已有归档或构建载体。预检通过后加载已有 `.cache/xcn-base-images.tar`，
+保留其中的 VPP，替换 Ubuntu，原子保存新归档并断网构建 `xran-ci/xcn-bases:2`。
+新的归档继续使用 `xcn.ubuntuImage` 指定的业务引用，公共 `ubuntu:22.04` 标签不变。
+
+离线部署对载体镜像使用 `Never`，每个可运行构建 Pod 的节点都需要导入新镜像，之后再提交新的 XCN 构建。
+无需重做 Controller 或公共编译镜像，也无需修改业务 Git 分支。
+代表性依赖预检不等于完整发布验收；三个业务镜像和 Chart 仍需在内网重新构建验证。
+原有 `xcn-bases:1` 和已运行 Pod 不会自动切换。回退可恢复原归档并将 `config/versions.env` 的载体版本改回 `1` 后部署。
+
+准备机重新获取官方归档时沿用当前代理：
+
+```bash
+python3 scripts/fetch-image.py ubuntu:jammy-20240111 .cache/images/ubuntu_jammy-20240111.tar
+```
+
+来源：[Ubuntu 官方镜像](https://hub.docker.com/_/ubuntu)。版本解析规则见 [APT preferences](https://manpages.ubuntu.com/manpages/jammy/man5/apt_preferences.5.html)。

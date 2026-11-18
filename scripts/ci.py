@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import tempfile
 import time
 import zipfile
 import importlib.util
@@ -194,7 +195,7 @@ def lock_plugins():
     (ROOT / 'config/plugins.lock').write_text('\n'.join(sorted(plugins)) + '\n')
 
 
-def prepare_xcn_bases(cfg, offline):
+def prepare_xcn_bases(cfg, offline, ubuntu_id=None):
     compiler = compiler_module()
     archive = CACHE / 'xcn-base-images.tar'
     previous = CACHE / 'open5gs-base-images.tar'
@@ -205,9 +206,67 @@ def prepare_xcn_bases(cfg, offline):
     if offline and archive.exists():
         run(['docker', 'load', '-i', archive])
     bases = [cfg['xcn']['ubuntuImage'], cfg['xcn']['vppImage']]
+    if ubuntu_id:
+        if bases[0] == versions()['UBUNTU_IMAGE'] or bases[0] == bases[1]:
+            raise ValueError('xcn.ubuntuImage 必须使用独立镜像引用，不能覆盖公共 Ubuntu 或 VPP 镜像')
+        run(['docker', 'tag', ubuntu_id, bases[0]])
     for ref in bases:
         compiler.ensure_image(ref, offline)
-    run(['docker', 'save', '-o', archive, *bases])
+    # Keep the current archive intact if save fails (e.g. disk pressure).
+    with tempfile.TemporaryDirectory(prefix='xcn-bases-', dir=CACHE) as folder:
+        temporary = Path(folder) / 'images.tar'
+        run(['docker', 'save', '-o', temporary, *bases])
+        temporary.replace(archive)
+
+
+def check_xcn_apt(args, image):
+    """Resolve the reported conflicting packages; never install into the host."""
+    source = (ROOT / args.apt_sources).resolve(strict=True)
+    proxy = []
+    if not args.offline:
+        for name in ('HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'NO_PROXY', 'no_proxy'):
+            if name in os.environ:
+                proxy += ['-e', name]
+    options = ['-o', 'Dir::Etc::sourceparts=-', '-o', 'Acquire::Retries=1',
+               '-o', 'Acquire::http::Timeout=15', '-o', 'Acquire::https::Timeout=15']
+    if args.offline:
+        options += ['-o', 'Acquire::http::Proxy=DIRECT', '-o', 'Acquire::https::Proxy=DIRECT']
+    run(['docker', 'run', '--rm', '--network', 'host', *proxy,
+         '-v', f'{source}:/etc/apt/sources.list:ro', image, 'bash', '-euc',
+         'apt-get "$@" -o APT::Update::Error-Mode=any update; '
+         'apt-get "$@" --simulate --no-install-recommends install '
+         'build-essential libc6-dev libssl-dev libgcrypt20-dev libgnutls28-dev perl',
+         'apt-preflight', *options])
+
+
+def xcn_bases(args):
+    """Rebuild only the XCN image carrier, optionally replacing its Ubuntu."""
+    cfg, v = config(args), versions()
+    compiler = compiler_module()
+    ubuntu_id = None
+    if args.xcn_ubuntu_archive:
+        archive = Path(args.xcn_ubuntu_archive).resolve(strict=True)
+        lock = json.loads((ROOT / 'config/xcn-ubuntu.lock.json').read_text())
+        run(['docker', 'load', '-i', archive])
+        details = compiler.inspect(lock['image'])
+        if details['Id'] != lock['imageId'] or (details['Os'], details['Architecture']) != ('linux', 'amd64'):
+            raise ValueError('XCN Ubuntu 归档与 config/xcn-ubuntu.lock.json 不符')
+        ubuntu_id = details['Id']
+        # Run before replacing the archive or its deployed image. This is a
+        # representative dependency check, not a complete business release.
+        check_xcn_apt(args, ubuntu_id)
+    prepare_xcn_bases(cfg, args.offline, ubuntu_id)
+    compiler.ensure_image(v['STORAGE_HELPER_IMAGE'], args.offline)
+    env = dict(os.environ, DOCKER_BUILDKIT='0')
+    with tempfile.TemporaryDirectory(prefix='xcn-context-', dir=CACHE) as folder:
+        context = Path(folder)
+        (context / '.cache').mkdir()
+        os.link(CACHE / 'xcn-base-images.tar', context / '.cache/xcn-base-images.tar')
+        shutil.copy2(ROOT / 'docker/xcn-bases.Dockerfile', context / 'Dockerfile')
+        run(['docker', 'build', '--network', 'none', '--pull=false', '--build-arg',
+             f'STORAGE_HELPER_IMAGE={v["STORAGE_HELPER_IMAGE"]}',
+             '-f', context / 'Dockerfile', '-t', cfg['xcnBasesImage'], context], env=env)
+    print('已生成 ' + cfg['xcnBasesImage'] + '；请导入各构建节点后执行 make deploy。')
 
 
 def images(args):
@@ -710,7 +769,7 @@ def wait_controller_stopped(cfg):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['prepare', 'images', 'render', 'import-images', 'deploy', 'bundle', 'backup', 'restore'])
+    parser.add_argument('command', choices=['prepare', 'images', 'xcn-bases', 'render', 'import-images', 'deploy', 'bundle', 'backup', 'restore'])
     parser.add_argument('--site', default=str(ROOT / 'config/site.yaml'))
     parser.add_argument('--source', default='/home/xiazhangtao/code/X-RAN-CLOUD')
     parser.add_argument('--namespace')
@@ -724,6 +783,7 @@ if __name__ == '__main__':
     parser.add_argument('--dockerfile', default='docker/builder-compat.Dockerfile')
     parser.add_argument('--jobs', type=int, default=4)
     parser.add_argument('--xcn-source', default=default_xcn_source())
+    parser.add_argument('--xcn-ubuntu-archive', help='仅 xcn-bases：替换为锁定的历史 Ubuntu，先执行 APT 依赖预检')
     parser.add_argument('--open5gs-source', dest='xcn_source', default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     arguments = parser.parse_args()
     os.chdir(ROOT)

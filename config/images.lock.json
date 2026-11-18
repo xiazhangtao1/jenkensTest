@@ -2,7 +2,7 @@
   "192.168.10.35/xnet/xran-compile:latest": "sha256:5361379b3bbe657d34cb079df633774e9588ddaa5c02793e38cd6bf6ae07a1b6",
   "jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25": "sha256:b54f24329a88a33fdc08608857b2136beebcbff88295e751b5cfc0f4b67849cb",
   "docker:29.9.3-dind": "sha256:51d0681aa1e6756df485af7922fbaf9bd73275db418900c713b564bc94f94175",
-  "xran-ci/xcn-bases:1": "sha256:9b5190e74cf3021633ab3c71ca5b875155459942b2207688fe87f603d1aa4eb0",
+  "xran-ci/xcn-bases:2": "sha256:f3345cd3dbb09c3a74736b1d4388994d966eaf776f633dc19819f58378f4fa7b",
   "xran-ci/demo:4": "sha256:9fb52ca80925cbc117c18fa153260d89b0bba1b01e1faf04d7ad8eadba827f84",
   "registry:2.8.3": "sha256:26b2eb03618e749084668eaff68cff8f81dda12d06ac641be7a6398b82a6f25b",
   "rancher/local-path-provisioner:v0.0.37": "sha256:683316f41426e4fc774e1cd7388e3bcbd5d4d63837753a789d929d64365c399a",
