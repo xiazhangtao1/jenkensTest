@@ -50,7 +50,8 @@ asn1c 0.9.29 和资料中的 x86-64 `libairtracer.so`。该二进制没有随附
 
 原提供的 etcd 和 OpenTelemetry 动态库依赖不同 protobuf/gRPC ABI，因此重新构建整条依赖链，
 补充固定版本 gRPC 1.49.1、Abseil 20220623.1、OpenTelemetry C++ 1.17.0 和 proto 1.3.2；
-gRPC 所需外部 proto 源码也已锁定提交并入库。`wls_mod.tar` 和 Intel oneAPI 不参与构建。
+gRPC 所需外部 proto 源码也已锁定提交并入库。`wls_mod.tar` 不参与构建；不安装完整 Intel 编译器工具链。
+MKL CPU SDK 单独使用 `config/mkl.lock.json` 锁定的 Intel 2022.1.0 二进制组件，见 [MKL 补齐](xtue.md#补齐-mkl-202210)。
 protobuf、gRPC、Abseil、OpenTelemetry 和 spdlog 同时提供共享库与静态归档，兼容原装机资料中直接链接 `.a` 的用法；CMake 默认使用共享版本。
 
 APT 包只维护以下三份清单：
@@ -73,6 +74,13 @@ APT 包只维护以下三份清单：
 缓存清单保留实际下载来源的哈希。需要主动刷新时先将对应缓存目录移走备份，再准备；新增软件或更换基础镜像仍需匹配的新缓存。
 准备步骤会校验、准备两种 Dockerfile 所需的缓存，方便迁入后切换；两版自行选择安装内容。
 Helm 3.17.3 二进制及 SHA256 固定于 `config/helm.lock.json`，缓存随离线包交付。
+MKL、配套 OpenMP/TBB 运行库和许可证缓存于 `.cache/compile-tools/mkl/`。
+准备步骤按 `config/mkl.lock.json` 的 URL、大小和 SHA256 校验；离线缺少或损坏时明确失败。
+Docker 中将选定 Intel 包作为二进制 SDK 解包到原 `/opt/intel/oneapi/` 路径，不注册成完整的 Intel APT 安装，
+也不解析或安装其 DPC++/MPI 工具链依赖。此处支持已验证的 CPU C/C++ 接口；版本和来源以独立锁文件追溯。
+镜像显式设置 `MKLROOT`、`CPATH`、`LIBRARY_PATH`、pkg-config/CMake 搜索路径，并通过 ldconfig 登记 CPU 动态库。
+MKL 自检包含头文件直引、64 字节对齐内存分配、矩阵乘法、VSL 同种子复现与数组边界，
+分别运行默认、GNU 和串行线程层，每个进程限制为一个线程。
 protobuf、gRPC、Boost 使用上述源码版本，避免再安装 APT 中不同版本的开发库。
 全套 1.5.2 Dockerfile 中，现有工具、头文件和运行库由 `docker/package-protobuf-c.sh` 打成真实的
 `protobuf-c-compiler`、`libprotobuf-c-dev`、`libprotobuf-c1` 软件包，再通过 `dpkg --install` 安装。

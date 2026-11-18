@@ -47,6 +47,9 @@ ENV PKG_CONFIG_DISABLE_UNINSTALLED=1
 COPY .cache/compile-extra-apt/ /tmp/extra-apt/
 RUN apt-get install -y --no-install-recommends /tmp/extra-apt/*.deb \
     && dpkg-query -W > /opt/packages.lock && rm -rf /tmp/extra-apt /var/lib/apt/lists/*
+COPY .cache/compile-tools/mkl/ /opt/xran/mkl-deps/
+COPY config/mkl.lock.json docker/install-mkl.sh /opt/xran/
+RUN bash /opt/xran/install-mkl.sh && rm -rf /opt/xran/mkl-deps
 COPY .cache/compile-tools/helm /usr/local/bin/helm
 COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
 COPY --from=dockercli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/local/libexec/docker/cli-plugins/docker-buildx
@@ -61,6 +64,11 @@ COPY config/compiler-extra-apt-packages.txt /opt/xran/extra-apt-packages.txt
 COPY docker/package-protobuf-c.sh /opt/xran/package-protobuf-c.sh
 RUN bash /opt/xran/package-protobuf-c.sh
 ENV XRAN_PROTOBUF_C_VERSION=1.5.2
+ENV MKLROOT=/opt/intel/oneapi/mkl/2022.1.0
+ENV CPATH=${MKLROOT}/include \
+    LIBRARY_PATH=${MKLROOT}/lib/intel64:/opt/intel/oneapi/lib/intel64:/opt/intel/oneapi/tbb/2021.6.0/lib/intel64/gcc4.8 \
+    PKG_CONFIG_PATH=${MKLROOT}/lib/pkgconfig:${PKG_CONFIG_PATH} \
+    CMAKE_PREFIX_PATH=${MKLROOT}:${CMAKE_PREFIX_PATH}
 USER 1000:1000
 WORKDIR /home/jenkins/agent
 CMD ["sleep", "infinity"]

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build/export the Ubuntu 22.04 SDK independently of Jenkins preparation."""
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import os
@@ -190,6 +191,42 @@ def prepare_helm(offline):
     binary.chmod(0o755)
 
 
+def prepare_mkl(offline):
+    lock = json.loads((ROOT / 'config/mkl.lock.json').read_text())
+    directory = CACHE / 'compile-tools/mkl'
+    directory.mkdir(parents=True, exist_ok=True)
+
+    def prepare(item):
+        name = item['file']
+        if not re.fullmatch(r'[A-Za-z0-9_.+-]+\.deb', name):
+            raise ValueError('非法 MKL 依赖文件名')
+        target = directory / name
+        if target.is_file() and target.stat().st_size == item['bytes'] and sha256(target) == item['sha256']:
+            return
+        if offline:
+            raise RuntimeError('MKL ' + lock['version'] + ' 离线依赖缺失或校验失败：' + name)
+        if not item['url'].startswith('https://apt.repos.intel.com/oneapi/'):
+            raise ValueError('MKL 依赖必须来自锁定的 Intel HTTPS 地址')
+        descriptor, temporary_name = tempfile.mkstemp(prefix=name + '.', dir=directory)
+        temporary = Path(temporary_name)
+        try:
+            with os.fdopen(descriptor, 'wb') as output, urllib.request.urlopen(item['url'], timeout=90) as response:
+                while block := response.read(1024 * 1024):
+                    output.write(block)
+            if temporary.stat().st_size != item['bytes'] or sha256(temporary) != item['sha256']:
+                raise RuntimeError('MKL 下载大小或 SHA256 不符：' + name)
+            temporary.chmod(0o644)
+            temporary.replace(target)
+            print('MKL 已校验：' + name, flush=True)
+        finally:
+            temporary.unlink(missing_ok=True)
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        list(executor.map(prepare, lock['packages']))
+    (directory / 'SHA256SUMS').write_text(''.join(item['sha256'] + '  ' + item['file'] + '\n'
+                                              for item in lock['packages']))
+
+
 def build(args):
     ref = image_reference(args.image_name, args.image_tag)
     dockerfile = resolve_dockerfile(getattr(args, 'dockerfile', DEFAULT_DOCKERFILE))
@@ -211,6 +248,7 @@ def build(args):
     # Prepare both recipes' small extra caches so the same offline kit can build either.
     prepare_apt(args, v['UBUNTU_IMAGE'], 'compile-compat-apt', ['config/compiler-compat-apt-packages.txt'])
     prepare_helm(args.offline)
+    prepare_mkl(args.offline)
     env = os.environ.copy()
     env['DOCKER_BUILDKIT'] = '0'
     # Compilation never needs a network: all archives and debs have already been verified.
@@ -246,6 +284,8 @@ print(json.dumps({name: subprocess.check_output(command, text=True).strip()
                 'aptManifestSha256': sha256(CACHE / 'compile-apt/manifest.json'),
                 'extraAptManifestSha256': sha256(CACHE / 'compile-extra-apt/manifest.json'),
                 'compatAptManifestSha256': sha256(CACHE / 'compile-compat-apt/manifest.json'),
+                'mklVersion': json.loads((ROOT / 'config/mkl.lock.json').read_text())['version'],
+                'mklManifestSha256': sha256(ROOT / 'config/mkl.lock.json'),
                 'bytes': archive.stat().st_size, 'sha256': sha256(archive)}
     (directory / 'manifest.json').write_text(json.dumps(metadata, indent=2) + '\n')
     (directory / 'SHA256SUMS').write_text(f"{metadata['sha256']}  image.tar\n{sha256(directory / 'manifest.json')}  manifest.json\n")

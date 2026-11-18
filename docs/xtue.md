@@ -52,13 +52,16 @@ sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml 
 
 ## 补齐 xxd 与 LAPACKE（2026-11-18）
 
+以下保留该次补包记录；当前 `01-dependencies/updates/` 已替换为下文的 MKL 专项差量。
+缺少 xxd/LAPACKE 的环境须先补齐对应完整 APT 缓存，MKL 差量不包含它们。
+
 真实内网构建发现还需要 `xxd` 和 `liblapacke-dev`：前者生成 `T_messages.txt.h`，后者提供
 `lapacke_utils.h` 和 LAPACKE C 接口；已有 `liblapack-dev` 不包含该头文件。
 对应 Ubuntu 文件清单见 [xxd](https://packages.ubuntu.com/jammy/amd64/xxd/filelist) 和
 [liblapacke-dev](https://packages.ubuntu.com/jammy/amd64/liblapacke-dev/filelist)。两种 Dockerfile 共用的补充清单已加入这两项。
 镜像自检实际执行 `xxd -i`、编译运行生成的头文件，并包含 `lapacke_utils.h`、链接运行 LAPACKE 求解器。
 
-已应用此前 XTUE 依赖的内网环境，本次只需最新 `02-code` 和最新 `01-dependencies/updates/`。
+当时已应用此前 XTUE 依赖的内网环境，只需该次 `02-code` 和 `01-dependencies/updates/`。
 该差量只描述 `.cache/compile-extra-apt/`，包含新增的五个 deb 和缓存 manifest，复用原有已校验文件，
 不检查 xcn/Controller 镜像归档，也不更新它们。完整依赖包同步更新，用于全新安装或缓存基线不匹配的情况。
 此前约 61MiB 的 XTUE 首次升级差量不包含本次新增包，不能重复当成本次补包使用。
@@ -77,8 +80,45 @@ sudo make push-compile-image IMAGE_TAG=26.11.18-compat-xtue-tools
 
 另一个编译环境使用 `DOCKERFILE=docker/builder.Dockerfile` 和不同的 tag。
 网页选择新 tag 和 `Always` 后重新构建。不需要重做 Controller；若一并更新了 DinD 启动脚本，另执行 `make deploy`。
-此次 `DEPENDENCIES_APPLIED.json` 只记录补充 APT 范围；将来的完整依赖对比使用 `02-code/DEPENDENCIES.json`。
-实际私有业务源码不可访问，完整 nrUE/tuePhy 构建仍需内网复测。
+该次 `DEPENDENCIES_APPLIED.json` 只记录补充 APT 范围；将来的完整依赖对比使用 `02-code/DEPENDENCIES.json`。
+实际私有业务源码不可访问，完整 nrUE/tuePhy 构建仍需内网复测。下文 MKL 差量不重复包含这次 xxd/LAPACKE 依赖。
+
+## 补齐 MKL 2022.1.0
+
+真实内网源码还使用 `mkl.h` 和 `mkl_vsl.h`。已确认原可编译宿主机安装在
+`/opt/intel/oneapi/mkl/2022.1.0`，本次按同版提供 SDK，不采用 Ubuntu 的 MKL 2020 替代。
+`MKLROOT` 为空不代表未安装；非交互 Pod 不依赖原宿主机的 shell 配置，镜像显式设置路径。
+
+官方包的 URL/版本/大小/SHA256 位于 `config/mkl.lock.json`。独立缓存为 `.cache/compile-tools/mkl/`，
+约 356MB，包含 MKL 开发/运行文件、配套 OpenMP、TBB 运行库及许可证。
+三份 Ubuntu APT 清单及其现有缓存不变。只解包所选 CPU SDK 组件，不安装整套 Intel 编译器，
+不修改系统 BLAS/LAPACK alternatives；不提供 DPC++/MPI 工具链。
+来源：[Intel 安装入口](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html) 和
+[Intel 2022 发布记录](https://www.intel.com/content/www/us/en/developer/articles/release-notes/onemkl/2022.html)。
+
+内网停留在 `2dff0d7`、尚未引入 `27562e5` 时，带入
+`02-code/updates/xtue-mkl/` 和本次最新 `01-dependencies/updates/` 即可。
+这里使用专项代码补丁，不解压整个最新 `02-code/code.tar.gz`，不带入 XCN 载体版本切换。
+各目录先校验 `SHA256SUMS`。在已有内网项目根目录执行：
+
+```bash
+git apply --check /data/jenkins-update/xtue-mkl/code.patch
+git apply /data/jenkins-update/xtue-mkl/code.patch
+sudo make apply-dependency-delta \
+  DELTA_PACKAGE=/data/jenkins-update/updates/dependencies-delta.tar.gz
+sudo make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list \
+  DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.18-compat-xtue-mkl
+sudo make push-compile-image IMAGE_TAG=26.11.18-compat-xtue-mkl
+```
+
+代码补丁同时验证可用于 `27562e5` 基线；有其他本地修改时 `git apply --check` 若失败先核对差异，
+不要强制覆盖。依赖差量只新增 MKL 缓存，不校验或修改 XCN、Controller 或已有 Ubuntu APT 缓存。
+此前 xxd/LAPACKE 的约 1.1MB 补包不包含 MKL，不可用旧包代替。
+
+Jenkins 选择编译环境 `192.168.10.35/xnet/xran-compile:26.11.18-compat-xtue-mkl`，拉取策略 `Always`。
+无需重建 Controller 或重新部署 Jenkins。另一套 SDK 使用 `docker/builder.Dockerfile` 和独立的 sdk tag。
+本次自检验证 MKL 2022.1.0 的头文件、运行库版本一致，实际执行内存分配、BLAS 和 VSL，
+并回归原 SDK。真实私有 XTUE 完整构建仍需在内网重新验证；若业务脚本写死其他路径，按实际日志再适配。
 
 ## ASN.1 来源
 

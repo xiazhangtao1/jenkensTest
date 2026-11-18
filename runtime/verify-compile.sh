@@ -14,6 +14,11 @@ while read -r line; do
     done
 done < /opt/xran/extra-apt-packages.txt
 pkg-config --exists libxml++-2.6 libnghttp2 libxslt libibverbs
+pkg-config --modversion mkl-dynamic-lp64-seq
+# Business C sources include these headers directly without pkg-config flags.
+printf '#include <mkl.h>\n#include <mkl_vsl.h>\nint main(void) { MKLVersion v; mkl_get_version(&v); return v.MajorVersion != 2022; }\n' > "$sdk_check_dir/mkl-headers.c"
+gcc -Wall -Wextra -Werror "$sdk_check_dir/mkl-headers.c" -lmkl_rt -lpthread -ldl -lm -o "$sdk_check_dir/mkl-headers"
+"$sdk_check_dir/mkl-headers"
 command -v unrar
 command -v xxd
 # Exercise the same binary-to-header command used by XTUE's T tracer.

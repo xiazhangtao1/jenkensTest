@@ -73,6 +73,7 @@ class CompilerTests(unittest.TestCase):
                         'DOCKER_CLI_IMAGE': 'docker:test'}), \
                      patch.object(compiler, 'assemble_sources'), patch.object(compiler, 'ensure_image'), \
                      patch.object(compiler, 'prepare_apt'), patch.object(compiler, 'prepare_helm'), \
+                     patch.object(compiler, 'prepare_mkl'), \
                      patch.object(compiler, 'run') as execute:
                     (root / 'config').mkdir()
                     (root / 'config/base-images.txt').write_text('')

@@ -1,0 +1,91 @@
+{
+  "version": "2022.1.0",
+  "root": "/opt/intel/oneapi/mkl/2022.1.0",
+  "scope": "CPU C/C++ SDK with OpenMP and TBB runtime; no DPC++ or MPI compiler toolchain",
+  "metadataUrls": [
+    "https://apt.repos.intel.com/oneapi/dists/all/main/binary-amd64/Packages.gz",
+    "https://apt.repos.intel.com/oneapi/dists/all/main/binary-all/Packages.gz"
+  ],
+  "packages": [
+    {
+      "package": "intel-oneapi-common-licensing-2022.1.0",
+      "version": "2022.1.0-161",
+      "file": "intel-oneapi-common-licensing-2022.1.0-2022.1.0-161_all.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-common-licensing-2022.1.0-2022.1.0-161_all.deb",
+      "sha256": "30f36ef653964ac629ce77c2c2d21a923c7ba4ff88936c39a8f39237b7446cca",
+      "bytes": 30506
+    },
+    {
+      "package": "intel-oneapi-common-vars",
+      "version": "2022.1.0-161",
+      "file": "intel-oneapi-common-vars-2022.1.0-161_all.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-common-vars-2022.1.0-161_all.deb",
+      "sha256": "52a2726739652b4d3021a9f21d8ca664cd5582853b561e421f003b94789a4469",
+      "bytes": 11634
+    },
+    {
+      "package": "intel-oneapi-mkl-2022.1.0",
+      "version": "2022.1.0-223",
+      "file": "intel-oneapi-mkl-2022.1.0-2022.1.0-223_amd64.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-mkl-2022.1.0-2022.1.0-223_amd64.deb",
+      "sha256": "10974019f1bf2c3bcbb76880892b39d436e8d95faebbb62004fa9727e0eaae4b",
+      "bytes": 185025174
+    },
+    {
+      "package": "intel-oneapi-mkl-common-2022.1.0",
+      "version": "2022.1.0-223",
+      "file": "intel-oneapi-mkl-common-2022.1.0-2022.1.0-223_all.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-mkl-common-2022.1.0-2022.1.0-223_all.deb",
+      "sha256": "93b461332d506ba74900518f0d65a309b203391d91b33b399f37262dbb23bdfc",
+      "bytes": 23906
+    },
+    {
+      "package": "intel-oneapi-mkl-common-devel-2022.1.0",
+      "version": "2022.1.0-223",
+      "file": "intel-oneapi-mkl-common-devel-2022.1.0-2022.1.0-223_all.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-mkl-common-devel-2022.1.0-2022.1.0-223_all.deb",
+      "sha256": "789924d0506f55d9d0db23636402e9a0f73026d2849eac460d73ee7d083c4701",
+      "bytes": 4909496
+    },
+    {
+      "package": "intel-oneapi-mkl-devel-2022.1.0",
+      "version": "2022.1.0-223",
+      "file": "intel-oneapi-mkl-devel-2022.1.0-2022.1.0-223_amd64.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-mkl-devel-2022.1.0-2022.1.0-223_amd64.deb",
+      "sha256": "49399449a4e834124b63d3a4a1a48a154fe7e8a43f5617aea3bf6e9aa3337d64",
+      "bytes": 156885826
+    },
+    {
+      "package": "intel-oneapi-runtime-openmp",
+      "version": "2022.1.0-3768",
+      "file": "intel-oneapi-runtime-openmp-2022.1.0-3768_amd64.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-runtime-openmp-2022.1.0-3768_amd64.deb",
+      "sha256": "957aede330cd5f8b32c1175beaaef0e135fe446ad62f55b7748109cfbaff3fce",
+      "bytes": 7602824
+    },
+    {
+      "package": "intel-oneapi-runtime-openmp-common",
+      "version": "2022.1.0-3768",
+      "file": "intel-oneapi-runtime-openmp-common-2022.1.0-3768_all.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-runtime-openmp-common-2022.1.0-3768_all.deb",
+      "sha256": "827f518cb53c2694a5d635b361219fa136344986cd74277b55b1d0b8e7a561d2",
+      "bytes": 10048
+    },
+    {
+      "package": "intel-oneapi-tbb-2021.6.0",
+      "version": "2021.6.0-835",
+      "file": "intel-oneapi-tbb-2021.6.0-2021.6.0-835_amd64.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-tbb-2021.6.0-2021.6.0-835_amd64.deb",
+      "sha256": "80617c7ebf590006fadaa271a8f193b2937eaf901ed51e626c02c9073a8dc9e4",
+      "bytes": 1985316
+    },
+    {
+      "package": "intel-oneapi-tbb-common-2021.6.0",
+      "version": "2021.6.0-835",
+      "file": "intel-oneapi-tbb-common-2021.6.0-2021.6.0-835_all.deb",
+      "url": "https://apt.repos.intel.com/oneapi/pool/main/intel-oneapi-tbb-common-2021.6.0-2021.6.0-835_all.deb",
+      "sha256": "148f21702a2cb0ae185aef720cce19e3e7abcd219ac20a0a8211a0b931b0b816",
+      "bytes": 21254
+    }
+  ]
+}

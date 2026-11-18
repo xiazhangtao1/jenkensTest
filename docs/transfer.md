@@ -2,14 +2,20 @@
 
 当前项目目录是构建工作区，`.cache` 中既有依赖也有构建时使用的镜像归档。日常搬运统一使用 `dist/transfer/`，无需反复复制整个项目或 `.cache`。
 
+XTUE 补齐 MKL 2022.1.0：只需 `02-code/updates/xtue-mkl/` 专项代码补丁和
+`01-dependencies/updates/` MKL 依赖差量，然后重建、推送编译镜像。
+该补丁已兼容尚未应用 `27562e5` 的 `2dff0d7` 环境，不切换 XCN 载体或 Ubuntu，
+也不需要重做 Controller、重新部署 Jenkins。不要为此覆盖整个最新代码包；操作见 [MKL 更新](xtue.md#补齐-mkl-202210)。
+该次差量仅含 `.cache/compile-tools/mkl/`，不含此前 xxd/LAPACKE 补充 APT 包。
+
 内网 APT 源暂不能更新时，本次 XCN 基础镜像适配需最新 `02-code` 和
 `01-dependencies/optional-xcn-ubuntu/`。代码将载体版本升到 `xran-ci/xcn-bases:2`，
 部署前先 `make xcn-bases`、导入新载体，再 `make deploy`；不重做 Controller 或公共编译镜像。
 补包只有官方历史 Ubuntu，不覆盖目标机的 VPP；完整步骤及预检范围见 [冻结 APT 源适配](xcn.md#内网-apt-源冻结时的基础镜像更新)。
 
-XTUE 新增 `xxd`/`liblapacke-dev` 的本次补包使用最新 `02-code` 和 `01-dependencies/updates/`，
-随后重建、推送编译镜像。差量限定为补充 APT 缓存，不校验无关的 xcn 镜像归档；
-适用于此前 XTUE 依赖已同步的环境。具体命令见 [XTUE 工具补齐](xtue.md#补齐-xxd-与-lapacke2026-11-18)。
+此前 XTUE 新增 `xxd`/`liblapacke-dev` 的差量已由当前 MKL 补包替换。
+新装环境使用最新完整 `compiler-deps.tar.gz`；旧环境缺少这两项时补齐完整 `.cache/compile-extra-apt/` 后重建编译镜像。
+历史验证及命令见 [XTUE 工具补齐](xtue.md#补齐-xxd-与-lapacke2026-11-18)。
 
 已完成 Controller 22 升级的环境，单独取得此前 cgroup v2 DinD 修复时只需覆盖 `runtime/dind-start.sh`，
 然后 `make deploy SITE=config/site.local.yaml OFFLINE=1`。不重传依赖或重做任何镜像；对新构建 Pod 生效。
@@ -153,8 +159,8 @@ sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml 
 只重建编译镜像时：
 
 ```bash
-sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.18-compat-xtue-tools
-sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.18-sdk-xtue-tools
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.18-compat-xtue-mkl
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.18-sdk-xtue-mkl
 ```
 
 成品在 `dist/transfer/03-generated-images/compiler/`。两个目录是不同编译环境，均是当前版本。

@@ -1,0 +1,230 @@
+{
+  "date": "2026-11-18",
+  "status": "PASS",
+  "originalWorkingHostMklRoot": "/opt/intel/oneapi/mkl/2022.1.0",
+  "mkl": {
+    "packageVersion": "2022.1.0",
+    "cApiVersionMacro": 20220001,
+    "lock": "config/mkl.lock.json",
+    "lockSha256": "0ea11610a23890769cd5005d23d7cce0cef3ece58318504658de14fe3025275f",
+    "officialPackages": 10,
+    "downloadBytes": 356505984,
+    "cache": ".cache/compile-tools/mkl/",
+    "packageHashAndSizeVerification": "PASS",
+    "components": "CPU MKL development/runtime, OpenMP/TBB runtime, original licenses",
+    "install": "Extract selected locked SDK components; no full DPC++/MPI toolchain or APT registration"
+  },
+  "images": [
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.18-compat-xtue-mkl",
+      "imageId": "sha256:fca1720b6589688a6187680d066b67d59bcdebcabb0f7489af548e0b79b1fa2b",
+      "createdAt": "2026-11-18T11:57:27.165073339Z",
+      "dockerfile": "docker/builder-compat.Dockerfile",
+      "dockerfileSha256": "b7373dcd04043f9c203d38ba95461a958fcf5a320a6237971169b897dd4a65a6",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.3.3",
+        "pkgconf": "1.8.0"
+      },
+      "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+      "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+      "extraAptManifestSha256": "8c3eeb54710430a3e86232387b5dd9810ed419d5a803fa213cdeba18c86287da",
+      "compatAptManifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1",
+      "mklVersion": "2022.1.0",
+      "mklManifestSha256": "0ea11610a23890769cd5005d23d7cce0cef3ece58318504658de14fe3025275f",
+      "bytes": 7584908288,
+      "sha256": "e743bb09f141356d3db54ec9034cbe4152179825b7dd00a79b04dfdd1522a9d0",
+      "ctest": {
+        "passed": 13,
+        "failed": 0
+      },
+      "network": "none",
+      "user": "1000:1000",
+      "mklDirectHeaderAndLink": "PASS",
+      "mklAllocationBlasVsl": {
+        "DEFAULT": "PASS",
+        "GNU": "PASS",
+        "SEQUENTIAL": "PASS"
+      }
+    },
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.18-sdk-xtue-mkl",
+      "imageId": "sha256:1a60672a3882a58948256453dcef16fa9351eb03e947293f46b380600cc68791",
+      "createdAt": "2026-11-18T11:57:28.885384837Z",
+      "dockerfile": "docker/builder.Dockerfile",
+      "dockerfileSha256": "78b1bee2cfe8156d94350f2fa70dd23832ad57d85497850b935e50f0e99fa497",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.5.2",
+        "pkgconf": "1.8.0"
+      },
+      "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+      "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+      "extraAptManifestSha256": "8c3eeb54710430a3e86232387b5dd9810ed419d5a803fa213cdeba18c86287da",
+      "compatAptManifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1",
+      "mklVersion": "2022.1.0",
+      "mklManifestSha256": "0ea11610a23890769cd5005d23d7cce0cef3ece58318504658de14fe3025275f",
+      "bytes": 7583956480,
+      "sha256": "6f1fa021478427d307f1c3539a03ddec04a1b526bf53395555182e12a9507d6f",
+      "ctest": {
+        "passed": 13,
+        "failed": 0
+      },
+      "network": "none",
+      "user": "1000:1000",
+      "mklDirectHeaderAndLink": "PASS",
+      "mklAllocationBlasVsl": {
+        "DEFAULT": "PASS",
+        "GNU": "PASS",
+        "SEQUENTIAL": "PASS"
+      }
+    }
+  ],
+  "pythonTests": {
+    "total": 105,
+    "passed": 104,
+    "skipped": 1,
+    "failed": 0,
+    "skipReason": "Git cache real UID switching requires a root compiler test container"
+  },
+  "ubuntuAptCachesAndLists": "UNCHANGED",
+  "systemBlasLapackAlternatives": {
+    "compat": {
+      "tools": {
+        "mklRoot": null,
+        "alternatives": {
+          "libblas.so.3-x86_64-linux-gnu": "/usr/lib/x86_64-linux-gnu/atlas/libblas.so.3.10.3",
+          "liblapack.so.3-x86_64-linux-gnu": "/usr/lib/x86_64-linux-gnu/atlas/liblapack.so.3.10.3"
+        },
+        "mklHeaders": {
+          "mkl.h": false,
+          "mkl_vsl.h": false
+        },
+        "ldconfigMkl": null
+      },
+      "mkl": {
+        "mklRoot": "/opt/intel/oneapi/mkl/2022.1.0",
+        "alternatives": {
+          "libblas.so.3-x86_64-linux-gnu": "/usr/lib/x86_64-linux-gnu/atlas/libblas.so.3.10.3",
+          "liblapack.so.3-x86_64-linux-gnu": "/usr/lib/x86_64-linux-gnu/atlas/liblapack.so.3.10.3"
+        },
+        "mklHeaders": {
+          "mkl.h": true,
+          "mkl_vsl.h": true
+        },
+        "ldconfigMkl": "/opt/intel/oneapi/lib/intel64\n/opt/intel/oneapi/mkl/2022.1.0/lib/intel64\n/opt/intel/oneapi/tbb/2021.6.0/lib/intel64/gcc4.8\n"
+      }
+    },
+    "sdk": {
+      "tools": {
+        "mklRoot": null,
+        "alternatives": {
+          "libblas.so.3-x86_64-linux-gnu": "/usr/lib/x86_64-linux-gnu/atlas/libblas.so.3.10.3",
+          "liblapack.so.3-x86_64-linux-gnu": "/usr/lib/x86_64-linux-gnu/atlas/liblapack.so.3.10.3"
+        },
+        "mklHeaders": {
+          "mkl.h": false,
+          "mkl_vsl.h": false
+        },
+        "ldconfigMkl": null
+      },
+      "mkl": {
+        "mklRoot": "/opt/intel/oneapi/mkl/2022.1.0",
+        "alternatives": {
+          "libblas.so.3-x86_64-linux-gnu": "/usr/lib/x86_64-linux-gnu/atlas/libblas.so.3.10.3",
+          "liblapack.so.3-x86_64-linux-gnu": "/usr/lib/x86_64-linux-gnu/atlas/liblapack.so.3.10.3"
+        },
+        "mklHeaders": {
+          "mkl.h": true,
+          "mkl_vsl.h": true
+        },
+        "ldconfigMkl": "/opt/intel/oneapi/lib/intel64\n/opt/intel/oneapi/mkl/2022.1.0/lib/intel64\n/opt/intel/oneapi/tbb/2021.6.0/lib/intel64/gcc4.8\n"
+      }
+    }
+  },
+  "dependencyDelta": {
+    "scope": [
+      ".cache/compile-tools/mkl/"
+    ],
+    "files": 11,
+    "packageBytes": 356608730,
+    "sha256": "ba9f0b07cc56df3bae3e2b145a96ee3cbccc02522f979e6335c5c39096c956f5",
+    "actualApply": "PASS",
+    "allDeliveredFilesVerified": "PASS",
+    "duplicateApply": "REJECTED",
+    "unrelatedXcnAndApt": "UNCHANGED"
+  },
+  "codePatch": {
+    "patch": {
+      "format": 1,
+      "kind": "xtue-mkl-code-update",
+      "baseCommit": "27562e5c10be16068e85c67e40ca8bd03b41104c",
+      "supportedBaselines": [
+        "2dff0d7",
+        "27562e5"
+      ],
+      "files": [
+        "Makefile",
+        "docker/builder-compat.Dockerfile",
+        "docker/builder.Dockerfile",
+        "docs/compile-image.md",
+        "docs/xtue.md",
+        "runtime/compile-check/CMakeLists.txt",
+        "runtime/verify-compile.sh",
+        "scripts/compile-image.py",
+        "tests/test_compile_image.py",
+        "config/mkl.lock.json",
+        "docker/install-mkl.sh",
+        "runtime/compile-check/mkl-check.c",
+        "tests/test_mkl.py"
+      ],
+      "package": "code.patch",
+      "bytes": 31468,
+      "sha256": "0caea2c6b4451448ef27cc453a0a5095c26ede31ab1d18fabef5e2d4fd7098ae",
+      "preserves": [
+        "config/versions.env",
+        "config/images.lock.json",
+        "config/site.local.yaml",
+        "XCN base images"
+      ]
+    },
+    "validation": [
+      {
+        "baseline": "2dff0d7",
+        "gitApplyCheck": "PASS",
+        "actualApply": "PASS",
+        "compilerTests": {
+          "passed": 15,
+          "failed": 0
+        },
+        "xcnCarrierPreserved": "xran-ci/xcn-bases:1",
+        "localSitePreserved": "PASS",
+        "mklFilesAndBaselineSpecificMakefile": "PASS"
+      },
+      {
+        "baseline": "27562e5",
+        "gitApplyCheck": "PASS",
+        "actualApply": "PASS",
+        "compilerTests": {
+          "passed": 15,
+          "failed": 0
+        },
+        "xcnCarrierPreserved": "xran-ci/xcn-bases:2",
+        "localSitePreserved": "PASS",
+        "mklFilesAndBaselineSpecificMakefile": "PASS"
+      }
+    ]
+  },
+  "fullCompilerDependencyPackage": {
+    "package": "compiler-deps.tar.gz",
+    "bytes": 972451839,
+    "sha256": "1a13a3954304c351b5ba9c7275d6dbb73216f5faba1a2192df2b4b357823be3a"
+  },
+  "limitations": [
+    "Real private XTUE source unavailable; nrUE/tuePhy full builds require intranet verification.",
+    "New compiler images were built, verified and exported here; not pushed to intranet Harbor.",
+    "Compiler latest tag, Jenkins deployment, Controller and XCN carrier were not updated by this change."
+  ]
+}
