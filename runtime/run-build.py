@@ -51,7 +51,26 @@ def run(args, cwd=None, capture=False, input_text=None, env=None):
 
 
 def checkout():
-    return checkout_source(ROOT, SOURCE, PUBLISH)
+    checkout_source(ROOT, SOURCE, PUBLISH)
+    return 0
+
+
+def snapshot():
+    """Pin one ConfigMap revision for the entire build, independent of the image."""
+    directory = Path(__file__).resolve().parent
+    scripts = {name: (directory / name).read_text()
+               for name in ('run-build.py', 'projects.py', 'git_checkout.py')}
+    digest = hashlib.sha256(json.dumps(scripts, sort_keys=True).encode()).hexdigest()
+    if digest != os.environ.get('XRAN_RUNTIME_SCRIPTS_SHA256'):
+        raise ValueError('平台运行脚本校验失败，部署配置与挂载版本不一致，请重新部署后重试')
+    temporary = Path(tempfile.mkdtemp(prefix='.xran-platform-', dir=ROOT))
+    try:
+        for name, content in scripts.items():
+            (temporary / name).write_text(content)
+        temporary.replace(ROOT / '.xran-platform')
+    finally:
+        if temporary.exists(): shutil.rmtree(temporary)
+    print('平台运行脚本已固定: ' + digest, flush=True)
 
 
 def ensure_docker(archive):
@@ -98,7 +117,13 @@ def release_build():
 
 
 def capabilities():
-    print(json.dumps({'xranServiceCompatibility': 1, 'xranImageArchiveFallback': 1, 'projectRecipes': 1}))
+    print(json.dumps({'xranServiceCompatibility': 1, 'xranServiceArtifacts': 1,
+                      'xranImageArchiveFallback': 1, 'projectRecipes': 1}))
+
+
+def service_artifacts():
+    directory = inside_source(project_recipe('service').get('artifactDirectory', 'JDBG/Release/services'))
+    return sorted(directory.glob('*.tar.gz'))
 
 
 def prepare_xran():
@@ -135,6 +160,10 @@ def build():
         if target == 'all':
             raise ValueError('服务目标 all 已取消，请选择单个服务或 services_all')
         prepare_xran()
+        # A repository may track old packages, and scripts may leave them on failure.
+        # Only packages produced after this cleanup belong to the current build.
+        for path in service_artifacts():
+            path.unlink()
         spec = project_recipe('service')
         run(recipe_command(spec, target=target) if spec else ['./build.sh', '-c', '-m', target],
             inside_source(spec.get('workdir', 'services')), input_text='/opt/dpdk-22.03\n')
@@ -157,6 +186,13 @@ def read_small(archive, name):
     if not item.isfile() or item.size > 8 * 1024 * 1024:
         raise ValueError('非法归档元数据: ' + name)
     return archive.extractfile(item).read()
+
+
+def checksum_line(item):
+    # GNU sha256sum escaping keeps unusual but valid filenames unambiguous.
+    name = item['name']
+    escaped = name.replace('\\', '\\\\').replace('\n', '\\n')
+    return ('\\' if escaped != name else '') + item['sha256'] + '  ' + escaped + '\n'
 
 
 def image_archive_path():
@@ -300,11 +336,8 @@ def collect():
     meta.update(json.loads(os.environ['XRAN_BUILD_METADATA']))
     kind, target = os.environ['XRAN_KIND'], os.environ['XRAN_TARGET']
     generic = project_spec().get('adapter') == 'command'
-    spec = project_recipe(kind)
-    directory = inside_source(spec.get('artifactDirectory', 'JDBG/Release/services' if kind == 'service' else 'platform/k8s/images-build'))
     files = ([inside_source(name) for name in command_recipe()['artifacts']] if generic else
-        sorted(directory.glob(spec.get('bundlePattern', 'L2L3_*.tar.gz') if target == 'services_all' else spec.get('artifact', '{target}.tar.gz').format(target=target)))
-        if kind == 'service' and directory.exists() else [])
+             service_artifacts() if kind == 'service' else [])
     collected = []
     errors = []
     if kind == 'image':
@@ -315,10 +348,13 @@ def collect():
                 subprocess.CalledProcessError) as error:
             errors.append('镜像产物: ' + str(error))
     for path in files:
+        if path.is_symlink():
+            errors.append('非法产物路径: ' + path.name)
+            continue
         if not path.is_file():
             if generic and meta.get('result') == 'SUCCESS': errors.append('缺少预期产物: ' + path.name)
             continue
-        if path.is_symlink() or not re.fullmatch(r'[A-Za-z0-9_.-]+', path.name):
+        if (generic or kind != 'service') and not re.fullmatch(r'[A-Za-z0-9_.-]+', path.name):
             errors.append('非法产物路径: ' + path.name)
             continue
         try:
@@ -331,7 +367,10 @@ def collect():
                             content_files += 1
                             with archive.extractfile(entry) as data:
                                 while data.read(1024 * 1024): pass
-                    if generic and not content_files:
+                    # Tar end markers can precede the gzip trailer. Drain it to
+                    # validate CRC/length and reject truncated compressed streams.
+                    while archive.fileobj.read(1024 * 1024): pass
+                    if not content_files:
                         raise tarfile.ReadError('服务包不能为空')
         except (tarfile.TarError, EOFError, OSError) as error:
             errors.append(f'{path.name}: {error}')
@@ -348,13 +387,8 @@ def collect():
     if kind == 'service' and not generic and meta.get('result') == 'SUCCESS':
         if target == 'all':
             errors.append('服务目标 all 已取消，请选择单个服务或 services_all')
-        expected = {spec.get('artifact', '{target}.tar.gz').format(target=target).removesuffix('.tar.gz')} if target != 'services_all' else None
-        actual = {x['name'].removesuffix('.tar.gz') for x in collected}
-        if expected is not None and expected != actual:
-            errors.append('服务产物集合不符合目标')
-        pattern = spec.get('bundleNameRegex', r'L2L3_\d{10}_{commit9}\.tar\.gz').replace('{commit9}', meta.get('commit', '')[:9])
-        if target == 'services_all' and (len(collected) != 1 or not re.fullmatch(pattern, collected[0]['name'])):
-            errors.append('services_all 产物名称或数量不符合约定')
+        if len(collected) != 1:
+            errors.append(f'服务构建应生成一个有效 .tar.gz，实际归集 {len(collected)} 个')
     if meta.get('result') == 'SUCCESS' and not collected:
         errors.append('构建没有产生有效产物')
     if errors:
@@ -363,7 +397,7 @@ def collect():
     meta['collectionErrors'] = errors
     meta['finishedAt'] = dt.datetime.now(dt.timezone.utc).isoformat()
     (PUBLISH / 'metadata.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2) + '\n')
-    (PUBLISH / 'SHA256SUMS').write_text(''.join(f'{x["sha256"]}  {x["name"]}\n' for x in collected))
+    (PUBLISH / 'SHA256SUMS').write_text(''.join(checksum_line(x) for x in collected))
     (ROOT / 'collection.json').write_text(json.dumps({'bytes': sum(p.stat().st_size for p in PUBLISH.iterdir()),
         'errors': errors, 'files': len(collected)}))
     if errors:
@@ -373,7 +407,7 @@ def collect():
 
 
 if __name__ == '__main__':
-    commands = {'checkout': checkout, 'build': build, 'collect': collect, 'capabilities': capabilities}
+    commands = {'checkout': checkout, 'build': build, 'collect': collect, 'capabilities': capabilities, 'snapshot': snapshot}
     if len(sys.argv) != 2 or sys.argv[1] not in commands:
-        raise SystemExit('usage: run-build.py checkout|build|collect|capabilities')
+        raise SystemExit('usage: run-build.py checkout|build|collect|capabilities|snapshot')
     raise SystemExit(commands[sys.argv[1]]() or 0)

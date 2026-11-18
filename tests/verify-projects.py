@@ -84,7 +84,7 @@ def main():
     assert names==['COMPILER_IMAGE','COMPILER_IMAGE_PULL_POLICY','REF_TYPE','GIT_REF','SERVICE_TARGET'],names
     record('XTUE 专用五参数，无镜像/Chart 字段')
     with admin.request('configure') as response:
-        page=response.read().decode();assert 'XTUE-CLOUD 仅管理员可见' in page
+        page=response.read().decode();assert 'X-TUE-CLOUD 仅管理员可见' in page
     record('管理员系统表单动态渲染 XTUE 权限开关')
     for kind,ref,sha in [('branch','main',pins['head']),('tag','fixture-v1',pins['old']),('commit',pins['old'],pins['old']),('commit',pins['head'][:9],pins['head'])]:
       for target,artifact in [('nrUE','tue.tar.gz'),('tuePhy','tue_simuphy.tar.gz')]:

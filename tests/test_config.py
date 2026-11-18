@@ -51,6 +51,11 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual(pvc['metadata']['annotations']['helm.sh/resource-policy'],'keep')
             config=next(r for r in resources if r['kind']=='ConfigMap')['data']
             self.assertEqual(config['git_checkout.py'],(REPO/'runtime/git_checkout.py').read_text())
+            for name in ('run-build.py', 'projects.py'):
+                self.assertEqual(config[name], (REPO/'runtime'/name).read_text())
+            import hashlib
+            scripts={name:config[name] for name in ('run-build.py','projects.py','git_checkout.py')}
+            self.assertEqual(cfg['runtimeScriptsSha256'],hashlib.sha256(json.dumps(scripts,sort_keys=True).encode()).hexdigest())
             values=yaml.safe_load((Path(folder)/'values.yaml').read_text())
             self.assertTrue(any(v.get('persistentVolumeClaim',{}).get('claimName')=='xran-git-cache' for v in values['persistence']['volumes']))
             init=values['controller']['customInitContainers'][0]
@@ -60,6 +65,8 @@ class ConfigurationTests(unittest.TestCase):
                 self.assertEqual(pod['spec']['securityContext']['fsGroupChangePolicy'],'OnRootMismatch')
                 builder=next(c for c in pod['spec']['containers'] if c['name']=='builder')
                 self.assertTrue(any(v['name']=='git-checkout' and v['readOnly'] for v in builder['volumeMounts']))
+                volume=next(v for v in pod['spec']['volumes'] if v['name']=='git-checkout')
+                self.assertEqual({item['key'] for item in volume['configMap']['items']},set(scripts))
 
     def test_both_pod_profiles_enforce_total_resources(self):
         cfg = ci.config(SimpleNamespace(site=REPO / 'config/site.yaml', namespace=None, offline=False))

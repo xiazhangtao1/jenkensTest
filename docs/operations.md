@@ -6,9 +6,10 @@ Controller 成品镜像通过其他 Registry 分发时，在实际站点 YAML �
 （换成实际仓库地址，不含协议），镜像仓库路径和 tag 仍由 `config/versions.env` 指定。省略时为 `docker.io`。
 后续 `make deploy SITE=config/site.local.yaml` 会保留该选择；编译环境仍在网页“构建平台设置”中配置。
 
-当前外网演示主实例已升级至 Controller `2.580.2-20`、平台插件 `1.0.6`，使用本机 Registry 分发镜像，
-XTUE 使用独立只读模拟仓库；内网项目默认地址不变。原 PVC、账号及全部历史保留，四次实际构建及下载验证通过，
-见 [2026-11-17 主实例升级记录](verification/current-upgrade.json)。
+当前外网演示主实例已升级至 Controller `2.580.2-22`、平台插件 `1.0.7`，使用本机 Registry 分发镜像。
+首页显示 X-RAN-CLOUD、X-CN-CLOUD、X-TUE-CLOUD，任务地址保留；构建脚本及 Git 缓存按当前部署使用，原编译镜像继续复用。
+已对照完整备份核对全部 380 次旧构建和账号、配置、PVC；原 #101 镜像包 SHA256 一致，升级后三次实际构建及浏览器复验通过，
+见 [2026-11-18 主实例升级记录](verification/current-upgrade.json)。
 
 ## 历史回收
 
@@ -88,7 +89,7 @@ admin、builder1、builder2 的密码，不是后续全部账号的名单。初�
 
 ## 新增服务构建目标
 
-例如业务代码已经支持 `./build.sh -c -m DemoC`，并生成 `JDBG/Release/services/DemoC.tar.gz`：
+例如业务代码已经支持 `./build.sh -c -m DemoC`，并在 `JDBG/Release/services/` 生成一个 `.tar.gz`：
 
 1. 在实际部署使用的 `config/site.local.yaml` 的 `services` 列表末尾增加 `DemoC`，保留 `services_all` 为第一项。
 2. 等待当前构建完成，再执行 `sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml OFFLINE=1`。
@@ -98,6 +99,28 @@ admin、builder1、builder2 的密码，不是后续全部账号的名单。初�
 列表保存在本地 YAML 和部署后的 ConfigMap，服务器正常重启不会丢失。
 当前“构建平台设置”尚未提供服务/镜像列表编辑入口；只改任务网页的 Choices 会在启动时被初始化脚本覆盖，
 且流水线仍按站点配置校验合法目标。新增镜像同理修改 `images` 和 `imageRepositories` 后部署。
+
+## 项目显示名称与产物页面
+
+首页显示名称由 `config/projects.yaml` 的 `displayName` 控制，也可以在实际站点配置中覆盖：
+
+```yaml
+projects:
+  xcn:
+    displayName: X-CN-CLOUD
+  xtue-cloud:
+    displayName: X-TUE-CLOUD
+```
+
+合并到已有 `projects` 映射，执行 `make deploy SITE=config/site.local.yaml OFFLINE=1` 生效；任务 ID、URL、Git 地址、缓存及历史保持原值。
+以后修改显示名同样无需重做镜像，服务器重启会从持久部署配置重新加载。直接在网页任务配置里改名会在启动时被配置覆盖。
+
+X-RAN 服务的单目标和 `services_all` 均从配置的 `artifactDirectory`（默认 `JDBG/Release/services`）收集一个有效 `.tar.gz`，不限制服务同名、前缀、时间或 commit 后缀。
+编译前只清除此目录直接包含的旧 `.tar.gz`，其他文件保留；成功构建缺包、多包、空包、损坏包或符号链接均报错。
+依旧记录 SHA256、commit、用户和时间。通用项目的明确产物路径及 X-CN 的四产物校验继续按各自配置执行。
+
+压缩归档保留文件名下载链接，隐藏强制文本预览的 `view`；`metadata.json`、`SHA256SUMS` 等文本仍可预览。
+左侧历史构建的普通文本描述也可点击、按 Enter 或通过浏览器原生方式打开，列表自动刷新后仍生效。
 
 ## 备份恢复
 

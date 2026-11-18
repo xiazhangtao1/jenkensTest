@@ -37,7 +37,7 @@ PY
 test "$(pkg-config --modversion libprotobuf-c)" = "$XRAN_PROTOBUF_C_VERSION"
 protoc-c --version | grep -qx 'protobuf-c 1.5.2'
 python3 /opt/xran/run-build.py capabilities | python3 -c \
-    'import json,sys; c=json.load(sys.stdin); assert c["xranServiceCompatibility"] == c["xranImageArchiveFallback"] == c["projectRecipes"] == 1'
+    'import json,sys; c=json.load(sys.stdin); assert c["xranServiceCompatibility"] == c["xranServiceArtifacts"] == c["xranImageArchiveFallback"] == c["projectRecipes"] == 1'
 for package in protobuf-c-compiler libprotobuf-c-dev libprotobuf-c1 uuid-dev libzstd-dev libhwloc-dev libreadline-dev; do
     test "$(dpkg-query -W -f='${Status}' "$package")" = 'install ok installed'
 done

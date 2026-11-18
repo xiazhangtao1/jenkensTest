@@ -44,9 +44,9 @@ local-path 声明不会预占 20Gi 或提供硬配额；网页预算是所有项
 ```bash
 sudo make platform-plugin OFFLINE=1
 sudo docker build --network none --pull=false \
-  -f docker/controller.Dockerfile -t xran-ci/controller:2.580.2-21 .
-sudo docker save -o /tmp/xran-controller-21.tar xran-ci/controller:2.580.2-21
-sudo ctr -n k8s.io images import /tmp/xran-controller-21.tar
+  -f docker/controller.Dockerfile -t xran-ci/controller:2.580.2-22 .
+sudo docker save -o /tmp/xran-controller-22.tar xran-ci/controller:2.580.2-22
+sudo ctr -n k8s.io images import /tmp/xran-controller-22.tar
 sudo env "PATH=$PATH:$PWD/.cache/tools" \
   make deploy SITE=config/site.local.yaml OFFLINE=1
 ```

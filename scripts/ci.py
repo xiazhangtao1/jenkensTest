@@ -293,7 +293,8 @@ def pod_template(cfg, kind):
         {'name': 'git-checkout', 'mountPath': '/opt/xran-platform', 'readOnly': True},
         {'name': 'git-cache', 'mountPath': '/var/xran-git-cache', 'subPath': 'XRAN_PROJECT'}]
     volumes += [
-        {'name': 'git-checkout', 'configMap': {'name': 'xran-config', 'items': [{'key': 'git_checkout.py', 'path': 'git_checkout.py'}]}},
+        {'name': 'git-checkout', 'configMap': {'name': 'xran-config', 'items': [
+            {'key': name, 'path': name} for name in ('run-build.py', 'projects.py', 'git_checkout.py')]}},
         {'name': 'git-cache', 'persistentVolumeClaim': {'claimName': 'xran-git-cache'}}]
     containers = [jnlp, builder]
     if image:
@@ -362,12 +363,15 @@ def render(args):
          'metadata': {'name': 'xran-git-cache', 'namespace': namespace, 'annotations': {'helm.sh/resource-policy': 'keep'}},
          'spec': {'accessModes': ['ReadWriteOnce'], 'storageClassName': cfg['storageClass'],
                   'resources': {'requests': {'storage': cfg['gitCachePvcSize']}}}}]
+    platform_scripts = {name: (ROOT / 'runtime' / name).read_text()
+                        for name in ('run-build.py', 'projects.py', 'git_checkout.py')}
+    cfg['runtimeScriptsSha256'] = hashlib.sha256(json.dumps(platform_scripts, sort_keys=True).encode()).hexdigest()
     runtime = {'site.json': json.dumps(cfg, ensure_ascii=False, indent=2),
                'pod-service.json': json.dumps(pod_template(cfg, 'service')),
                'pod-image.json': json.dumps(pod_template(cfg, 'image')),
                'pod-xcn.json': json.dumps(pod_template(cfg, 'xcn')),
                'dind-start.sh': (ROOT / 'runtime/dind-start.sh').read_text(),
-               'git_checkout.py': (ROOT / 'runtime/git_checkout.py').read_text()}
+               **platform_scripts}
     manifests.append({'apiVersion': 'v1', 'kind': 'ConfigMap',
         'metadata': {'name': 'xran-config', 'namespace': namespace}, 'data': runtime})
     if cfg.get('offline'):

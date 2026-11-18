@@ -53,6 +53,7 @@ COPY --from=dockercli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/l
 COPY --chown=1000:1000 .cache/base-images.tar /opt/xran/base-images.tar
 COPY runtime/run-build.py /opt/xran/run-build.py
 COPY runtime/projects.py /opt/xran/projects.py
+COPY runtime/git_checkout.py /opt/xran/git_checkout.py
 COPY runtime/demo-server.py /opt/xran/demo-server.py
 COPY runtime/compile-check/ /opt/xran/compile-check/
 COPY runtime/verify-compile.sh /opt/xran/verify-compile.sh

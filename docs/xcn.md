@@ -1,6 +1,6 @@
-# xcn 发布构建
+# X-CN-CLOUD 发布构建
 
-入口：Jenkins → **xcn** → **Build with Parameters**。独立于 `x-ran-cloud`，两者共用六个构建槽位和磁盘压力回收。
+入口：Jenkins → **X-CN-CLOUD** → **Build with Parameters**，任务 ID 仍为 `xcn`。独立于 `x-ran-cloud`，共用六个构建槽位和磁盘压力回收。
 
 升级前先完成运行中和排队的构建，并保留 Jenkins HOME 备份。初始化会将原发布任务原地迁移为 `xcn`，
 保留原构建编号、日志、参数和归档；已有资源配置自动迁移，具体数值不恢复为默认值。重复启动不会重复迁移。

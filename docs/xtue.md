@@ -1,6 +1,6 @@
 # XTUE-CLOUD 与项目扩展
 
-Jenkins 入口 `xtue-cloud`，显示名称 **XTUE-CLOUD**。默认 `main`、`nrUE`，支持分支、tag、完整及唯一短 commit SHA。
+Jenkins 入口 `xtue-cloud`，显示名称 **X-TUE-CLOUD**。默认 `main`、`nrUE`，支持分支、tag、完整及唯一短 commit SHA。
 默认编译环境为 `192.168.10.35/xnet/xran-compile:latest`，拉取策略 Always，均可在提交构建时修改。
 
 | 目标 | 工作目录 | 命令 | 仓库内预期产物 |
@@ -12,7 +12,7 @@ Jenkins 入口 `xtue-cloud`，显示名称 **XTUE-CLOUD**。默认 `main`、`nrU
 超时、磁盘预留、历史保留与压力回收规则相同；编译 Pod 默认 UID 1000，不给 XTUE 注入 X-RAN 的 Makefile 串行补丁。
 业务脚本若自行覆盖并行参数，仍以脚本行为为准；可在项目命令/环境配置中调整。
 
-管理员在系统配置的“构建平台设置”看到“XTUE-CLOUD 仅管理员可见”。保存、重启后保持，关闭后恢复原项目授权。
+管理员在系统配置的“构建平台设置”看到“X-TUE-CLOUD 仅管理员可见”。保存、重启后保持，关闭后恢复原项目授权。
 构建详情记录用户、时间、完整 commit、实际编译镜像及项目规则哈希；HOME 中的每次构建还保存 `xran-project.json` 规则快照。
 
 ## 修改构建规则与新增项目

@@ -20,6 +20,8 @@ class ProjectTests(unittest.TestCase):
     def test_registry_legacy_connections_overrides_and_new_project(self):
         site = yaml.safe_load((ROOT/'config/site.intranet.yaml').read_text())
         projects = load_registry(site, ROOT/'config/projects.yaml')
+        self.assertEqual(projects['xcn']['displayName'], 'X-CN-CLOUD')
+        self.assertEqual(projects['xtue-cloud']['displayName'], 'X-TUE-CLOUD')
         self.assertEqual(projects['x-ran-cloud']['gitUrl'], site['gitUrl'])
         self.assertEqual(projects['xcn']['gitUrl'], site['xcn']['gitUrl'])
         self.assertEqual(list(projects['xtue-cloud']['targets']), ['nrUE','tuePhy'])

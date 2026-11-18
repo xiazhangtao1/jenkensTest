@@ -1,185 +1,116 @@
 {
-  "date": "2026-11-17",
-  "url": "http://10.2.0.119:32080/",
+  "date": "2026-11-18",
   "namespace": "jenkins",
+  "url": "http://10.2.0.119:32080/",
+  "sourceFingerprint": "26782c87809e8cfe1ead8da614f9c81c195a27c8cfad98674420f1deededb96e",
+  "controller": "xran-ci/controller:2.580.2-22",
+  "plugin": "1.0.7",
   "checks": [
     {
-      "name": "插件升级为 1.0.6，原管理员配置保留",
+      "name": "主实例已升级；原账号、配置、PVC、Secret、全部历史编号和结果保留",
       "status": "PASS"
     },
     {
-      "name": "当前环境默认编译镜像更新为已验证版本，拉取策略 Always",
+      "name": "原 #101 镜像产物下载 SHA256 一致",
       "status": "PASS"
     },
     {
-      "name": "原 PVC 和账号 Secret 保留，Controller 使用 2.580.2-20",
-      "status": "PASS"
-    },
-    {
-      "name": "全部原构建编号、结果和账号保留",
-      "status": "PASS"
-    },
-    {
-      "name": "原历史镜像产物下载 SHA256 保持一致",
+      "name": "主实例实际构建和普通账号下载成功",
       "status": "PASS",
       "job": "x-ran-cloud",
-      "number": 99
+      "number": 102,
+      "target": "serviceA"
     },
     {
-      "name": "原普通账号可访问三个业务项目，维护任务继续隐藏",
-      "status": "PASS"
-    },
-    {
-      "name": "XTUE 原生页面和五参数正确，xcn 版本参数与离线模式保持原规则",
-      "status": "PASS"
-    },
-    {
-      "name": "主实例实际构建及下载成功",
-      "status": "PASS",
-      "job": "xtue-cloud",
-      "number": 1,
-      "target": "nrUE"
-    },
-    {
-      "name": "主实例实际构建及下载成功",
-      "status": "PASS",
-      "job": "xtue-cloud",
-      "number": 2,
-      "target": "tuePhy"
-    },
-    {
-      "name": "主实例实际构建及下载成功",
+      "name": "主实例实际构建和普通账号下载成功",
       "status": "PASS",
       "job": "x-ran-cloud",
-      "number": 100,
+      "number": 103,
       "target": "services_all"
     },
     {
-      "name": "主实例实际构建及下载成功",
+      "name": "主实例实际构建和普通账号下载成功",
       "status": "PASS",
-      "job": "x-ran-cloud",
-      "number": 101,
-      "target": "imageA"
+      "job": "xtue-cloud",
+      "number": 3,
+      "target": "nrUE"
+    },
+    {
+      "name": "主实例普通用户看到新名称；压缩包 view 隐藏，原 #101 描述可点击",
+      "status": "PASS"
     }
   ],
   "builds": [
     {
-      "job": "xtue-cloud",
-      "number": 1,
+      "job": "x-ran-cloud",
+      "number": 102,
+      "target": "serviceA",
       "result": "SUCCESS",
-      "parameters": {
-        "REF_TYPE": "branch",
-        "GIT_REF": "main",
-        "SERVICE_TARGET": "nrUE",
-        "COMPILER_IMAGE": "localhost:5000/xran-ci/xran-compile:26.11.17-compat-xtue",
-        "COMPILER_IMAGE_PULL_POLICY": "Always"
+      "runtimeScriptsSha256": "3f0ef4c48f85437be6eecc3a5db9fe3f4194c4ff0b8958a4f4cf5218451bcfe9",
+      "gitCache": {
+        "hit": false,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 146,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "a75ede2c5ad6462a2eab0ad99e652ad2245d1afbf1e5c55c0e46f98725f67762"
       },
-      "files": [
-        {
-          "name": "tue.tar.gz",
-          "size": 176,
-          "sha256": "483240807cd3bdc2bd71588c89dc184386446df5fd410bee79ee544b76a0ab04"
-        }
-      ],
-      "commit": "4a04fb9e62ce60d913995bad50c580c8c1f5622e",
-      "durationSeconds": 280.556
-    },
-    {
-      "job": "xtue-cloud",
-      "number": 2,
-      "result": "SUCCESS",
-      "parameters": {
-        "REF_TYPE": "tag",
-        "GIT_REF": "fixture-v1",
-        "SERVICE_TARGET": "tuePhy",
-        "COMPILER_IMAGE": "localhost:5000/xran-ci/xran-compile:26.11.17-compat-xtue",
-        "COMPILER_IMAGE_PULL_POLICY": "Always"
-      },
-      "files": [
-        {
-          "name": "tue_simuphy.tar.gz",
-          "size": 184,
-          "sha256": "446d9260dbd346fc0e4178ff043353961e7a60b9748bb8e8adc392b946c64d57"
-        }
-      ],
-      "commit": "97214896b513464caf612c6aaa3270b04e9466e1",
-      "durationSeconds": 19.744
+      "compilerImage": "localhost:5000/xran-ci/xran-compile:26.11.17-compat-xtue"
     },
     {
       "job": "x-ran-cloud",
-      "number": 100,
+      "number": 103,
+      "target": "services_all",
       "result": "SUCCESS",
-      "parameters": {
-        "BUILD_KIND": "service",
-        "REF_TYPE": "branch",
-        "GIT_REF": "main",
-        "SERVICE_TARGET": "services_all",
-        "COMPILER_IMAGE": "localhost:5000/xran-ci/xran-compile:26.11.17-compat-xtue",
-        "COMPILER_IMAGE_PULL_POLICY": "Always"
+      "runtimeScriptsSha256": "3f0ef4c48f85437be6eecc3a5db9fe3f4194c4ff0b8958a4f4cf5218451bcfe9",
+      "gitCache": {
+        "hit": true,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 106,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "a75ede2c5ad6462a2eab0ad99e652ad2245d1afbf1e5c55c0e46f98725f67762"
       },
-      "files": [
-        {
-          "name": "L2L3_1117200921_db3051980.tar.gz",
-          "size": 2949,
-          "sha256": "4f94c84c252580f9697e98848e797d814a7316207f8d9e733a748e9c54badac6"
-        }
-      ],
-      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
-      "durationSeconds": 26.763
+      "compilerImage": "localhost:5000/xran-ci/xran-compile:26.11.17-compat-xtue"
     },
     {
-      "job": "x-ran-cloud",
-      "number": 101,
+      "job": "xtue-cloud",
+      "number": 3,
+      "target": "nrUE",
       "result": "SUCCESS",
-      "parameters": {
-        "BUILD_KIND": "image",
-        "REF_TYPE": "branch",
-        "GIT_REF": "main",
-        "IMAGE_TARGET": "imageA",
-        "IMAGE_TAG": "upgrade-26.11.17",
-        "COMPILER_IMAGE": "localhost:5000/xran-ci/xran-compile:26.11.17-compat-xtue",
-        "COMPILER_IMAGE_PULL_POLICY": "Always"
+      "runtimeScriptsSha256": "3f0ef4c48f85437be6eecc3a5db9fe3f4194c4ff0b8958a4f4cf5218451bcfe9",
+      "gitCache": {
+        "hit": false,
+        "timings": {
+          "copyMillis": 63,
+          "waitMillis": 0,
+          "fetchMillis": 126,
+          "submoduleMillis": 21,
+          "checkoutMillis": 21
+        },
+        "enabled": true,
+        "key": "b438fa776891c8bc8ada3c64fb34805ed7398434eb2b77cea8576246085a4fdd"
       },
-      "files": [
-        {
-          "name": "imageA.tar",
-          "size": 80658944,
-          "sha256": "a169900e39356ac06d17fcdc097923e7c36805e6e5d5bb03fedf761d906d4de8"
-        }
-      ],
-      "commit": "db3051980abe0cc90204f771b96ebb7a728341b2",
-      "durationSeconds": 52.071
+      "compilerImage": "localhost:5000/xran-ci/xran-compile:26.11.17-compat-xtue"
     }
   ],
-  "controller": {
-    "image": "localhost:5000/xran-ci/controller:2.580.2-20",
-    "podUid": "486a85ad-cb56-46c1-83e0-6ef3a7699a00",
-    "plugin": "1.0.6"
-  },
-  "preservedBuildCounts": {
-    "storage-maintenance": 264,
-    "x-ran-cloud": 99,
-    "xcn": 5
-  },
   "backup": {
-    "path": ".state/upgrade-current/jenkins-home-before-upgrade.tar.gz",
-    "bytes": 1318282244,
-    "gzipIntegrity": "PASS",
-    "mode": "0600"
+    "path": ".state/upgrades/controller22/jenkins-home.tar.gz",
+    "bytes": 1348379807
   },
-  "limitations": [
-    "XTUE 使用当前环境模拟 Git 仓库，未编译私有真实业务。",
-    "本轮保留并核对 xcn 历史和参数；本轮没有再次执行完整 xcn 业务发布。"
-  ],
   "status": "PASS",
-  "unitTests": {
-    "passed": 65,
-    "failed": 0
-  },
-  "compilerImage": "localhost:5000/xran-ci/xran-compile:26.11.17-compat-xtue",
-  "compilerPullPolicy": "Always",
-  "intranetDefaultsChanged": false,
-  "firstBuildObservation": "第一个 XTUE 构建在 Controller 重启后等待节点供给约四分钟，随后成功；后续 X-RAN 两次构建正常自动供给。排查时对第二个 XTUE 标签调用过公开的 suggestReviewNow 调度评估 API，未更改超时或资源。",
-  "sourceCommitBeforeDeployment": "6974fe7f0fb25fb53bd83bec91dfb1370083ba61",
-  "controllerRegistryPersistsInHelm": true
+  "preservedBuilds": {
+    "x-ran-cloud": 101,
+    "xcn": 5,
+    "xtue-cloud": 2,
+    "storage-maintenance": 272
+  }
 }

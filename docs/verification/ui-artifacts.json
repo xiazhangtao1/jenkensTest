@@ -1,0 +1,227 @@
+{
+  "namespace": "jenkins-git-cache-verify",
+  "url": "http://10.2.0.119:32190/",
+  "fixtureOnly": true,
+  "sourceFingerprint": "ee5911cf03470cd1736e881c9b84305c33dab97fbefb032c3fb2983404fbb200",
+  "compilerImage": "localhost:5000/xran-ci/xran-compile:26.11.17-compat-xtue",
+  "runtimeScriptsSha256": "3f0ef4c48f85437be6eecc3a5db9fe3f4194c4ff0b8958a4f4cf5218451bcfe9",
+  "checks": [
+    {
+      "name": "旧编译镜像执行平台下发脚本及普通用户下载",
+      "status": "PASS",
+      "job": "x-ran-cloud",
+      "number": 22,
+      "result": "SUCCESS",
+      "files": [
+        "任意服务 发布.tar.gz"
+      ]
+    },
+    {
+      "name": "旧编译镜像执行平台下发脚本及普通用户下载",
+      "status": "PASS",
+      "job": "x-ran-cloud",
+      "number": 23,
+      "result": "SUCCESS",
+      "files": [
+        "all-custom-release.tar.gz"
+      ]
+    },
+    {
+      "name": "旧编译镜像执行平台下发脚本及普通用户下载",
+      "status": "PASS",
+      "job": "x-ran-cloud",
+      "number": 24,
+      "result": "FAILURE",
+      "files": []
+    },
+    {
+      "name": "旧编译镜像执行平台下发脚本及普通用户下载",
+      "status": "PASS",
+      "job": "x-ran-cloud",
+      "number": 25,
+      "result": "FAILURE",
+      "files": []
+    },
+    {
+      "name": "旧编译镜像执行平台下发脚本及普通用户下载",
+      "status": "PASS",
+      "job": "x-ran-cloud",
+      "number": 26,
+      "result": "FAILURE",
+      "files": [
+        "one.tar.gz",
+        "two.tar.gz"
+      ]
+    },
+    {
+      "name": "旧编译镜像执行平台下发脚本及普通用户下载",
+      "status": "PASS",
+      "job": "x-ran-cloud",
+      "number": 27,
+      "result": "SUCCESS",
+      "files": [
+        "imageA.tar"
+      ]
+    },
+    {
+      "name": "旧编译镜像执行平台下发脚本及普通用户下载",
+      "status": "PASS",
+      "job": "xcn",
+      "number": 10,
+      "result": "SUCCESS",
+      "files": [
+        "xcn-runtime.tar",
+        "xcn-webui.tar",
+        "xcn-monitor.tar",
+        "xcn-26.11.18-ui22.tgz"
+      ]
+    },
+    {
+      "name": "旧编译镜像执行平台下发脚本及普通用户下载",
+      "status": "PASS",
+      "job": "xtue-cloud",
+      "number": 11,
+      "result": "SUCCESS",
+      "files": [
+        "tue.tar.gz"
+      ]
+    },
+    {
+      "name": "单服务/全服务任意名称、旧包清理及三个项目回归",
+      "status": "PASS"
+    },
+    {
+      "name": "两类账号显示新名称；首页及构建详情的压缩包 view 隐藏、文本预览和下载保留",
+      "status": "PASS"
+    },
+    {
+      "name": "历史描述鼠标点击和键盘 Enter 均跳转对应构建",
+      "status": "PASS"
+    },
+    {
+      "name": "旧编译镜像执行平台下发脚本及普通用户下载",
+      "status": "PASS",
+      "job": "x-ran-cloud",
+      "number": 28,
+      "result": "SUCCESS",
+      "files": [
+        "任意服务 发布.tar.gz"
+      ]
+    },
+    {
+      "name": "实际新构建触发历史列表自动刷新后描述仍可点击",
+      "status": "PASS"
+    },
+    {
+      "name": "参数显隐与 X-CN 历史版本参数继续可用",
+      "status": "PASS"
+    },
+    {
+      "name": "Controller 重启后显示名、历史、脚本和交互保留",
+      "status": "PASS"
+    }
+  ],
+  "builds": [
+    {
+      "job": "x-ran-cloud",
+      "number": 22,
+      "result": "SUCCESS",
+      "files": [
+        "任意服务 发布.tar.gz"
+      ],
+      "commit": "69fe74b3ab9c7a1055cdfd16c1e41befe3b74feb"
+    },
+    {
+      "job": "x-ran-cloud",
+      "number": 23,
+      "result": "SUCCESS",
+      "files": [
+        "all-custom-release.tar.gz"
+      ],
+      "commit": "69fe74b3ab9c7a1055cdfd16c1e41befe3b74feb"
+    },
+    {
+      "job": "x-ran-cloud",
+      "number": 24,
+      "result": "FAILURE",
+      "files": [],
+      "commit": "a0363c3f0eef85da8b7ed85ffe472eb8ddaaa0bc"
+    },
+    {
+      "job": "x-ran-cloud",
+      "number": 25,
+      "result": "FAILURE",
+      "files": [],
+      "commit": "99c8c5b2943228d4f57b28ac6de9e9b34f03b66b"
+    },
+    {
+      "job": "x-ran-cloud",
+      "number": 26,
+      "result": "FAILURE",
+      "files": [
+        "one.tar.gz",
+        "two.tar.gz"
+      ],
+      "commit": "9976a5d18aac930fe473a0bbe8c583a0cc20be17"
+    },
+    {
+      "job": "x-ran-cloud",
+      "number": 27,
+      "result": "SUCCESS",
+      "files": [
+        "imageA.tar"
+      ],
+      "commit": "af60f94f6044e1bb9550e3e195277658884ddbfb"
+    },
+    {
+      "job": "xcn",
+      "number": 10,
+      "result": "SUCCESS",
+      "files": [
+        "xcn-runtime.tar",
+        "xcn-webui.tar",
+        "xcn-monitor.tar",
+        "xcn-26.11.18-ui22.tgz"
+      ],
+      "commit": "d6b7f07c6559f8d31027631ea5ee1058438ee817"
+    },
+    {
+      "job": "xtue-cloud",
+      "number": 11,
+      "result": "SUCCESS",
+      "files": [
+        "tue.tar.gz"
+      ],
+      "commit": "093a7ceb0d57e245e04de8893a8f3ecdee3d2034"
+    },
+    {
+      "job": "x-ran-cloud",
+      "number": 28,
+      "result": "SUCCESS",
+      "files": [
+        "任意服务 发布.tar.gz"
+      ],
+      "commit": "69fe74b3ab9c7a1055cdfd16c1e41befe3b74feb"
+    }
+  ],
+  "status": "PASS",
+  "unitTests": {
+    "total": 89,
+    "passed": 88,
+    "skipped": 1
+  },
+  "compilerImageFollowUp": [
+    {
+      "image": "xran-ci/xran-compile:26.11.18-compat",
+      "imageId": "sha256:839cf05d03f7fd9c0eb0387a956068639814be956cb03bddc4c4104b02f44cd8",
+      "ctestPassed": 10,
+      "network": "none"
+    },
+    {
+      "image": "xran-ci/xran-compile:26.11.18-sdk",
+      "imageId": "sha256:5c9c0ab39a7ce3535ce86b1dce6d20ad7628938354ebb70e27814701792ebdee",
+      "ctestPassed": 10,
+      "network": "none"
+    }
+  ]
+}

@@ -1,7 +1,10 @@
 # 将临时验证环境升级为正式构建环境
 
-当前版本为构建平台插件 1.0.5、Controller `xran-ci/controller:2.580.2-19`。
-Controller 19 仅统一 xcn 与 X-RAN-CLOUD 的任务描述；已有部署须按 [升级 Jenkins](#升级-jenkins) 更新 Controller，编译镜像不变。
+当前版本为构建平台插件 1.0.7、Controller `xran-ci/controller:2.580.2-22`。
+Controller 22 调整项目显示名、压缩包预览和历史描述链接；构建脚本通过 ConfigMap 下发并为每次构建固定版本。
+X-RAN 单服务和全服务均收集产物目录下唯一的有效 `.tar.gz`，不再限制具体文件名；编译前移除该目录中的旧服务包。
+已有部署只需新的 `02-code`，按 [升级 Jenkins](#升级-jenkins) 更新 Controller 和部署，完整依赖及现有编译镜像可复用。
+两个编译 Dockerfile 补齐了用于离线自检的 `git_checkout.py`；只有以后自行重建时使用修复，不强制更新现有编译环境。
 支持两个编译 Dockerfile，保留 `pkgconf`、DPDK 非交互输入、服务串行及取消 `all` 的修复；新增旧版业务镜像缺包自动导出和项目可见性开关。
 此前 Controller 18 关闭离线页面的 Jenkins 使用统计请求，固定 local-path helper 镜像 tag，并将 xcn 基础镜像复制初始化容器从 128MiB 调整为 1GiB，避免文件缓存触发 OOM；新增 [完整回归与持续构建验收](reliability.md)。
 此前平台测试与 root 兼容修复无需重建编译镜像；业务使用 zstd、hwloc 或 readline 时须按下面章节更新编译镜像。
@@ -358,9 +361,9 @@ sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml 
 ```bash
 sudo make platform-plugin OFFLINE=1
 sudo env DOCKER_BUILDKIT=0 docker build --network none --pull=false \
-  -f docker/controller.Dockerfile -t xran-ci/controller:2.580.2-19 .
-sudo docker save -o /tmp/xran-controller-2.580.2-19.tar xran-ci/controller:2.580.2-19
-sudo ctr -n k8s.io images import /tmp/xran-controller-2.580.2-19.tar
+  -f docker/controller.Dockerfile -t xran-ci/controller:2.580.2-22 .
+sudo docker save -o /tmp/xran-controller-2.580.2-22.tar xran-ci/controller:2.580.2-22
+sudo ctr -n k8s.io images import /tmp/xran-controller-2.580.2-22.tar
 sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml OFFLINE=1
 ```
 

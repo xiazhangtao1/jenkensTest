@@ -33,6 +33,7 @@ def started = currentBuild.startTimeInMillis
 def metadata = [buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, job: env.JOB_NAME, project: project,
     userId: trigger?.userId ?: 'system', userName: trigger?.userName ?: 'system',
     kind: kind, target: target, projectRulesSha256: projectSpec.rulesSha256, imageTag: kind == 'image' ? imageTag : null,
+    runtimeScriptsSha256: cfg.runtimeScriptsSha256,
     builderImage: compilerImage, builderImagePullPolicy: compilerPolicy,
     startedAt: new Date(started).format("yyyy-MM-dd'T'HH:mm:ssXXX", TimeZone.getTimeZone('Asia/Shanghai'))]
 if (isXcn) metadata.putAll([chartVersion: chartVersion, appVersion: imageTag])
@@ -102,6 +103,7 @@ def execute = {
                     "XRAN_IMAGE_REFERENCE=${reference}", "XRAN_SERVICES=${groovy.json.JsonOutput.toJson(cfg.services)}",
                     "XRAN_CHART_VERSION=${chartVersion}", "XRAN_OFFLINE=${offline}",
                     "XRAN_PROJECT_SPEC=${groovy.json.JsonOutput.toJson(projectSpec)}",
+                    "XRAN_RUNTIME_SCRIPTS_SHA256=${cfg.runtimeScriptsSha256}",
                     "XRAN_SERVICE_SERIAL=${cfg.containsKey('xranServiceSerial') ? cfg.xranServiceSerial : true}",
                     "BUILD_MEMORY=${cfg.innerBuildMemoryGiB ?: 3}g", "BUILD_JOBS=${cfg.buildJobs ?: 2}",
                     "XRAN_BUILD_DELAY_SECONDS=${cfg.demoBuildDelaySeconds ?: 0}",
@@ -119,17 +121,12 @@ def execute = {
                                     for tool in python3 git gcc g++ cmake pkg-config; do
                                         command -v "$tool" >/dev/null || { echo "编译镜像缺少工具：$tool" >&2; exit 1; }
                                     done
-                                    test -r /opt/xran/run-build.py || { echo '编译镜像缺少 /opt/xran/run-build.py，请使用本项目制作的兼容镜像' >&2; exit 1; }
+                                    test -r /opt/xran-platform/run-build.py || { echo '缺少挂载的平台运行脚本，请更新代码并重新部署' >&2; exit 1; }
+                                    python3 /opt/xran-platform/run-build.py snapshot
+                                    python3 .xran-platform/run-build.py capabilities > platform-capabilities.json
+                                    python3 -c 'import json; c=json.load(open("platform-capabilities.json")); assert all(c.get(k)==1 for k in ("xranServiceCompatibility", "xranServiceArtifacts", "xranImageArchiveFallback", "projectRecipes")), "平台运行脚本版本不兼容，请更新代码并重新部署"'
                                 '''
-                                if (!isXcn && !genericProject) sh '''set -eu
-                                    command -v pkgconf >/dev/null || { echo '编译镜像缺少工具：pkgconf' >&2; exit 1; }
-                                    python3 /opt/xran/run-build.py capabilities > compiler-capabilities.json || {
-                                        echo '编译镜像适配器版本过旧，请使用本项目 Dockerfile 重新制作编译镜像' >&2; exit 1;
-                                    }
-                                    python3 -c 'import json,sys; s=json.load(open("compiler-capabilities.json")); sys.exit(0 if s.get("xranServiceCompatibility") == 1 else "编译镜像不支持当前服务适配，请重新制作编译镜像")'
-                                '''
-                                if (kind == 'image') sh '''python3 -c 'import json,sys; s=json.load(open("compiler-capabilities.json")); sys.exit(0 if s.get("xranImageArchiveFallback") == 1 else "编译镜像缺少镜像包自动导出能力，请更新本项目编译镜像")' '''
-                                sh '''python3 /opt/xran/run-build.py capabilities | python3 -c 'import json,sys; assert json.load(sys.stdin).get("projectRecipes") == 1, "请更新编译镜像以支持项目配置"' '''
+                                if (!isXcn && !genericProject) sh 'command -v pkgconf >/dev/null'
                                 if (needsDocker) sh 'command -v docker >/dev/null && test -r /opt/xran/base-images.tar'
                                 if (isXcn) sh 'command -v helm >/dev/null && python3 -c "import yaml" && test -r /opt/xran/xcn-bases/images.tar'
                             }
@@ -142,7 +139,7 @@ def execute = {
                             stage('检出指定版本') {
                                 def checkoutCommand = {
                                     withEnv(["XRAN_GIT_SPACE_REQUIREMENTS=${groovy.json.JsonOutput.toJson(gitSpaceRequirements)}"]) {
-                                        sh 'python3 /opt/xran-platform/git_checkout.py'
+                                        sh 'python3 .xran-platform/git_checkout.py'
                                     }
                                 }
                                 if (cfg.gitCredentialsId) {
@@ -166,10 +163,10 @@ def execute = {
                                         sh '''set +x
                                             for i in $(seq 1 120); do docker info >/dev/null 2>&1 && break; sleep 1; done
                                             printf '%s' "$REGISTRY_PASSWORD" | docker login "$XRAN_REGISTRY" --username "$REGISTRY_USER" --password-stdin
-                                            python3 /opt/xran/run-build.py build
+                                            python3 .xran-platform/run-build.py build
                                         '''
                                     }
-                                } else sh 'python3 /opt/xran/run-build.py build'
+                                } else sh 'python3 .xran-platform/run-build.py build'
                             }
                         } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException interrupted) {
                             outcome = 'ABORTED'
@@ -182,7 +179,7 @@ def execute = {
                                 metadata.result = outcome
                                 metadata.durationMillis = System.currentTimeMillis() - started
                                 withEnv(["XRAN_BUILD_METADATA=${groovy.json.JsonOutput.toJson(metadata)}"]) {
-                                    def status = sh(returnStatus: true, script: 'python3 /opt/xran/run-build.py collect')
+                                    def status = sh(returnStatus: true, script: 'python3 .xran-platform/run-build.py collect')
                                     if (status != 0 && outcome == 'SUCCESS') {
                                         outcome = 'FAILURE'
                                         failure = new RuntimeException('产物完整性或数量校验失败')

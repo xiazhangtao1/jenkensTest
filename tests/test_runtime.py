@@ -1,10 +1,12 @@
 import hashlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tarfile
 import tempfile
 import threading
@@ -84,6 +86,10 @@ class RuntimeTests(unittest.TestCase):
                 runner.checkout()
             self.assertFalse(marker.exists())
 
+    def test_checkout_command_exits_successfully(self):
+        subprocess.run([sys.executable,str(REPO/'runtime/run-build.py'),'checkout'],cwd=self.work,check=True)
+        self.assertEqual(json.loads((self.work/'checkout.json').read_text())['commit'],self.head)
+
     def test_compile_service_and_big_package(self):
         for target, count in [('serviceA', 1), ('services_all', 1)]:
             with self.subTest(target=target):
@@ -119,6 +125,36 @@ class RuntimeTests(unittest.TestCase):
         self.assertFalse((runner.PUBLISH / 'serviceA.tar.gz').exists())
 
 
+class RuntimeSnapshotTests(unittest.TestCase):
+    def test_configmap_revision_is_pinned_for_the_whole_build(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder); mount = root/'mount'; version = mount/'..v1'
+            version.mkdir(parents=True)
+            names = ('run-build.py','projects.py','git_checkout.py')
+            scripts = {name:(REPO/'runtime'/name).read_text() for name in names}
+            for name,content in scripts.items(): (version/name).write_text(content)
+            (mount/'..data').symlink_to('..v1')
+            for name in names: (mount/name).symlink_to('..data/'+name)
+            digest = hashlib.sha256(json.dumps(scripts,sort_keys=True).encode()).hexdigest()
+            environment = dict(os.environ, XRAN_RUNTIME_SCRIPTS_SHA256=digest)
+            subprocess.run([sys.executable,str(mount/'run-build.py'),'snapshot'],cwd=root,env=environment,check=True)
+            # Kubelet switches the mount to a different revision during compilation.
+            next_version = mount/'..v2';shutil.copytree(version,next_version)
+            (next_version/'run-build.py').write_text('raise RuntimeError("new deployment")\n')
+            (mount/'..data-next').symlink_to('..v2');(mount/'..data-next').replace(mount/'..data')
+            for name,content in scripts.items():self.assertEqual((root/'.xran-platform'/name).read_text(),content)
+            result = subprocess.check_output([sys.executable,str(root/'.xran-platform/run-build.py'),'capabilities'],cwd=root,text=True)
+            self.assertEqual(json.loads(result)['xranServiceArtifacts'],1)
+
+    def test_mismatched_runtime_is_rejected_before_working_copy_creation(self):
+        with tempfile.TemporaryDirectory() as folder:
+            result = subprocess.run([sys.executable,str(REPO/'runtime/run-build.py'),'snapshot'],cwd=folder,
+                env=dict(os.environ,XRAN_RUNTIME_SCRIPTS_SHA256='wrong'),capture_output=True,text=True)
+            self.assertNotEqual(result.returncode,0)
+            self.assertIn('平台运行脚本校验失败',result.stderr)
+            self.assertFalse((Path(folder)/'.xran-platform').exists())
+
+
 class IntranetServiceTests(unittest.TestCase):
     def test_every_individual_service_dispatches_and_collects_its_exact_name(self):
         targets = yaml.safe_load((REPO / 'config/site.intranet.yaml').read_text())['services']
@@ -151,6 +187,112 @@ tar -czf "../JDBG/Release/services/$3.tar.gz" dispatched-target
                     self.assertEqual([f['name'] for f in metadata['files']], [target + '.tar.gz'])
                     self.assertEqual(metadata['files'][0]['sha256'],
                                      hashlib.sha256((publish / (target + '.tar.gz')).read_bytes()).hexdigest())
+
+
+class ServiceArtifactTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        for name, value in [('ROOT', self.root), ('SOURCE', self.root / 'source'),
+                            ('PUBLISH', self.root / 'publish')]:
+            context = patch.object(runner, name, value)
+            context.start()
+            self.addCleanup(context.stop)
+        self.directory = runner.SOURCE / 'JDBG/Release/services'
+        self.directory.mkdir(parents=True)
+        self.services = runner.SOURCE / 'services'
+        self.services.mkdir()
+        (self.services / 'build.sh').write_text('#!/bin/sh\nexit 0\n')
+        (self.services / 'build.sh').chmod(0o755)
+        (self.root / 'checkout.json').write_text(json.dumps({'commit': 'b' * 40}))
+        context = patch.dict(os.environ, XRAN_KIND='service', XRAN_TARGET='DemoA',
+                             XRAN_PROJECT_SPEC='{}', XRAN_BUILD_METADATA='{"result":"SUCCESS"}')
+        context.start()
+        self.addCleanup(context.stop)
+
+    def archive(self, name, empty=False):
+        path = self.directory / name
+        with tarfile.open(path, 'w:gz') as archive:
+            if not empty:
+                member = tarfile.TarInfo('app'); member.size = 3
+                archive.addfile(member, io.BytesIO(b'app'))
+        return path
+
+    def metadata(self):
+        return json.loads((runner.PUBLISH / 'metadata.json').read_text())
+
+    def test_both_targets_accept_arbitrary_archive_names_and_checksummable_unicode(self):
+        for target in ('DemoA', 'services_all'):
+            for name in ('custom-26.11-release.tar.gz', '服务 输出.tar.gz', 'release\\one\nname\r.tar.gz'):
+                with self.subTest(target=target, name=name):
+                    os.environ['XRAN_TARGET'] = target
+                    archive = self.archive(name)
+                    digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+                    # Former name restrictions must also be ignored in old recipe snapshots.
+                    os.environ['XRAN_PROJECT_SPEC'] = json.dumps({'builds': {'service': {
+                        'artifact': '{target}.tar.gz', 'bundlePattern': 'L2L3_*.tar.gz'}}})
+                    self.assertEqual(runner.collect(), 0)
+                    meta = self.metadata()
+                    self.assertEqual(meta['files'], [{'name': name, 'size': (runner.PUBLISH / name).stat().st_size,
+                                                     'sha256': digest}])
+                    subprocess.run(['sha256sum', '--check', 'SHA256SUMS'], cwd=runner.PUBLISH,
+                                   check=True, stdout=subprocess.DEVNULL)
+
+    def test_old_tracked_packages_are_removed_even_when_script_produces_nothing(self):
+        stale = self.archive('old-release.tar.gz')
+        runner.build()
+        self.assertFalse(stale.exists())
+        self.assertEqual(runner.collect(), 1)
+        self.assertEqual(self.metadata()['files'], [])
+
+    def test_compilation_replaces_old_packages_and_ignores_other_suffixes(self):
+        self.archive('stale.tar.gz')
+        (self.directory / 'notes.txt').write_text('keep')
+        (self.services / 'build.sh').write_text('''#!/bin/sh
+set -eu
+mkdir -p ../JDBG/Release/services
+tar -czf ../JDBG/Release/services/brand-new.tar.gz build.sh
+''')
+        runner.build()
+        self.assertEqual(runner.collect(), 0)
+        self.assertEqual([item['name'] for item in self.metadata()['files']], ['brand-new.tar.gz'])
+        self.assertEqual((self.directory / 'notes.txt').read_text(), 'keep')
+
+    def test_multiple_archives_fail_instead_of_choosing_one(self):
+        self.archive('one.tar.gz'); self.archive('two.tar.gz')
+        self.assertEqual(runner.collect(), 1)
+        self.assertTrue(any('实际归集 2 个' in error for error in self.metadata()['collectionErrors']))
+
+    def test_empty_or_corrupt_archives_fail(self):
+        for empty in (True, False):
+            with self.subTest(empty=empty):
+                path = self.archive('custom.tar.gz', empty=empty)
+                if not empty: path.write_bytes(path.read_bytes()[:32])
+                self.assertEqual(runner.collect(), 1)
+                self.assertEqual(self.metadata()['files'], [])
+
+    def test_bad_gzip_trailer_is_rejected_after_valid_tar_members(self):
+        for truncated in (False, True):
+            with self.subTest(truncated=truncated):
+                path = self.archive('otherwise-valid.tar.gz')
+                content = bytearray(path.read_bytes())
+                if truncated: content = content[:-4]
+                else: content[-8] ^= 1
+                path.write_bytes(content)
+                self.assertEqual(runner.collect(), 1)
+                self.assertEqual(self.metadata()['files'], [])
+
+    def test_dangling_symlink_is_rejected_and_cleanup_never_deletes_link_target(self):
+        private = self.root / 'private'; private.write_text('private')
+        link = self.directory / 'different.tar.gz'; link.symlink_to(private)
+        self.assertEqual(runner.collect(), 1)
+        runner.build()
+        self.assertFalse(link.is_symlink())
+        self.assertEqual(private.read_text(), 'private')
+        link.symlink_to(self.root / 'missing')
+        self.assertEqual(runner.collect(), 1)
+        self.assertTrue(any('非法产物路径' in error for error in self.metadata()['collectionErrors']))
 
 
 class ServiceCompatibilityTests(unittest.TestCase):

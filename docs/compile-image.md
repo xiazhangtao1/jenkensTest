@@ -1,5 +1,10 @@
 # Ubuntu 22.04 编译镜像
 
+Jenkins 使用部署 ConfigMap 中的构建、Git 检出和产物收集脚本，每次构建按 SHA256 校验并复制到独立工作目录，后续统一使用该固定版本。
+修改 `runtime/` 中的 Python 构建脚本或项目产物规则后更新代码并部署即可；新增、删除或升级编译依赖时才需要重做编译镜像。
+Jenkins 页面 JS、流水线 Groovy 引导代码和内部插件仍随 Controller 发布，修改它们需要更新 Controller。
+镜像内仍附带脚本供离线自检和手动使用；Jenkins 实际执行的是部署下发的版本，`metadata.json.runtimeScriptsSha256` 可追溯。
+
 ## 构建、导出与发布
 
 ```bash

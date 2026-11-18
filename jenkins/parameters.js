@@ -23,6 +23,46 @@
   else defaults();
 })();
 
+// Archive previews force large binary files into a text view. Keep native
+// download links, including in artifact lists loaded asynchronously by Jenkins.
+(() => {
+  "use strict";
+  const style = document.createElement("style");
+  const archives = [".tar", ".tar.gz", ".tgz", ".tar.xz", ".tar.bz2", ".tar.zst", ".zip", ".7z", ".gz", ".bz2", ".xz", ".zst"];
+  style.textContent = archives.map(extension => `#main-panel a[href$="${extension}/*view*/" i]`).join(",\n") +
+    " { display: none !important; }\n" +
+    ".xran-build-description-link { display: block; color: inherit; text-decoration: none; }\n" +
+    ".xran-build-description-link:hover { text-decoration: underline; }\n" +
+    ".xran-build-description-link:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }";
+  document.head.append(style);
+
+  function update() {
+    document.querySelectorAll(".app-builds-container__item__description").forEach(description => {
+      // Preserve any links or controls supplied by custom build descriptions.
+      if (description.querySelector("a, button, input, select, textarea, [tabindex], [contenteditable]")) return;
+      const heading = description.closest(".app-builds-container__item")
+        ?.querySelector("a.app-builds-container__item__inner__link");
+      if (!heading) return;
+      const link = document.createElement("a");
+      link.className = "xran-build-description-link";
+      link.href = heading.href;
+      link.append(...description.childNodes);
+      description.append(link);
+    });
+  }
+
+  function start() {
+    const panel = document.querySelector("#side-panel");
+    if (!panel) return;
+    update();
+    // Build history is replaced during polling, filtering and pagination.
+    new MutationObserver(update).observe(panel, {childList: true, subtree: true});
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, {once: true});
+  else start();
+})();
+
 // Jenkins' native clipboard API requires HTTPS. On HTTP Parameters pages, keep
 // copying available through a synchronous, user-initiated browser copy command.
 (() => {

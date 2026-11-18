@@ -1,4 +1,4 @@
-# X-RAN-CLOUD / xcn / XTUE-CLOUD Jenkins 构建平台
+# X-RAN-CLOUD / X-CN-CLOUD / X-TUE-CLOUD Jenkins 构建平台
 
 使用官方 Jenkins Helm chart 部署 Controller，按需创建 Ubuntu 22.04 编译 Pod。
 支持 X-RAN-CLOUD 服务包、镜像、xcn 发布包及 XTUE-CLOUD 服务包，支持分支/tag/commit、实名构建记录和下载，并交付可搬入内网的离线目录。
@@ -7,7 +7,7 @@
 
 | 项目 | 默认值 |
 |---|---|
-| 构建入口 | Jenkins → x-ran-cloud / xcn / XTUE-CLOUD → Build with Parameters |
+| 构建入口 | Jenkins → X-RAN-CLOUD / X-CN-CLOUD / X-TUE-CLOUD → Build with Parameters |
 | 登录 | 个人本地账号，匿名不可查看和下载 |
 | 并发 | 全部项目合计最多 6 个；同镜像同标签 / xcn 同 app 版本先等待标签锁，再申请槽位 |
 | 每个构建 Pod 总上限 | 4 CPU、8GiB 内存、20GiB 临时存储 |
