@@ -50,6 +50,38 @@ sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml 
 新增依赖集中在 `config/compiler-extra-apt-packages.txt`，已有软件保留；pkg-config 命令由 pkgconf 提供，
 `libscpp-dev` 经确认按已有 libsctp-dev 处理。支持注释、去重和固定版本 `包名=版本`。
 
+## 补齐 xxd 与 LAPACKE（2026-11-18）
+
+真实内网构建发现还需要 `xxd` 和 `liblapacke-dev`：前者生成 `T_messages.txt.h`，后者提供
+`lapacke_utils.h` 和 LAPACKE C 接口；已有 `liblapack-dev` 不包含该头文件。
+对应 Ubuntu 文件清单见 [xxd](https://packages.ubuntu.com/jammy/amd64/xxd/filelist) 和
+[liblapacke-dev](https://packages.ubuntu.com/jammy/amd64/liblapacke-dev/filelist)。两种 Dockerfile 共用的补充清单已加入这两项。
+镜像自检实际执行 `xxd -i`、编译运行生成的头文件，并包含 `lapacke_utils.h`、链接运行 LAPACKE 求解器。
+
+已应用此前 XTUE 依赖的内网环境，本次只需最新 `02-code` 和最新 `01-dependencies/updates/`。
+该差量只描述 `.cache/compile-extra-apt/`，包含新增的五个 deb 和缓存 manifest，复用原有已校验文件，
+不检查 xcn/Controller 镜像归档，也不更新它们。完整依赖包同步更新，用于全新安装或缓存基线不匹配的情况。
+此前约 61MiB 的 XTUE 首次升级差量不包含本次新增包，不能重复当成本次补包使用。
+
+更新代码后，先在搬入的 `updates` 目录校验，再在内网项目根目录执行：
+
+```bash
+sha256sum -c SHA256SUMS
+cd /内网项目目录
+sudo make apply-dependency-delta DELTA_PACKAGE=/搬入路径/updates/dependencies-delta.tar.gz
+sudo python3 scripts/transfer.py check --manifest DEPENDENCIES_APPLIED.json
+sudo make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list \
+  DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.18-compat-xtue-tools
+sudo make push-compile-image IMAGE_TAG=26.11.18-compat-xtue-tools
+```
+
+另一个编译环境使用 `DOCKERFILE=docker/builder.Dockerfile` 和不同的 tag。
+网页选择新 tag 和 `Always` 后重新构建。不需要重做 Controller；若一并更新了 DinD 启动脚本，另执行 `make deploy`。
+此次 `DEPENDENCIES_APPLIED.json` 只记录补充 APT 范围；将来的完整依赖对比使用 `02-code/DEPENDENCIES.json`。
+实际私有业务源码不可访问，完整 nrUE/tuePhy 构建仍需内网复测。
+
+## ASN.1 来源
+
 提供的 `asn1c.tar.gz`：20,697,300 字节，SHA256
 `bb9b423fff6d73d00ebc420e5d64be7359be0e1309cc0ff2a3cc5e02cca76911`，包含 Git 提交
 `f12568d617dbf48497588f8e227d70388fa217c9`。与现有锁定归档逐文件比较，所有手写 C/H（除生成的 config.h）、
@@ -58,10 +90,10 @@ Autotools 输入及 ASN.1 源文件相同，无新增手写源文件；变化为
 
 ```bash
 # 内网源可达时准备/更新依赖；Docker 编译步骤本身仍断网。
-sudo make compile-image OFFLINE=0 APT_SOURCES=config/sources.intranet.list DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.17-compat-xtue
+sudo make compile-image OFFLINE=0 APT_SOURCES=config/sources.intranet.list DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.18-compat-xtue-tools
 # 已补齐匹配缓存后完全离线制作；全套新版改用 docker/builder.Dockerfile。
-sudo make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.17-compat-xtue
-sudo make push-compile-image IMAGE_TAG=26.11.17-compat-xtue
+sudo make compile-image OFFLINE=1 APT_SOURCES=config/sources.intranet.list DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.18-compat-xtue-tools
+sudo make push-compile-image IMAGE_TAG=26.11.18-compat-xtue-tools
 ```
 
 新增/删除 APT 软件修改分组清单后重做对应缓存及镜像；旧缓存不会在软件清单变化后继续使用。

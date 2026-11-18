@@ -1,0 +1,145 @@
+{
+  "date": "2026-11-18",
+  "status": "PASS",
+  "addedPackages": [
+    "xxd",
+    "liblapacke-dev"
+  ],
+  "downloadedDependencies": [
+    {
+      "package": "xxd",
+      "file": "xxd_8.2.3995-1ubuntu2.36_amd64.deb",
+      "sha256": "604b5215094112909cebbab13ccfa34500d46b19afa2f2e885342e5f576b7597",
+      "metadataUrl": "https://packages.ubuntu.com/jammy/amd64/xxd/download",
+      "downloadUrl": "https://mirrors.huaweicloud.com/ubuntu/pool/main/v/vim/xxd_8.2.3995-1ubuntu2.36_amd64.deb",
+      "control": "Package: xxd\nVersion: 2:8.2.3995-1ubuntu2.36\nArchitecture: amd64\n"
+    },
+    {
+      "package": "liblapacke-dev",
+      "file": "liblapacke-dev_3.10.0-2ubuntu1_amd64.deb",
+      "sha256": "728598f981ceabf0a867d46c5508d830bd235f0581d53b048e246be6409a8b70",
+      "metadataUrl": "https://packages.ubuntu.com/jammy/amd64/liblapacke-dev/download",
+      "downloadUrl": "https://mirrors.huaweicloud.com/ubuntu/pool/main/l/lapack/liblapacke-dev_3.10.0-2ubuntu1_amd64.deb",
+      "control": "Package: liblapacke-dev\nVersion: 3.10.0-2ubuntu1\nArchitecture: amd64\n"
+    },
+    {
+      "package": "liblapacke",
+      "file": "liblapacke_3.10.0-2ubuntu1_amd64.deb",
+      "sha256": "fe522bf86cbca3888304cf49b62f24ba2334967310609a30ee857642fe8ce978",
+      "metadataUrl": "https://packages.ubuntu.com/jammy/amd64/liblapacke/download",
+      "downloadUrl": "https://mirrors.huaweicloud.com/ubuntu/pool/main/l/lapack/liblapacke_3.10.0-2ubuntu1_amd64.deb",
+      "control": "Package: liblapacke\nVersion: 3.10.0-2ubuntu1\nArchitecture: amd64\n"
+    },
+    {
+      "package": "libtmglib-dev",
+      "file": "libtmglib-dev_3.10.0-2ubuntu1_amd64.deb",
+      "sha256": "c27da917a1c1284dc7c61b4c272c203732b631534860194e34ab3de2f089107e",
+      "metadataUrl": "https://packages.ubuntu.com/jammy/amd64/libtmglib-dev/download",
+      "downloadUrl": "https://mirrors.huaweicloud.com/ubuntu/pool/main/l/lapack/libtmglib-dev_3.10.0-2ubuntu1_amd64.deb",
+      "control": "Package: libtmglib-dev\nVersion: 3.10.0-2ubuntu1\nArchitecture: amd64\n"
+    },
+    {
+      "package": "libtmglib3",
+      "file": "libtmglib3_3.10.0-2ubuntu1_amd64.deb",
+      "sha256": "d56741c612d1eaff3af1f70fef0f33c5c5cb1ed249601a7022854501efbc7c9c",
+      "metadataUrl": "https://packages.ubuntu.com/jammy/amd64/libtmglib3/download",
+      "downloadUrl": "https://mirrors.huaweicloud.com/ubuntu/pool/main/l/lapack/libtmglib3_3.10.0-2ubuntu1_amd64.deb",
+      "control": "Package: libtmglib3\nVersion: 3.10.0-2ubuntu1\nArchitecture: amd64\n"
+    }
+  ],
+  "offlineCoreAndExtraInstall": "PASS",
+  "pythonTests": {
+    "total": 94,
+    "passed": 93,
+    "skipped": 1,
+    "failed": 0
+  },
+  "images": [
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.18-compat-xtue-tools",
+      "imageId": "sha256:a2e46edf39e9f4a4d7db74ad9012399b02cc3090ba301e8c1779f41b2bf11955",
+      "createdAt": "2026-11-18T08:22:51.940853307Z",
+      "dockerfile": "docker/builder-compat.Dockerfile",
+      "dockerfileSha256": "d10ee4e928c7f7666cc729cdfb8a6cb0601632131d6320eff9f5706cdeefce3d",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.3.3",
+        "pkgconf": "1.8.0"
+      },
+      "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+      "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+      "extraAptManifestSha256": "8c3eeb54710430a3e86232387b5dd9810ed419d5a803fa213cdeba18c86287da",
+      "compatAptManifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1",
+      "bytes": 3759415808,
+      "sha256": "6d0dfeea1783c0b8e3d7af368262f4e95467451bc2743a7d38a4e4a09eb288f9",
+      "ctest": {
+        "passed": 10,
+        "failed": 0
+      },
+      "xxdHeaderGenerationCompileAndRun": "PASS",
+      "lapackeHeaderLinkAndSolver": "PASS",
+      "network": "none"
+    },
+    {
+      "image": "192.168.10.35/xnet/xran-compile:26.11.18-sdk-xtue-tools",
+      "imageId": "sha256:05f3ec2d9bac09a13fc09b3801a7fba2292bf91b8f8eeee1d7a652a06c06522b",
+      "createdAt": "2026-11-18T08:23:55.175715305Z",
+      "dockerfile": "docker/builder.Dockerfile",
+      "dockerfileSha256": "811a3724b373389c76e2a7f610c6503a6830efbb4a69fe31158a6d0f4d9b73e2",
+      "dependencyVersions": {
+        "protoc": "libprotoc 3.21.11",
+        "protocC": "protobuf-c 1.5.2\nlibprotoc 3.21.11",
+        "protobufCLibrary": "1.5.2",
+        "pkgconf": "1.8.0"
+      },
+      "sourceManifestSha256": "d52a6b8f7f3a156b4a81de5484c7da9f9aa5b6cb28bace3999403cea217c623c",
+      "aptManifestSha256": "9c6241f284625dcf4feddddd5167ac3b5faaf969ce802b7203fcd4f20ac5008b",
+      "extraAptManifestSha256": "8c3eeb54710430a3e86232387b5dd9810ed419d5a803fa213cdeba18c86287da",
+      "compatAptManifestSha256": "180e7d5b1dd6d63082ae7c84574124dcf5987214e20b2a26d48109b6082cdae1",
+      "bytes": 3758465536,
+      "sha256": "47a0e048d65c59b4dd283d70ae9c4eecfe9b8c530d8e987b081cdd6f27f70bbe",
+      "ctest": {
+        "passed": 10,
+        "failed": 0
+      },
+      "xxdHeaderGenerationCompileAndRun": "PASS",
+      "lapackeHeaderLinkAndSolver": "PASS",
+      "network": "none"
+    }
+  ],
+  "delta": {
+    "scope": [
+      ".cache/compile-extra-apt/"
+    ],
+    "changed": [
+      ".cache/compile-extra-apt/liblapacke-dev_3.10.0-2ubuntu1_amd64.deb",
+      ".cache/compile-extra-apt/liblapacke_3.10.0-2ubuntu1_amd64.deb",
+      ".cache/compile-extra-apt/libtmglib-dev_3.10.0-2ubuntu1_amd64.deb",
+      ".cache/compile-extra-apt/libtmglib3_3.10.0-2ubuntu1_amd64.deb",
+      ".cache/compile-extra-apt/manifest.json",
+      ".cache/compile-extra-apt/xxd_8.2.3995-1ubuntu2.36_amd64.deb"
+    ],
+    "bytes": 1139754,
+    "sha256": "7362314178723cd4d082433cad63d40131230962297528c8b5bcb2d769f3513d",
+    "baselineCorruption": "REJECTED",
+    "actualCacheApply": "PASS",
+    "unrelatedXcnArchive": "NOT_CHECKED_OR_MODIFIED"
+  },
+  "fullCompilerPackage": {
+    "package": "compiler-deps.tar.gz",
+    "sha256": "ecec64639528b42234a4d0406d039758c80b374716aaa37d9a52dde8016c2311",
+    "bytes": 615842329
+  },
+  "sourceFilesSha256": {
+    "config/compiler-extra-apt-packages.txt": "d367d0e5ed16b2105bc75868991f74fbfb6306026c3a20ab94d2acad9a510374",
+    "runtime/verify-compile.sh": "e5a00e1c7e04ac4cc69d93cbd77f67243c1b6174c6807ab868f48e412f6c880e",
+    "runtime/compile-check/xtue-deps.c": "3a336c24427a476653ba13ec2d5905539d8de9fa56119570c1938026b9bb3c17",
+    "runtime/compile-check/CMakeLists.txt": "f02e75461b591d54c3e489898ebc66000948ea8ffc5cfdca759d3038f8e24e34",
+    "Makefile": "771266a36e1e6a9057df961cf705f6c5cd925b9dd22f012827692d5507d8fc26"
+  },
+  "limitations": [
+    "Real private XTUE source unavailable; nrUE/tuePhy full business builds require intranet verification.",
+    "Compiler images were built and exported here; not pushed to the intranet Harbor."
+  ]
+}

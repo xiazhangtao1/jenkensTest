@@ -8,9 +8,11 @@ libxml++2.6-dev
 libnghttp2-dev
 libgoogle-perftools-dev
 liblapack-dev
+liblapacke-dev
 libatlas-base-dev
 libforms-dev
 libibverbs-dev
 libxslt1-dev
 ncurses-term
 unrar
+xxd

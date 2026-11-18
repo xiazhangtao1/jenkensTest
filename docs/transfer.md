@@ -2,6 +2,10 @@
 
 当前项目目录是构建工作区，`.cache` 中既有依赖也有构建时使用的镜像归档。日常搬运统一使用 `dist/transfer/`，无需反复复制整个项目或 `.cache`。
 
+XTUE 新增 `xxd`/`liblapacke-dev` 的本次补包使用最新 `02-code` 和 `01-dependencies/updates/`，
+随后重建、推送编译镜像。差量限定为补充 APT 缓存，不校验无关的 xcn 镜像归档；
+适用于此前 XTUE 依赖已同步的环境。具体命令见 [XTUE 工具补齐](xtue.md#补齐-xxd-与-lapacke2026-11-18)。
+
 已完成 Controller 22 升级的环境，本次 cgroup v2 DinD 修复只需覆盖 `runtime/dind-start.sh`（或新的 `02-code`），
 然后 `make deploy SITE=config/site.local.yaml OFFLINE=1`。不重传依赖或重做任何镜像；对新构建 Pod 生效。
 原因、复测命令及验证范围见 [cgroup v2 DinD](xcn.md#cgroup-v2-节点上的-dind)。
@@ -143,8 +147,8 @@ sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml 
 只重建编译镜像时：
 
 ```bash
-sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.17-compat-xtue
-sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.17-sdk-xtue
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder-compat.Dockerfile IMAGE_TAG=26.11.18-compat-xtue-tools
+sudo make compile-image OFFLINE=1 DOCKERFILE=docker/builder.Dockerfile IMAGE_TAG=26.11.18-sdk-xtue-tools
 ```
 
 成品在 `dist/transfer/03-generated-images/compiler/`。两个目录是不同编译环境，均是当前版本。

@@ -15,6 +15,19 @@ while read -r line; do
 done < /opt/xran/extra-apt-packages.txt
 pkg-config --exists libxml++-2.6 libnghttp2 libxslt libibverbs
 command -v unrar
+command -v xxd
+# Exercise the same binary-to-header command used by XTUE's T tracer.
+(cd "$sdk_check_dir" && printf 'XTUE' > T_messages.txt && xxd -i T_messages.txt T_messages.txt.h)
+cat > "$sdk_check_dir/xxd-check.c" <<'C'
+#include <string.h>
+#include "T_messages.txt.h"
+int main(void) {
+    return T_messages_txt_len != 4 || memcmp(T_messages_txt, "XTUE", 4) != 0;
+}
+C
+gcc -Wall -Wextra -Werror "$sdk_check_dir/xxd-check.c" -o "$sdk_check_dir/xxd-check"
+"$sdk_check_dir/xxd-check"
+echo 'xxd -i header generation: OK'
 infocmp xterm-256color >/dev/null
 test -d /opt/dpdk-22.03/build
 python3 - <<'PY'
