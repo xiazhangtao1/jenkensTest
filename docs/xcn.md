@@ -71,3 +71,37 @@ Chart 要求显式站点网络地址，渲染默认读取所选提交的 `helm/t
 
 默认版本保存与历史回填的专项验收使用 `python3 tests/verify-parameters.py --site /路径/验收-site.yaml`。
 该脚本只接受带 `verificationInstance: true` 的独立命名空间，在槽位内跳过业务编译，并在结束时恢复流水线定义。
+
+## cgroup v2 节点上的 DinD
+
+镜像构建的第一条 `RUN` 若报 `cannot enter cgroupv2 ... with domain controllers -- it is in an invalid state`，
+说明嵌套容器无法建立所需的资源控制组，此时 APT 命令还没有执行。
+v2 的 domain 控制器要求父组不直接包含进程；旧启动脚本直接把含有 daemon 进程的 Kubernetes 容器组作为父组，
+在暴露宿主 cgroup 命名空间的节点上可能触发此错误。参见 [内核约束](https://docs.kernel.org/admin-guide/cgroup-v2.html#no-internal-process-constraint)。
+
+`runtime/dind-start.sh` 按实际挂载的层级区分 v1/v2，避免把混合模式中的 `0::` 误判成 v2。
+v1 继续使用当前容器的 memory cgroup。v2 把该容器组内的 daemon 进程移入 `xran-daemon` 子组，
+启用可用控制器，使用同一组内的 `xran-builds` 承载嵌套构建，并明确使用 cgroupfs 驱动。
+两类子组仍继承原 DinD 容器的 CPU/内存限额，不把构建移到 Pod 之外；初始化失败时有界退出。
+
+已有 Controller 22 的环境只需更新此脚本并重新部署，无需重做 Controller、编译镜像或 xcn 基础镜像：
+
+```bash
+# 在内网项目根目录执行；先将新 runtime/dind-start.sh 覆盖到同名路径。
+sudo env "PATH=$PATH:$PWD/.cache/tools" make deploy SITE=config/site.local.yaml OFFLINE=1
+```
+
+新脚本由 ConfigMap 挂载到新构建 Pod。部署完成后重新提交失败的构建。
+构建 Pod 存活时可以检查（POD 替换为本次 Pod 名）：
+
+```bash
+sudo kubectl -n jenkins logs POD -c dind --tail=100
+sudo kubectl -n jenkins exec POD -c dind -- \
+  docker -H unix:///var/run/xran/docker.sock info \
+  --format 'CgroupVersion={{.CgroupVersion}} CgroupDriver={{.CgroupDriver}}'
+```
+
+v2 日志中的父路径应以 `/xran-builds` 结束，Docker 应报告 `2` 和 `cgroupfs`。
+若提示 `controller is not delegated`，需检查节点是否给该容器层级开放了 cpu/memory 控制器。
+当前准备机仅有 v1：已执行带 CPU/内存限额的真实嵌套 run/build 回归，v2 的宿主/私有命名空间有脚本测试，
+v2 内核及真实内网业务构建仍需在目标节点复测。

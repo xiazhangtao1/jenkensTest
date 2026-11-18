@@ -2,6 +2,10 @@
 
 当前项目目录是构建工作区，`.cache` 中既有依赖也有构建时使用的镜像归档。日常搬运统一使用 `dist/transfer/`，无需反复复制整个项目或 `.cache`。
 
+已完成 Controller 22 升级的环境，本次 cgroup v2 DinD 修复只需覆盖 `runtime/dind-start.sh`（或新的 `02-code`），
+然后 `make deploy SITE=config/site.local.yaml OFFLINE=1`。不重传依赖或重做任何镜像；对新构建 Pod 生效。
+原因、复测命令及验证范围见 [cgroup v2 DinD](xcn.md#cgroup-v2-节点上的-dind)。
+
 本次显示名、下载/历史交互和服务产物匹配更新只需新的 `02-code`；重建 Controller 22 并部署，已有编译镜像和完整依赖继续复用。
 构建脚本改为 ConfigMap 下发，每次构建使用校验后固定的副本；以后改匹配逻辑无需重做编译镜像。见 [升级 Jenkins](formal-build-upgrade.md#升级-jenkins)。
 
